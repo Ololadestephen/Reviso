@@ -1,0 +1,49 @@
+# Reviso delivery plan
+
+## Current objective
+
+First feasible vertical slice: NVIDIA thesis → confirmed assumptions → cited assessment and controlled numerical stresses → stored version → timestamp-gated evidence → retain/revise/retire decision.
+
+The deployed NVIDIA slice remains the current production prototype. The [newcomer experience and stock expansion plan](docs/NEWCOMER-EXPERIENCE-PLAN.md) is now implemented and verified locally: a guided five-step journey, three explicitly verified stocks, evidence recovery, cited follow-up questions, and saved-thesis export. It has not been deployed. Its authorized live-Qwen batch is complete and exposes operational risk in the suggestion path that must be handled before deployment.
+
+## Milestones
+
+- [x] Inspect empty workspace and installed quality tool.
+- [x] Inspect toolkit; reject unsupported NVDAONUSDT and verify RNVDAUSDT catalog and product identity.
+- [x] Verify S2 handbook and submission requirements; exact cutoff time remains unconfirmed.
+- [x] Implement typed input contracts, SQLite migrations/repository and Decimal engine with independent tests.
+- [x] Implement bounded historical evidence lifecycle, atomic revisions and replay selection without future citations.
+- [x] Implement Vite/React workspace and browser verification of the local research flow.
+- [x] Verify public Bitget market adapter, preserving unavailable responses.
+- [x] Run numerical/calibration checks and separate backend/frontend mechanical quality scans.
+- [ ] Complete independent Desloppify review/triage (runner usage-limit failure; no fabricated scores).
+- [ ] Confirm the organizer's exact September 21 UTC+8 cutoff time.
+- [x] Wire provider-neutral LLM contracts to sponsored Bitget Qwen 3.8 Max first and Qwen 3.8 27B on Groq as fallback, with schema-constrained local validation, citation bounds, provenance, idempotence and manual fallback.
+- [x] Configure the received Bitget Qwen key locally and verify one approved live extraction call.
+- [x] Run the first frozen live narrative calibration and plain-prompt baseline; record failures without fixes.
+- [x] Implement offline Qwen response-contract repairs and regression fixtures from batch 01.
+- [x] Run a newly frozen five-case validation holdout against prompt versions v2 under a 10-request cap (5 used).
+- [x] Connect public NVIDIA earnings discovery/retrieval, reported-metric parsing, provenance and saved assessment lifecycle.
+- [x] Prepare and run a frozen 21-case calibration corpus and plain-prompt baseline under a 42-request cap (25 used).
+- [x] Rehearse the documented locked install in a clean temporary copy and pass the full backend/frontend verification suite.
+- [x] Prepare a production-shaped local container with runtime secrets, loopback binding, non-root execution, read-only root filesystem and opt-in private-demo guards; do not publish it.
+- [x] Complete the current browser journey with live Qwen, public NVIDIA evidence, public Bitget market data, immutable revision/decision history, deep-link reload and multi-thesis library persistence.
+- [x] Select AWS Lightsail and prepare the single-instance HTTPS/SQLite deployment package locally.
+- [x] Reauthenticate AWS CLI with the non-root `reviso-deployer` identity and provision the Lightsail instance, restricted firewall and attached static IP.
+- [x] Run the deployed HTTPS/API persistence and live-provider smoke test through a temporary authenticated hostname.
+- [x] Complete `revisoagent.xyz` registry delegation, switch the runtime allowlists/Caddy hostname and verify final-domain HTTPS plus persisted state.
+- [x] Implement the blank-start five-step newcomer journey with a separate labeled NVIDIA example and manual AI-unavailable path.
+- [x] Add issuer-bound NVIDIA, Apple and Microsoft research coverage with per-stock market identity/cache isolation and NVIDIA-only historical replay.
+- [x] Add explicit unavailable/partial/stale recovery, last-saved-evidence context, cited follow-up questions and version-bounded Markdown/JSON export.
+- [x] Pass the offline contract, failure, persistence, citation and export suites plus a disposable local Apple browser walkthrough using public sources and no Qwen credit.
+- [x] Run the newly frozen multi-stock live-Qwen validation batch under its 10-request cap (6 used); preserve two cited-question passes and three suggestion errors without rerun.
+- [x] Build the public landing page, read-only NVIDIA walkthrough, guide/privacy/terms pages and a lighter app shell locally; keep saved research and every API action behind the demo gate.
+- [ ] Review and deploy the newcomer release after explicit production approval.
+- [ ] Run the final deployed browser walkthrough and enable snapshots after explicit approval of snapshot storage charges.
+- [ ] Publish only after user approval; record walkthrough and prepare final submission.
+
+No release-complete claim until the connected lifecycle, real AI integration, evaluation and deployment gates pass.
+
+## Latest verification — September 12, 2026
+
+95 Python tests, 34 frontend tests, formatting/static checks, TypeScript and the production frontend build pass for the local newcomer release. A fresh locked install and disposable legacy-database migration/backup rehearsal pass. The final production-built browser journey completed blank start → Apple → manual assumptions → confirmation → public SEC/Bitget refresh → retained decision → deep-link reload and immutable exports, with keyboard focus and 390px/768px checks. A later local design pass added public information pages and a read-only example that make no API request, plus a protected `/app` boundary and a dark indigo-to-violet Reviso visual system with local vector brand and company marks. The landing page now cycles focus across the three companies, uses project-specific Reviso screen images for writing and evidence review, presents the saved research record as a richer connected workspace, and closes with one simple light-panel CTA. It used no Qwen request and did not touch production. The frozen newcomer live-Qwen batch used 6/10 requests: Apple and Microsoft suggestions timed out, NVIDIA failed the exact condition contract after one repair, and both cited-question integrations passed after correcting one raw harness false negative offline. The AWS-hosted private demo still runs the earlier NVIDIA build. See docs/EVALUATION.md and the dated reports under docs/evaluations.

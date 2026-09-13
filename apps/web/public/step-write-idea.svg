@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" role="img" aria-labelledby="title desc">
+  <title id="title">Reviso idea writing screen</title>
+  <desc id="desc">A Reviso screen for writing an NVIDIA research idea and setting what could change it.</desc>
+  <rect width="640" height="420" rx="24" fill="#F8F9FC"/>
+  <rect width="92" height="420" rx="24" fill="#0B1030"/>
+  <rect x="22" y="25" width="48" height="48" rx="14" fill="#5B5CF6"/>
+  <path d="M31 56 39 39h8l-8 17h-8Zm13 0 8-17h8l-8 17h-8Z" fill="#fff"/>
+  <rect x="25" y="112" width="42" height="42" rx="11" fill="#242B62"/>
+  <path d="M36 126h20M36 133h20M36 140h13" stroke="#AEB7FF" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="46" cy="381" r="13" fill="#252B51"/>
+  <path d="M46 374v14M39 381h14" stroke="#9198C0" stroke-width="2"/>
+  <rect x="92" width="548" height="66" fill="#fff"/>
+  <path d="M92 66h548" stroke="#E3E6ED"/>
+  <text x="124" y="41" fill="#202333" font-family="Arial, sans-serif" font-size="17" font-weight="700">New research idea</text>
+  <rect x="510" y="20" width="98" height="28" rx="14" fill="#EEF0FF"/>
+  <text x="529" y="38" fill="#4F52CF" font-family="Arial, sans-serif" font-size="11" font-weight="700">STEP 2 OF 5</text>
+  <text x="126" y="105" fill="#656B79" font-family="Arial, sans-serif" font-size="11" font-weight="700" letter-spacing="1.2">EXPLAIN YOUR IDEA</text>
+  <text x="126" y="142" fill="#171923" font-family="Arial, sans-serif" font-size="25" font-weight="700">Why are you interested?</text>
+  <rect x="124" y="166" width="466" height="105" rx="12" fill="#fff" stroke="#CED3DE" stroke-width="2"/>
+  <text x="147" y="201" fill="#252A38" font-family="Arial, sans-serif" font-size="15">NVIDIA data-centre demand can stay strong</text>
+  <text x="147" y="225" fill="#252A38" font-family="Arial, sans-serif" font-size="15">as customers keep investing in AI infrastructure.</text>
+  <text x="147" y="252" fill="#8A909E" font-family="Arial, sans-serif" font-size="11">Your words stay editable until you confirm them.</text>
+  <rect x="124" y="291" width="466" height="61" rx="11" fill="#FFF8E8" stroke="#E9D8AE"/>
+  <circle cx="151" cy="321" r="14" fill="#F7E7B8"/>
+  <path d="m146 321 4 4 7-9" fill="none" stroke="#9A6C12" stroke-width="2"/>
+  <text x="176" y="316" fill="#6F521D" font-family="Arial, sans-serif" font-size="12" font-weight="700">What would change your mind?</text>
+  <text x="176" y="336" fill="#88704A" font-family="Arial, sans-serif" font-size="11">Add clear conditions yourself or ask Qwen for suggestions.</text>
+  <rect x="452" y="370" width="138" height="34" rx="17" fill="#5B5CF6"/>
+  <text x="478" y="392" fill="#fff" font-family="Arial, sans-serif" font-size="12" font-weight="700">Review conditions</text>
+</svg>

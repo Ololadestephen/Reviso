@@ -1,0 +1,77 @@
+[
+  {
+    "request_number": 24,
+    "request": {
+      "model": "qwen3.8-max",
+      "instructions": "Review these investment assumptions using the supplied passages. Return the requested JSON schema.",
+      "input": "{\"task\": \"For each assumption, say whether the supplied evidence supports it, contradicts it, is insufficient, or is irrelevant. Give evidence IDs and a brief explanation.\", \"confirmed_assumptions\": [{\"id\": \"margin\", \"claim\": \"Reported GAAP gross margin remains at least 75%.\", \"category\": \"fundamental\", \"essential\": true, \"metric\": \"gaap_margin_pct\", \"minimum\": \"75\", \"invalidation_condition\": \"Invalidate when reported GAAP gross margin is below 75%.\"}, {\"id\": \"growth\", \"claim\": \"Reported revenue growth remains at least 80% year-over-year.\", \"category\": \"fundamental\", \"essential\": true, \"metric\": \"revenue_growth_yoy_pct\", \"minimum\": \"80\", \"invalidation_condition\": \"Invalidate when reported year-over-year revenue growth is below 80%.\"}], \"allowlisted_evidence\": [{\"id\": \"fixture-irrelevant\", \"publisher\": \"Reviso evaluation fixture\", \"title\": \"Synthetic evaluation passage \\u2014 not an actual NVIDIA disclosure\", \"excerpt\": \"The company opened an employee art exhibition. No financial results are discussed.\", \"published_at\": \"2024-08-28T00:00:00+00:00\", \"scope\": \"Synthetic test of reported-quarter metric claims\", \"limitations\": \"Invented passage for evaluation only. No real observation is asserted.\"}]}",
+      "max_output_tokens": 2500,
+      "text": {
+        "format": {
+          "type": "json_schema",
+          "name": "evidence_review_v1",
+          "strict": false,
+          "schema": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "summary",
+              "next_question",
+              "items"
+            ],
+            "properties": {
+              "summary": {
+                "type": "string"
+              },
+              "next_question": {
+                "type": "string"
+              },
+              "items": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 12,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "assumption_id",
+                    "stance",
+                    "explanation",
+                    "evidence_ids"
+                  ],
+                  "properties": {
+                    "assumption_id": {
+                      "type": "string"
+                    },
+                    "stance": {
+                      "type": "string",
+                      "enum": [
+                        "SUPPORTS",
+                        "CONTRADICTS",
+                        "INSUFFICIENT_EVIDENCE",
+                        "IRRELEVANT"
+                      ]
+                    },
+                    "explanation": {
+                      "type": "string"
+                    },
+                    "evidence_ids": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "started_at": "2026-09-11T13:18:05.486992+00:00",
+    "error_type": "LLMUnavailableError",
+    "cause_type": "ReadTimeout",
+    "seconds": 90.688
+  }
+]

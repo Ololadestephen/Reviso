@@ -1,0 +1,13 @@
+{
+  "corpus_sha256": "b1a06c1778eb08e5e5a56f1a7dcb7ee054e7a8b93b5f5ac25a8f475d82f1a6f7",
+  "case_count": 5,
+  "source_sha256": {
+    "backend/llm.py": "96bbd97e828461631a5cb00867b2063f356bca7dc8dc9e29985d0ec8134881d7",
+    "backend/contracts.py": "4f1cb06d53a5c2987d339a0afea8ac88a1452856698005515d773ad869fd5329",
+    "backend/routes.py": "efd094245af867722b0ca690f7416da517f66161dd1df3122568030968036ad2",
+    "backend/replay.py": "425f729aa24387d2d2af9c562d38aa9cd485a302945a2a173087a22c2b9c47bb",
+    "tests/evaluation_batch.py": "adc5a0b66906e3b1e2f02f41823cdf88ac625a2eb52cc3ad8eeb35c170a7b013"
+  },
+  "limits": "5 cases, at most two provider requests per case and 10 total. HTTP errors/timeouts are not retried. No rerun of a started directory.",
+  "limitations": "Post-fix, developer-constructed validation holdout, not an untouched independent benchmark. Synthetic passages are not NVIDIA facts. Historical gating cannot remove pretrained future knowledge. Results establish behavior only for these frozen cases and do not establish investment-research accuracy."
+}

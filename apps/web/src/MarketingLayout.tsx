@@ -1,0 +1,60 @@
+import { Link, NavLink, Outlet } from "react-router-dom";
+import { RevisoMark } from "./components/Brand";
+
+const navClass = ({ isActive }: { isActive: boolean }) =>
+  isActive ? "active" : "";
+
+export function RevisoLogo() {
+  return (
+    <span className="public-logo">
+      <RevisoMark />
+      <span>Reviso</span>
+    </span>
+  );
+}
+
+export default function MarketingLayout() {
+  return (
+    <div className="public-shell">
+      <div className="announcement">
+        Bitget AI Base Camp Season 2 project
+        <span aria-hidden="true"> · </span>
+        <Link to="/example">View the NVIDIA example →</Link>
+      </div>
+      <nav className="public-nav" aria-label="Main navigation">
+        <Link to="/" aria-label="Reviso home">
+          <RevisoLogo />
+        </Link>
+        <div className="public-nav-links">
+          <a href="/#how-it-works">How it works</a>
+          <a href="/#features">Features</a>
+          <NavLink to="/guide" className={navClass}>
+            Guide
+          </NavLink>
+        </div>
+        <a className="button-link public-app-link" href="/app">
+          Open app
+        </a>
+      </nav>
+      <main className="public-main">
+        <Outlet />
+      </main>
+      <footer className="public-footer">
+        <div>
+          <RevisoLogo />
+          <p>Research ideas with clear conditions and cited sources.</p>
+        </div>
+        <div className="public-footer-links">
+          <Link to="/example">NVIDIA example</Link>
+          <Link to="/guide">Guide</Link>
+          <Link to="/privacy">Privacy</Link>
+          <Link to="/terms">Terms</Link>
+        </div>
+        <p className="public-footer-note">
+          Reviso is a research tool. It cannot place trades or make decisions
+          for you.
+        </p>
+      </footer>
+    </div>
+  );
+}

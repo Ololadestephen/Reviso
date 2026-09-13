@@ -1,0 +1,12 @@
+{
+  "corpus_sha256": "88d0059d9dc7486420b71d902ce8a216ae0ce32b0c1e81fef8b8169581d79b4c",
+  "source_sha256": {
+    "backend/llm.py": "e15b6d83c1c10ef4723c1e519a9b33cdcc2777b9c5cc2dab7a79a3b0c61da755",
+    "backend/contracts.py": "4f1cb06d53a5c2987d339a0afea8ac88a1452856698005515d773ad869fd5329",
+    "backend/routes.py": "efd094245af867722b0ca690f7416da517f66161dd1df3122568030968036ad2",
+    "backend/replay.py": "425f729aa24387d2d2af9c562d38aa9cd485a302945a2a173087a22c2b9c47bb",
+    "tests/evaluation_batch.py": "ba809d904a1b7ebbb732ede795090786732bd5d2b654e94a3f5d30be1fbc976b"
+  },
+  "limits": "21 cases, at most two provider requests per case and 42 total. HTTP errors/timeouts are not retried. No rerun of a started directory.",
+  "limitations": "Developer-inspected calibration, not a holdout. Synthetic edge cases are not NVIDIA facts. Baseline uses identical model/schema/inputs and a simpler prompt, so isolates prompt differences only. Historical gating cannot remove pretrained future knowledge. Absent/rationale-only extraction inputs still inherit app defaults; this suite records that limitation."
+}

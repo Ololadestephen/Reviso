@@ -1,0 +1,15 @@
+{
+  "corpus_sha256": "5a7b2ab1651771287137839615fda8c13fdbfd7738e8766d23bf77d817628743",
+  "case_count": 5,
+  "request_cap": 10,
+  "source_sha256": {
+    "backend/contracts.py": "84ae3d7cdec44c953e7b3d95781c0dd6c2c4b7eb3411a0880d73d319554cc3ca",
+    "backend/instruments.py": "b0b281b521817455ebcb7cfc9ea484e6f0b5589a4201fc486a24d886c087cee1",
+    "backend/llm.py": "464acbc62552e377ec06622954e8d6a5bcfbaeb45cd2f490546adb4501c59ff5",
+    "backend/routes.py": "44ae028bca22256e82b2ac6911d3c88e56f1a4d7d92570de0b116cc981a93539",
+    "backend/services.py": "e47f9c5526448da0f86ef820a32beb042895b06b6fef1a8744752d3e3816fcaf",
+    "backend/storage.py": "ff227c5be26b4e5918c9f93bfc8a6d97db65de655592106147aec4ade39221a3",
+    "scripts/newcomer_live_validation.py": "ae3d9518a9845abfad8074508b950875202100ab5b660db748f9a89cac614d34"
+  },
+  "frozen_at": "2026-09-12T18:59:39.213900+00:00"
+}

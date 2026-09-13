@@ -1,0 +1,93 @@
+[
+  {
+    "instrument_id": "RNVDAUSDT",
+    "provider_symbol": "RNVDAUSDT",
+    "market_availability": "AVAILABLE",
+    "market_identity_verified": true,
+    "market_observed_at": "2026-09-12T18:59:51.431000+00:00",
+    "market_retrieved_at": "2026-09-12T18:59:52.596657+00:00",
+    "evidence_availability": "AVAILABLE",
+    "evidence_source": "https://nvidianews.nvidia.com/news?q=financial%20results",
+    "evidence_count": 1,
+    "evidence": [
+      {
+        "id": "nvda-public-acc61d7488198c00a3767dc764e5c3e6703ca2ebacdae3f57db04608472e285c",
+        "instrument_id": "RNVDAUSDT",
+        "publisher": "NVIDIA Newsroom",
+        "published_at": "2026-08-26T00:00:00+00:00",
+        "available_at": "2026-08-27T00:00:00+00:00",
+        "retrieved_at": "2026-09-12T18:59:54.159333+00:00",
+        "metrics": [
+          "gaap_margin_pct",
+          "revenue_growth_yoy_pct"
+        ],
+        "source_url": "https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-second-quarter-fiscal-2027"
+      }
+    ],
+    "warnings": [
+      "Public SDK observation; verify symbol and source timestamp. No share-reference conversion."
+    ],
+    "status": "PASS"
+  },
+  {
+    "instrument_id": "RAAPLUSDT",
+    "provider_symbol": "RAAPLUSDT",
+    "market_availability": "AVAILABLE",
+    "market_identity_verified": true,
+    "market_observed_at": "2026-09-12T18:59:54.136000+00:00",
+    "market_retrieved_at": "2026-09-12T18:59:55.320041+00:00",
+    "evidence_availability": "AVAILABLE",
+    "evidence_source": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000320193.json",
+    "evidence_count": 1,
+    "evidence": [
+      {
+        "id": "sec-aapl-ec09e8143289e33782448b6e37f5f5b523608970ea7915910a3727b19ce3e40b",
+        "instrument_id": "RAAPLUSDT",
+        "publisher": "U.S. Securities and Exchange Commission",
+        "published_at": "2026-07-31T00:00:00+00:00",
+        "available_at": "2026-08-01T00:00:00+00:00",
+        "retrieved_at": "2026-09-12T18:59:55.320755+00:00",
+        "metrics": [
+          "gaap_margin_pct",
+          "revenue_growth_yoy_pct"
+        ],
+        "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000320193.json"
+      }
+    ],
+    "warnings": [
+      "Public SDK observation; verify symbol and source timestamp. No share-reference conversion."
+    ],
+    "status": "PASS"
+  },
+  {
+    "instrument_id": "RMSFTUSDT",
+    "provider_symbol": "RMSFTUSDT",
+    "market_availability": "AVAILABLE",
+    "market_identity_verified": true,
+    "market_observed_at": "2026-09-12T18:59:58.643000+00:00",
+    "market_retrieved_at": "2026-09-12T19:00:00.217920+00:00",
+    "evidence_availability": "STALE",
+    "evidence_source": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000789019.json",
+    "evidence_count": 1,
+    "evidence": [
+      {
+        "id": "sec-msft-4077b40c915d7ac57e5656000812ac50dfd29ca2884d76530051bc22fc1faeed",
+        "instrument_id": "RMSFTUSDT",
+        "publisher": "U.S. Securities and Exchange Commission",
+        "published_at": "2026-04-29T00:00:00+00:00",
+        "available_at": "2026-04-30T00:00:00+00:00",
+        "retrieved_at": "2026-09-12T19:00:00.218393+00:00",
+        "metrics": [
+          "gaap_margin_pct",
+          "revenue_growth_yoy_pct"
+        ],
+        "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000789019.json"
+      }
+    ],
+    "warnings": [
+      "Public SDK observation; verify symbol and source timestamp. No share-reference conversion.",
+      "Latest aligned quarterly filing is older than the 120-day evidence window."
+    ],
+    "status": "PASS"
+  }
+]

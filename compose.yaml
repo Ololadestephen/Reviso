@@ -1,0 +1,28 @@
+services:
+  reviso:
+    build:
+      context: .
+    ports:
+      - "127.0.0.1:8080:8000"
+    environment:
+      BITGET_QWEN_API_KEY: "${BITGET_QWEN_API_KEY:-}"
+      GROQ_API_KEY: "${GROQ_API_KEY:-}"
+      REVISO_LLM_MODEL: "${REVISO_LLM_MODEL:-qwen/qwen3.8-27b}"
+      REVISO_DB_PATH: /app/data/reviso.sqlite3
+      REVISO_SERVE_WEB: "1"
+      REVISO_WEB_DIST: /app/apps/web/dist
+      REVISO_PUBLIC_DEMO: "${REVISO_PUBLIC_DEMO:-0}"
+      REVISO_ALLOWED_HOSTS: "${REVISO_ALLOWED_HOSTS:-localhost,127.0.0.1}"
+      REVISO_ALLOWED_ORIGINS: "${REVISO_ALLOWED_ORIGINS:-http://localhost:8080,http://127.0.0.1:8080}"
+      REVISO_DEMO_USERNAME: "${REVISO_DEMO_USERNAME:-}"
+      REVISO_DEMO_PASSWORD: "${REVISO_DEMO_PASSWORD:-}"
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - reviso-data:/app/data
+
+volumes:
+  reviso-data:

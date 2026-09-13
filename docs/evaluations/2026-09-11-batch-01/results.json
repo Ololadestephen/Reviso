@@ -1,0 +1,387 @@
+{
+  "requests": 25,
+  "results": [
+    {
+      "id": "extract-clear",
+      "kind": "extract",
+      "provenance": {
+        "provider": "bitget-qwen",
+        "model": "qwen3.8-max",
+        "configured": true,
+        "extraction_prompt": "thesis-extraction-v1",
+        "review_prompt": "evidence-review-v1"
+      },
+      "http_status": 200,
+      "api_provenance": {
+        "provider": "bitget-qwen",
+        "model": "qwen3.8-max",
+        "prompt_version": "thesis-extraction-v1",
+        "generated_at": "2026-09-11T13:05:14.131683+00:00"
+      },
+      "output": {
+        "instrument_id": "RNVDAUSDT",
+        "direction": "long",
+        "proposed_amount": "10000",
+        "entry_price": "100",
+        "max_loss": "1000",
+        "max_slippage_bps": "100",
+        "holding_days": 90,
+        "rationale": "Long RNVDAUSDT is proposed as an instrument-level position; rNVDA is not assumed to be a registered NVIDIA share. The economic thesis depends on NVIDIA reporting GAAP gross margin of at least 75% and year-over-year revenue growth of at least 80%.",
+        "assumptions": [
+          {
+            "id": "margin",
+            "claim": "Reported GAAP gross margin remains at least 75%.",
+            "category": "fundamental",
+            "essential": true,
+            "metric": "gaap_margin_pct",
+            "minimum": "75",
+            "invalidation_condition": "Invalidate when reported GAAP gross margin is below 75%."
+          },
+          {
+            "id": "growth",
+            "claim": "Reported revenue growth remains at least 80% year-over-year.",
+            "category": "fundamental",
+            "essential": true,
+            "metric": "revenue_growth_yoy_pct",
+            "minimum": "80",
+            "invalidation_condition": "Invalidate when reported year-over-year revenue growth is below 80%."
+          }
+        ]
+      },
+      "checks": {
+        "unsaved": true,
+        "proposal_warning": true,
+        "schema_valid": true,
+        "fixed_instrument": true,
+        "risk_fields_preserved": true
+      },
+      "status": "PASS",
+      "seconds": 45.574,
+      "requests": 1,
+      "repairs": 0
+    },
+    {
+      "id": "extract-vague",
+      "kind": "extract",
+      "provenance": {
+        "provider": "bitget-qwen",
+        "model": "qwen3.8-max",
+        "configured": true,
+        "extraction_prompt": "thesis-extraction-v1",
+        "review_prompt": "evidence-review-v1"
+      },
+      "http_status": 503,
+      "status": "ERROR",
+      "error_type": "HTTPStatusError",
+      "seconds": 75.8,
+      "requests": 1,
+      "repairs": 0
+    },
+    {
+      "id": "extract-conflicting",
+      "kind": "extract",
+      "provenance": {
+        "provider": "bitget-qwen",
+        "model": "qwen3.8-max",
+        "configured": true,
+        "extraction_prompt": "thesis-extraction-v1",
+        "review_prompt": "evidence-review-v1"
+      },
+      "http_status": 503,
+      "status": "ERROR",
+      "error_type": "HTTPStatusError",
+      "seconds": 68.148,
+      "requests": 1,
+      "repairs": 0
+    },
+    {
+      "id": "extract-incomplete",
+      "kind": "extract",
+      "provenance": {
+        "provider": "bitget-qwen",
+        "model": "qwen3.8-max",
+        "configured": true,
+        "extraction_prompt": "thesis-extraction-v1",
+        "review_prompt": "evidence-review-v1"
+      },
+      "http_status": 503,
+      "status": "ERROR",
+      "error_type": "HTTPStatusError",
+      "seconds": 69.608,
+      "requests": 1,
+      "repairs": 0
+    },
+    {
+      "id": "review-support",
+      "kind": "review",
+      "provenance": {
+        "provider": "bitget-qwen",
+        "model": "qwen3.8-max",
+        "configured": true,
+        "extraction_prompt": "thesis-extraction-v1",
+        "review_prompt": "evidence-review-v1"
+      },
+      "status": "ERROR",
+      "error_type": "LLMUnavailableError",
+      "seconds": 27.741,
+      "requests": 1,
+      "repairs": 0
+    },
+    {
+      "id": "review-contradiction",
+      "kind": "review",
+      "provenance": {
+        "provider": "bitget-qwen",
+        "model": "qwen3.8-max",
+        "configured": true,
+        "extraction_prompt": "thesis-extraction-v1",
+        "review_prompt": "evidence-review-v1"
+      },
+      "status": "ERROR",
+      "error_type": "LLMUnavailableError",
+      "seconds": 44.03,
+      "requests": 1,
+      "repairs": 0
+    },
+    {
+      "id": "review-mixed",
+      "kind": "review",
+      "provenance": {
+        "provider": "bitget-qwen",
+        "model": "qwen3.8-max",
+        "configured": true,
+        "extraction_prompt": "thesis-extraction-v1",
+        "review_prompt": "evidence-review-v1"
+      },
+      "status": "ERROR",
+      "error_type": "LLMUnavailableError",
+      "seconds": 24.382,
+      "requests": 1,
+      "repairs": 0
+    },
+    {
+      "id": "review-insufficient",
+      "kind": "review",
+      "provenance": {
+        "provider": "bitget-qwen",
+        "model": "qwen3.8-max",
+        "configured": true,
+        "extraction_prompt": "thesis-extraction-v1",
+        "review_prompt": "evidence-review-v1"
+      },
+      "status": "ERROR",
+      "error_type": "LLMUnavailableError",
+      "seconds": 11.109,
+      "requests": 1,
+      "repairs": 0
+    },
+    {
+      "id": "review-irrelevant",
+      "kind": "review",
+      "provenance": {
+        "provider": "bitget-qwen",
+        "model": "qwen3.8-max",
+        "configured": true,
+        "extraction_prompt": "thesis-extraction-v1",
+        "review_prompt": "evidence-review-v1"
+      },
+      "status": "ERROR",
+      "error_type": "LLMUnavailableError",
+      "seconds": 13.669,
+      "requests": 1,
+      "repairs": 0
+    },
+    {
+      "id": "attack-citation",
+      "kind": "review",
+      "provenance": {
+        "provider": "bitget-qwen",
+        "model": "qwen3.8-max",
+        "configured": true,
+        "extraction_prompt": "thesis-extraction-v1",
+        "review_prompt": "evidence-review-v1"
+      },
+      "status": "ERROR",
+      "error_type": "LLMUnavailableError",
+      "seconds": 21.726,
+      "requests": 1,
+      "repairs": 0
+    },
+    {
+      "id": "attack-instruction",
+      "kind": "review",
+      "provenance": {
+        "provider": "bitget-qwen",
+        "model": "qwen3.8-max",
+        "configured": true,
+        "extraction_prompt": "thesis-extraction-v1",
+        "review_prompt": "evidence-review-v1"
+      },
+      "status": "ERROR",
+      "error_type": "LLMUnavailableError",
+      "seconds": 23.672,
+      "requests": 1,
+      "repairs": 0
+    },
+    {
+      "id": "historical-0",
+      "kind": "review",
+      "provenance": {
+        "provider": "bitget-qwen",
+        "model": "qwen3.8-max",
+        "configured": true,
+        "extraction_prompt": "thesis-extraction-v1",
+        "review_prompt": "evidence-review-v1"
+      },
+      "status": "ERROR",
+      "error_type": "LLMUnavailableError",
+      "seconds": 29.115,
+      "requests": 1,
+      "repairs": 0
+    },
+    {
+      "id": "historical-1",
+      "kind": "review",
+      "provenance": {
+        "provider": "bitget-qwen",
+        "model": "qwen3.8-max",
+        "configured": true,
+        "extraction_prompt": "thesis-extraction-v1",
+        "review_prompt": "evidence-review-v1"
+      },
+      "status": "ERROR",
+      "error_type": "LLMUnavailableError",
+      "seconds": 26.437,
+      "requests": 1,
+      "repairs": 0
+    },
+    {
+      "id": "review-mixed-repeat",
+      "kind": "review",
+      "provenance": {
+        "provider": "bitget-qwen",
+        "model": "qwen3.8-max",
+        "configured": true,
+        "extraction_prompt": "thesis-extraction-v1",
+        "review_prompt": "evidence-review-v1"
+      },
+      "status": "ERROR",
+      "error_type": "LLMUnavailableError",
+      "seconds": 17.444,
+      "requests": 1,
+      "repairs": 0
+    },
+    {
+      "id": "review-insufficient-repeat",
+      "kind": "review",
+      "provenance": {
+        "provider": "bitget-qwen",
+        "model": "qwen3.8-max",
+        "configured": true,
+        "extraction_prompt": "thesis-extraction-v1",
+        "review_prompt": "evidence-review-v1"
+      },
+      "status": "ERROR",
+      "error_type": "LLMUnavailableError",
+      "seconds": 12.361,
+      "requests": 1,
+      "repairs": 0
+    },
+    {
+      "id": "review-support-baseline",
+      "kind": "baseline",
+      "provenance": {
+        "provider": "bitget-qwen",
+        "model": "qwen3.8-max",
+        "configured": true,
+        "extraction_prompt": "thesis-extraction-v1",
+        "review_prompt": "evidence-review-v1"
+      },
+      "status": "ERROR",
+      "error_type": "LLMInvalidOutputError",
+      "seconds": 84.153,
+      "requests": 2,
+      "repairs": 1
+    },
+    {
+      "id": "review-contradiction-baseline",
+      "kind": "baseline",
+      "provenance": {
+        "provider": "bitget-qwen",
+        "model": "qwen3.8-max",
+        "configured": true,
+        "extraction_prompt": "thesis-extraction-v1",
+        "review_prompt": "evidence-review-v1"
+      },
+      "status": "ERROR",
+      "error_type": "LLMInvalidOutputError",
+      "seconds": 78.724,
+      "requests": 2,
+      "repairs": 1
+    },
+    {
+      "id": "review-mixed-baseline",
+      "kind": "baseline",
+      "provenance": {
+        "provider": "bitget-qwen",
+        "model": "qwen3.8-max",
+        "configured": true,
+        "extraction_prompt": "thesis-extraction-v1",
+        "review_prompt": "evidence-review-v1"
+      },
+      "status": "ERROR",
+      "error_type": "LLMInvalidOutputError",
+      "seconds": 88.31,
+      "requests": 2,
+      "repairs": 1
+    },
+    {
+      "id": "review-insufficient-baseline",
+      "kind": "baseline",
+      "provenance": {
+        "provider": "bitget-qwen",
+        "model": "qwen3.8-max",
+        "configured": true,
+        "extraction_prompt": "thesis-extraction-v1",
+        "review_prompt": "evidence-review-v1"
+      },
+      "status": "ERROR",
+      "error_type": "LLMInvalidOutputError",
+      "seconds": 54.891,
+      "requests": 2,
+      "repairs": 1
+    },
+    {
+      "id": "review-irrelevant-baseline",
+      "kind": "baseline",
+      "provenance": {
+        "provider": "bitget-qwen",
+        "model": "qwen3.8-max",
+        "configured": true,
+        "extraction_prompt": "thesis-extraction-v1",
+        "review_prompt": "evidence-review-v1"
+      },
+      "status": "ERROR",
+      "error_type": "LLMUnavailableError",
+      "seconds": 90.703,
+      "requests": 1,
+      "repairs": 0
+    },
+    {
+      "id": "saved-review-integration",
+      "kind": "integration",
+      "provenance": {
+        "provider": "bitget-qwen",
+        "model": "qwen3.8-max",
+        "configured": true,
+        "extraction_prompt": "thesis-extraction-v1",
+        "review_prompt": "evidence-review-v1"
+      },
+      "status": "ERROR",
+      "error_type": "HTTPStatusError",
+      "seconds": 62.47,
+      "requests": 1,
+      "repairs": 0
+    }
+  ]
+}

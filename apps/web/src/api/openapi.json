@@ -1,0 +1,2161 @@
+{
+  "components": {
+    "schemas": {
+      "Assumption-Input": {
+        "additionalProperties": false,
+        "properties": {
+          "category": {
+            "default": "fundamental",
+            "enum": [
+              "fundamental",
+              "valuation",
+              "instrument",
+              "execution"
+            ],
+            "title": "Category",
+            "type": "string"
+          },
+          "claim": {
+            "maxLength": 1000,
+            "minLength": 5,
+            "title": "Claim",
+            "type": "string"
+          },
+          "essential": {
+            "default": true,
+            "title": "Essential",
+            "type": "boolean"
+          },
+          "id": {
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          },
+          "invalidation_condition": {
+            "maxLength": 1000,
+            "minLength": 5,
+            "title": "Invalidation Condition",
+            "type": "string"
+          },
+          "metric": {
+            "enum": [
+              "gaap_margin_pct",
+              "revenue_growth_yoy_pct",
+              "manual"
+            ],
+            "title": "Metric",
+            "type": "string"
+          },
+          "minimum": {
+            "anyOf": [
+              {
+                "maximum": 1000.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              }
+            ],
+            "title": "Minimum"
+          }
+        },
+        "required": [
+          "id",
+          "claim",
+          "metric",
+          "minimum",
+          "invalidation_condition"
+        ],
+        "title": "Assumption",
+        "type": "object"
+      },
+      "Assumption-Output": {
+        "additionalProperties": false,
+        "properties": {
+          "category": {
+            "default": "fundamental",
+            "enum": [
+              "fundamental",
+              "valuation",
+              "instrument",
+              "execution"
+            ],
+            "title": "Category",
+            "type": "string"
+          },
+          "claim": {
+            "maxLength": 1000,
+            "minLength": 5,
+            "title": "Claim",
+            "type": "string"
+          },
+          "essential": {
+            "default": true,
+            "title": "Essential",
+            "type": "boolean"
+          },
+          "id": {
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          },
+          "invalidation_condition": {
+            "maxLength": 1000,
+            "minLength": 5,
+            "title": "Invalidation Condition",
+            "type": "string"
+          },
+          "metric": {
+            "enum": [
+              "gaap_margin_pct",
+              "revenue_growth_yoy_pct",
+              "manual"
+            ],
+            "title": "Metric",
+            "type": "string"
+          },
+          "minimum": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Minimum",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "claim",
+          "metric",
+          "minimum",
+          "invalidation_condition"
+        ],
+        "title": "Assumption",
+        "type": "object"
+      },
+      "BookLevel": {
+        "additionalProperties": false,
+        "properties": {
+          "price": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,14}|(?=[\\d.]{1,25}0*$)\\d{0,14}\\.\\d{0,10}0*$)",
+                "type": "string"
+              }
+            ],
+            "title": "Price"
+          },
+          "quantity": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,14}|(?=[\\d.]{1,25}0*$)\\d{0,14}\\.\\d{0,10}0*$)",
+                "type": "string"
+              }
+            ],
+            "title": "Quantity"
+          }
+        },
+        "required": [
+          "price",
+          "quantity"
+        ],
+        "title": "BookLevel",
+        "type": "object"
+      },
+      "Confirmation": {
+        "additionalProperties": false,
+        "properties": {
+          "assumptions": {
+            "items": {
+              "$ref": "#/components/schemas/Assumption-Input"
+            },
+            "maxItems": 12,
+            "minItems": 1,
+            "title": "Assumptions",
+            "type": "array"
+          },
+          "direction": {
+            "const": "long",
+            "default": "long",
+            "title": "Direction",
+            "type": "string"
+          },
+          "entry_price": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,14}|(?=[\\d.]{1,25}0*$)\\d{0,14}\\.\\d{0,10}0*$)",
+                "type": "string"
+              }
+            ],
+            "default": "100",
+            "title": "Entry Price"
+          },
+          "expected_version": {
+            "minimum": 1.0,
+            "title": "Expected Version",
+            "type": "integer"
+          },
+          "holding_days": {
+            "default": 90,
+            "maximum": 3650.0,
+            "minimum": 1.0,
+            "title": "Holding Days",
+            "type": "integer"
+          },
+          "instrument_id": {
+            "default": "RNVDAUSDT",
+            "enum": [
+              "RNVDAUSDT",
+              "RAAPLUSDT",
+              "RMSFTUSDT"
+            ],
+            "title": "Instrument Id",
+            "type": "string"
+          },
+          "max_loss": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,14}|(?=[\\d.]{1,25}0*$)\\d{0,14}\\.\\d{0,10}0*$)",
+                "type": "string"
+              }
+            ],
+            "default": "1000",
+            "title": "Max Loss"
+          },
+          "max_slippage_bps": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,14}|(?=[\\d.]{1,25}0*$)\\d{0,14}\\.\\d{0,10}0*$)",
+                "type": "string"
+              }
+            ],
+            "default": "100",
+            "title": "Max Slippage Bps"
+          },
+          "proposed_amount": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,14}|(?=[\\d.]{1,25}0*$)\\d{0,14}\\.\\d{0,10}0*$)",
+                "type": "string"
+              }
+            ],
+            "default": "10000",
+            "title": "Proposed Amount"
+          },
+          "rationale": {
+            "maxLength": 8000,
+            "minLength": 10,
+            "title": "Rationale",
+            "type": "string"
+          }
+        },
+        "required": [
+          "rationale",
+          "assumptions",
+          "expected_version"
+        ],
+        "title": "Confirmation",
+        "type": "object"
+      },
+      "DecisionInput": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "enum": [
+              "retain",
+              "retire"
+            ],
+            "title": "Action",
+            "type": "string"
+          },
+          "expected_version": {
+            "minimum": 1.0,
+            "title": "Expected Version",
+            "type": "integer"
+          },
+          "explanation": {
+            "maxLength": 2000,
+            "minLength": 5,
+            "title": "Explanation",
+            "type": "string"
+          }
+        },
+        "required": [
+          "expected_version",
+          "action",
+          "explanation"
+        ],
+        "title": "DecisionInput",
+        "type": "object"
+      },
+      "Evidence": {
+        "additionalProperties": false,
+        "properties": {
+          "available_at": {
+            "format": "date-time",
+            "title": "Available At",
+            "type": "string"
+          },
+          "content_hash": {
+            "title": "Content Hash",
+            "type": "string"
+          },
+          "document_hash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Hash"
+          },
+          "duplicate_family": {
+            "title": "Duplicate Family",
+            "type": "string"
+          },
+          "excerpt": {
+            "title": "Excerpt",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "instrument_id": {
+            "anyOf": [
+              {
+                "enum": [
+                  "RNVDAUSDT",
+                  "RAAPLUSDT",
+                  "RMSFTUSDT"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Instrument Id"
+          },
+          "limitations": {
+            "title": "Limitations",
+            "type": "string"
+          },
+          "metrics": {
+            "additionalProperties": {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            "title": "Metrics",
+            "type": "object"
+          },
+          "observed_at": {
+            "format": "date-time",
+            "title": "Observed At",
+            "type": "string"
+          },
+          "origin": {
+            "default": "CURATED_REPLAY",
+            "enum": [
+              "CURATED_REPLAY",
+              "PUBLIC_RETRIEVAL"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "parser_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parser Version"
+          },
+          "published_at": {
+            "format": "date-time",
+            "title": "Published At",
+            "type": "string"
+          },
+          "publisher": {
+            "title": "Publisher",
+            "type": "string"
+          },
+          "retrieved_at": {
+            "format": "date-time",
+            "title": "Retrieved At",
+            "type": "string"
+          },
+          "scope": {
+            "title": "Scope",
+            "type": "string"
+          },
+          "source_url": {
+            "title": "Source Url",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "source_url",
+          "publisher",
+          "title",
+          "excerpt",
+          "published_at",
+          "available_at",
+          "observed_at",
+          "retrieved_at",
+          "content_hash",
+          "duplicate_family",
+          "scope",
+          "limitations",
+          "metrics"
+        ],
+        "title": "Evidence",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "Instrument": {
+        "additionalProperties": false,
+        "properties": {
+          "base_coin": {
+            "title": "Base Coin",
+            "type": "string"
+          },
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "evidence_source": {
+            "title": "Evidence Source",
+            "type": "string"
+          },
+          "historical_replay_available": {
+            "default": false,
+            "title": "Historical Replay Available",
+            "type": "boolean"
+          },
+          "id": {
+            "enum": [
+              "RNVDAUSDT",
+              "RAAPLUSDT",
+              "RMSFTUSDT"
+            ],
+            "title": "Id",
+            "type": "string"
+          },
+          "issuer_cik": {
+            "title": "Issuer Cik",
+            "type": "string"
+          },
+          "issuer_name": {
+            "title": "Issuer Name",
+            "type": "string"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "product_type": {
+            "title": "Product Type",
+            "type": "string"
+          },
+          "provider_symbol": {
+            "title": "Provider Symbol",
+            "type": "string"
+          },
+          "quote_currency": {
+            "title": "Quote Currency",
+            "type": "string"
+          },
+          "schedule": {
+            "title": "Schedule",
+            "type": "string"
+          },
+          "supported_metrics": {
+            "items": {
+              "enum": [
+                "gaap_margin_pct",
+                "revenue_growth_yoy_pct",
+                "manual"
+              ],
+              "type": "string"
+            },
+            "title": "Supported Metrics",
+            "type": "array"
+          },
+          "terms_source": {
+            "title": "Terms Source",
+            "type": "string"
+          },
+          "ticker": {
+            "title": "Ticker",
+            "type": "string"
+          },
+          "underlying": {
+            "title": "Underlying",
+            "type": "string"
+          },
+          "venue": {
+            "title": "Venue",
+            "type": "string"
+          },
+          "verified_at": {
+            "format": "date-time",
+            "title": "Verified At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "display_name",
+          "ticker",
+          "base_coin",
+          "provider_symbol",
+          "underlying",
+          "issuer_name",
+          "issuer_cik",
+          "product_type",
+          "quote_currency",
+          "venue",
+          "terms_source",
+          "verified_at",
+          "schedule",
+          "evidence_source",
+          "supported_metrics",
+          "limitations"
+        ],
+        "title": "Instrument",
+        "type": "object"
+      },
+      "LLMProvenance": {
+        "additionalProperties": false,
+        "properties": {
+          "generated_at": {
+            "format": "date-time",
+            "title": "Generated At",
+            "type": "string"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "prompt_version": {
+            "title": "Prompt Version",
+            "type": "string"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          }
+        },
+        "required": [
+          "provider",
+          "model",
+          "prompt_version",
+          "generated_at"
+        ],
+        "title": "LLMProvenance",
+        "type": "object"
+      },
+      "ReplayInput": {
+        "additionalProperties": false,
+        "properties": {
+          "expected_version": {
+            "minimum": 1.0,
+            "title": "Expected Version",
+            "type": "integer"
+          },
+          "step": {
+            "enum": [
+              0,
+              1
+            ],
+            "title": "Step",
+            "type": "integer"
+          },
+          "thesis_id": {
+            "title": "Thesis Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "thesis_id",
+          "expected_version",
+          "step"
+        ],
+        "title": "ReplayInput",
+        "type": "object"
+      },
+      "ResearchAnswer": {
+        "additionalProperties": false,
+        "properties": {
+          "evidence_ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 20,
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "facts": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 12,
+            "title": "Facts",
+            "type": "array"
+          },
+          "summary": {
+            "maxLength": 3000,
+            "minLength": 5,
+            "title": "Summary",
+            "type": "string"
+          },
+          "uncertainty": {
+            "maxLength": 1500,
+            "minLength": 5,
+            "title": "Uncertainty",
+            "type": "string"
+          }
+        },
+        "required": [
+          "summary",
+          "uncertainty",
+          "evidence_ids"
+        ],
+        "title": "ResearchAnswer",
+        "type": "object"
+      },
+      "ResearchQuestionInput": {
+        "additionalProperties": false,
+        "properties": {
+          "assessment_input_hash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "title": "Assessment Input Hash",
+            "type": "string"
+          },
+          "question": {
+            "maxLength": 500,
+            "minLength": 5,
+            "title": "Question",
+            "type": "string"
+          }
+        },
+        "required": [
+          "question",
+          "assessment_input_hash"
+        ],
+        "title": "ResearchQuestionInput",
+        "type": "object"
+      },
+      "RevisionInput": {
+        "additionalProperties": false,
+        "properties": {
+          "assumptions": {
+            "items": {
+              "$ref": "#/components/schemas/Assumption-Input"
+            },
+            "maxItems": 12,
+            "minItems": 1,
+            "title": "Assumptions",
+            "type": "array"
+          },
+          "direction": {
+            "const": "long",
+            "default": "long",
+            "title": "Direction",
+            "type": "string"
+          },
+          "entry_price": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,14}|(?=[\\d.]{1,25}0*$)\\d{0,14}\\.\\d{0,10}0*$)",
+                "type": "string"
+              }
+            ],
+            "default": "100",
+            "title": "Entry Price"
+          },
+          "evidence_ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 20,
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "expected_version": {
+            "minimum": 1.0,
+            "title": "Expected Version",
+            "type": "integer"
+          },
+          "explanation": {
+            "maxLength": 2000,
+            "minLength": 5,
+            "title": "Explanation",
+            "type": "string"
+          },
+          "holding_days": {
+            "default": 90,
+            "maximum": 3650.0,
+            "minimum": 1.0,
+            "title": "Holding Days",
+            "type": "integer"
+          },
+          "instrument_id": {
+            "default": "RNVDAUSDT",
+            "enum": [
+              "RNVDAUSDT",
+              "RAAPLUSDT",
+              "RMSFTUSDT"
+            ],
+            "title": "Instrument Id",
+            "type": "string"
+          },
+          "max_loss": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,14}|(?=[\\d.]{1,25}0*$)\\d{0,14}\\.\\d{0,10}0*$)",
+                "type": "string"
+              }
+            ],
+            "default": "1000",
+            "title": "Max Loss"
+          },
+          "max_slippage_bps": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,14}|(?=[\\d.]{1,25}0*$)\\d{0,14}\\.\\d{0,10}0*$)",
+                "type": "string"
+              }
+            ],
+            "default": "100",
+            "title": "Max Slippage Bps"
+          },
+          "proposed_amount": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,14}|(?=[\\d.]{1,25}0*$)\\d{0,14}\\.\\d{0,10}0*$)",
+                "type": "string"
+              }
+            ],
+            "default": "10000",
+            "title": "Proposed Amount"
+          },
+          "rationale": {
+            "maxLength": 8000,
+            "minLength": 10,
+            "title": "Rationale",
+            "type": "string"
+          }
+        },
+        "required": [
+          "rationale",
+          "assumptions",
+          "expected_version",
+          "explanation"
+        ],
+        "title": "RevisionInput",
+        "type": "object"
+      },
+      "SavedResearchAnswer": {
+        "additionalProperties": false,
+        "properties": {
+          "answer": {
+            "$ref": "#/components/schemas/ResearchAnswer"
+          },
+          "assessment_input_hash": {
+            "title": "Assessment Input Hash",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "input_hash": {
+            "title": "Input Hash",
+            "type": "string"
+          },
+          "llm_provenance": {
+            "$ref": "#/components/schemas/LLMProvenance"
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          },
+          "thesis_id": {
+            "title": "Thesis Id",
+            "type": "string"
+          },
+          "thesis_version": {
+            "minimum": 1.0,
+            "title": "Thesis Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "thesis_id",
+          "thesis_version",
+          "assessment_input_hash",
+          "question",
+          "answer",
+          "llm_provenance",
+          "input_hash",
+          "created_at"
+        ],
+        "title": "SavedResearchAnswer",
+        "type": "object"
+      },
+      "State": {
+        "enum": [
+          "SUPPORTED",
+          "CHALLENGED",
+          "INVALIDATED",
+          "INSUFFICIENT_EVIDENCE"
+        ],
+        "title": "State",
+        "type": "string"
+      },
+      "StressInput": {
+        "additionalProperties": false,
+        "properties": {
+          "bids": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/BookLevel"
+                },
+                "maxItems": 100,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bids"
+          },
+          "depth_multiplier": {
+            "anyOf": [
+              {
+                "maximum": 10.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              }
+            ],
+            "default": "1",
+            "title": "Depth Multiplier"
+          },
+          "fee_bps": {
+            "anyOf": [
+              {
+                "maximum": 1000.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              }
+            ],
+            "default": "0",
+            "title": "Fee Bps"
+          },
+          "price_move_pct": {
+            "anyOf": [
+              {
+                "maximum": 100.0,
+                "minimum": -100.0,
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              }
+            ],
+            "default": "-10",
+            "title": "Price Move Pct"
+          },
+          "spread_bps": {
+            "anyOf": [
+              {
+                "maximum": 2000.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              }
+            ],
+            "default": "20",
+            "title": "Spread Bps"
+          }
+        },
+        "title": "StressInput",
+        "type": "object"
+      },
+      "ThesisExtractionInput": {
+        "additionalProperties": false,
+        "properties": {
+          "current": {
+            "$ref": "#/components/schemas/ThesisInput"
+          }
+        },
+        "required": [
+          "current"
+        ],
+        "title": "ThesisExtractionInput",
+        "type": "object"
+      },
+      "ThesisIdeaInput": {
+        "additionalProperties": false,
+        "properties": {
+          "instrument_id": {
+            "enum": [
+              "RNVDAUSDT",
+              "RAAPLUSDT",
+              "RMSFTUSDT"
+            ],
+            "title": "Instrument Id",
+            "type": "string"
+          },
+          "rationale": {
+            "maxLength": 8000,
+            "minLength": 10,
+            "title": "Rationale",
+            "type": "string"
+          }
+        },
+        "required": [
+          "instrument_id",
+          "rationale"
+        ],
+        "title": "ThesisIdeaInput",
+        "type": "object"
+      },
+      "ThesisInput": {
+        "additionalProperties": false,
+        "properties": {
+          "assumptions": {
+            "items": {
+              "$ref": "#/components/schemas/Assumption-Input"
+            },
+            "maxItems": 12,
+            "minItems": 1,
+            "title": "Assumptions",
+            "type": "array"
+          },
+          "direction": {
+            "const": "long",
+            "default": "long",
+            "title": "Direction",
+            "type": "string"
+          },
+          "entry_price": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,14}|(?=[\\d.]{1,25}0*$)\\d{0,14}\\.\\d{0,10}0*$)",
+                "type": "string"
+              }
+            ],
+            "default": "100",
+            "title": "Entry Price"
+          },
+          "holding_days": {
+            "default": 90,
+            "maximum": 3650.0,
+            "minimum": 1.0,
+            "title": "Holding Days",
+            "type": "integer"
+          },
+          "instrument_id": {
+            "default": "RNVDAUSDT",
+            "enum": [
+              "RNVDAUSDT",
+              "RAAPLUSDT",
+              "RMSFTUSDT"
+            ],
+            "title": "Instrument Id",
+            "type": "string"
+          },
+          "max_loss": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,14}|(?=[\\d.]{1,25}0*$)\\d{0,14}\\.\\d{0,10}0*$)",
+                "type": "string"
+              }
+            ],
+            "default": "1000",
+            "title": "Max Loss"
+          },
+          "max_slippage_bps": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,14}|(?=[\\d.]{1,25}0*$)\\d{0,14}\\.\\d{0,10}0*$)",
+                "type": "string"
+              }
+            ],
+            "default": "100",
+            "title": "Max Slippage Bps"
+          },
+          "proposed_amount": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,14}|(?=[\\d.]{1,25}0*$)\\d{0,14}\\.\\d{0,10}0*$)",
+                "type": "string"
+              }
+            ],
+            "default": "10000",
+            "title": "Proposed Amount"
+          },
+          "rationale": {
+            "maxLength": 8000,
+            "minLength": 10,
+            "title": "Rationale",
+            "type": "string"
+          }
+        },
+        "required": [
+          "rationale",
+          "assumptions"
+        ],
+        "title": "ThesisInput",
+        "type": "object"
+      },
+      "ThesisSuggestion": {
+        "additionalProperties": false,
+        "properties": {
+          "assumptions": {
+            "items": {
+              "$ref": "#/components/schemas/Assumption-Output"
+            },
+            "maxItems": 6,
+            "minItems": 1,
+            "title": "Assumptions",
+            "type": "array"
+          },
+          "rationale": {
+            "maxLength": 8000,
+            "minLength": 10,
+            "title": "Rationale",
+            "type": "string"
+          }
+        },
+        "required": [
+          "rationale",
+          "assumptions"
+        ],
+        "title": "ThesisSuggestion",
+        "type": "object"
+      },
+      "ThesisSummary": {
+        "additionalProperties": false,
+        "description": "Library row: the newest version of a thesis and its selected assessment.",
+        "properties": {
+          "assessed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assessed At"
+          },
+          "assumption_count": {
+            "title": "Assumption Count",
+            "type": "integer"
+          },
+          "confirmed": {
+            "title": "Confirmed",
+            "type": "boolean"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "instrument_id": {
+            "title": "Instrument Id",
+            "type": "string"
+          },
+          "mode": {
+            "anyOf": [
+              {
+                "enum": [
+                  "CONTROLLED_SCENARIO",
+                  "HISTORICAL_REPLAY",
+                  "LIVE_REFRESH"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mode"
+          },
+          "rationale": {
+            "title": "Rationale",
+            "type": "string"
+          },
+          "retired": {
+            "title": "Retired",
+            "type": "boolean"
+          },
+          "state": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/State"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "version",
+          "confirmed",
+          "retired",
+          "created_at",
+          "updated_at",
+          "instrument_id",
+          "rationale",
+          "assumption_count",
+          "state",
+          "mode",
+          "assessed_at"
+        ],
+        "title": "ThesisSummary",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "title": "Reviso research API",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/evidence/{evidence_id}": {
+      "get": {
+        "operationId": "get_evidence_evidence__evidence_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "evidence_id",
+            "required": true,
+            "schema": {
+              "title": "Evidence Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Evidence"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Evidence"
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health"
+      }
+    },
+    "/instrument": {
+      "get": {
+        "operationId": "instrument_instrument_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Instrument"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Instrument"
+      }
+    },
+    "/instruments": {
+      "get": {
+        "operationId": "instruments_instruments_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Instrument"
+                  },
+                  "title": "Response Instruments Instruments Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Instruments"
+      }
+    },
+    "/instruments/{instrument_id}": {
+      "get": {
+        "operationId": "selected_instrument_instruments__instrument_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "instrument_id",
+            "required": true,
+            "schema": {
+              "enum": [
+                "RNVDAUSDT",
+                "RAAPLUSDT",
+                "RMSFTUSDT"
+              ],
+              "title": "Instrument Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Instrument"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Selected Instrument"
+      }
+    },
+    "/llm/status": {
+      "get": {
+        "operationId": "llm_status_llm_status_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Llm Status"
+      }
+    },
+    "/market": {
+      "get": {
+        "operationId": "market_market_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "instrument_id",
+            "required": false,
+            "schema": {
+              "default": "RNVDAUSDT",
+              "enum": [
+                "RNVDAUSDT",
+                "RAAPLUSDT",
+                "RMSFTUSDT"
+              ],
+              "title": "Instrument Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Market"
+      }
+    },
+    "/replays/{case_id}/step": {
+      "post": {
+        "operationId": "replay_replays__case_id__step_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "title": "Case Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReplayInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Replay"
+      }
+    },
+    "/theses": {
+      "get": {
+        "operationId": "list_theses_theses_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ThesisSummary"
+                  },
+                  "title": "Response List Theses Theses Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Theses"
+      }
+    },
+    "/theses/draft": {
+      "post": {
+        "operationId": "draft_theses_draft_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ThesisInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Draft"
+      }
+    },
+    "/theses/extract": {
+      "post": {
+        "operationId": "extract_thesis_theses_extract_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ThesisExtractionInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Extract Thesis"
+      }
+    },
+    "/theses/suggest": {
+      "post": {
+        "operationId": "suggest_assumptions_theses_suggest_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ThesisIdeaInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThesisSuggestion"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Suggest Assumptions"
+      }
+    },
+    "/theses/{thesis_id}": {
+      "get": {
+        "operationId": "get_thesis_theses__thesis_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "thesis_id",
+            "required": true,
+            "schema": {
+              "title": "Thesis Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Thesis"
+      }
+    },
+    "/theses/{thesis_id}/ai-review": {
+      "post": {
+        "operationId": "ai_review_theses__thesis_id__ai_review_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "thesis_id",
+            "required": true,
+            "schema": {
+              "title": "Thesis Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Ai Review"
+      }
+    },
+    "/theses/{thesis_id}/assessments": {
+      "get": {
+        "operationId": "history_theses__thesis_id__assessments_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "thesis_id",
+            "required": true,
+            "schema": {
+              "title": "Thesis Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "History"
+      }
+    },
+    "/theses/{thesis_id}/confirm": {
+      "post": {
+        "operationId": "confirm_theses__thesis_id__confirm_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "thesis_id",
+            "required": true,
+            "schema": {
+              "title": "Thesis Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Confirmation"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Confirm"
+      }
+    },
+    "/theses/{thesis_id}/decisions": {
+      "post": {
+        "operationId": "decide_theses__thesis_id__decisions_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "thesis_id",
+            "required": true,
+            "schema": {
+              "title": "Thesis Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecisionInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Decide"
+      }
+    },
+    "/theses/{thesis_id}/export": {
+      "get": {
+        "operationId": "export_thesis_theses__thesis_id__export_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "thesis_id",
+            "required": true,
+            "schema": {
+              "title": "Thesis Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "format",
+            "required": false,
+            "schema": {
+              "default": "markdown",
+              "enum": [
+                "markdown",
+                "json"
+              ],
+              "title": "Format",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "version",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Export Thesis"
+      }
+    },
+    "/theses/{thesis_id}/questions": {
+      "get": {
+        "operationId": "research_questions_theses__thesis_id__questions_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "thesis_id",
+            "required": true,
+            "schema": {
+              "title": "Thesis Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SavedResearchAnswer"
+                  },
+                  "title": "Response Research Questions Theses  Thesis Id  Questions Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Research Questions"
+      },
+      "post": {
+        "operationId": "answer_research_question_theses__thesis_id__questions_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "thesis_id",
+            "required": true,
+            "schema": {
+              "title": "Thesis Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResearchQuestionInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavedResearchAnswer"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Answer Research Question"
+      }
+    },
+    "/theses/{thesis_id}/refresh": {
+      "post": {
+        "operationId": "refresh_theses__thesis_id__refresh_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "thesis_id",
+            "required": true,
+            "schema": {
+              "title": "Thesis Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Refresh"
+      }
+    },
+    "/theses/{thesis_id}/revisions": {
+      "post": {
+        "operationId": "revise_theses__thesis_id__revisions_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "thesis_id",
+            "required": true,
+            "schema": {
+              "title": "Thesis Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RevisionInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Revise"
+      }
+    },
+    "/theses/{thesis_id}/stress": {
+      "post": {
+        "operationId": "run_stress_theses__thesis_id__stress_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "thesis_id",
+            "required": true,
+            "schema": {
+              "title": "Thesis Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StressInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Run Stress"
+      }
+    }
+  }
+}
