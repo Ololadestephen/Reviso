@@ -62,6 +62,8 @@ def stock(
     issuer_name: str,
     issuer_cik: str,
     terms_source: str,
+    verified_at: str = "2026-09-12T14:30:00Z",
+    supported_metrics: list[MetricId] | None = None,
 ) -> Instrument:
     return Instrument(
         id=id,
@@ -76,10 +78,14 @@ def stock(
         quote_currency="USDT",
         venue="Bitget spot",
         terms_source=terms_source,
-        verified_at="2026-09-12T14:30:00Z",
+        verified_at=verified_at,
         schedule="Availability varies; current status must be observed through Bitget",
         evidence_source=f"https://data.sec.gov/api/xbrl/companyfacts/CIK{issuer_cik}.json",
-        supported_metrics=["gaap_margin_pct", "revenue_growth_yoy_pct", "manual"],
+        supported_metrics=(
+            supported_metrics
+            if supported_metrics is not None
+            else ["gaap_margin_pct", "revenue_growth_yoy_pct", "manual"]
+        ),
         limitations=[
             "Not direct registered share ownership; no voting rights inferred.",
             "Backing and tracking statements are provider claims, not independently verified here.",
@@ -110,7 +116,44 @@ MICROSOFT = stock(
     terms_source="https://www.bitget.com/price/microsoft-tokenized-stock-reality",
 )
 
-INSTRUMENTS: dict[InstrumentId, Instrument] = {item.id: item for item in (NVIDIA, APPLE, MICROSOFT)}
+ALPHABET = stock(
+    id="RGOOGLUSDT",
+    display_name="Alphabet",
+    ticker="GOOGL",
+    base_coin="rGOOGL",
+    issuer_name="Alphabet Inc.",
+    issuer_cik="0001652044",
+    terms_source="https://www.bitget.com/price/alphabet-tokenized-stock-reality",
+    verified_at="2026-09-13T10:35:09Z",
+    supported_metrics=["revenue_growth_yoy_pct", "manual"],
+)
+
+AMAZON = stock(
+    id="RAMZNUSDT",
+    display_name="Amazon",
+    ticker="AMZN",
+    base_coin="rAMZN",
+    issuer_name="AMAZON COM INC",
+    issuer_cik="0001018724",
+    terms_source="https://www.bitget.com/price/amazon-tokenized-stock-reality",
+    verified_at="2026-09-13T10:35:09Z",
+    supported_metrics=["revenue_growth_yoy_pct", "manual"],
+)
+
+TESLA = stock(
+    id="RTSLAUSDT",
+    display_name="Tesla",
+    ticker="TSLA",
+    base_coin="rTSLA",
+    issuer_name="Tesla, Inc.",
+    issuer_cik="0001318605",
+    terms_source="https://www.bitget.com/price/tesla-tokenized-stock-reality",
+    verified_at="2026-09-13T10:35:09Z",
+)
+
+INSTRUMENTS: dict[InstrumentId, Instrument] = {
+    item.id: item for item in (NVIDIA, APPLE, MICROSOFT, ALPHABET, AMAZON, TESLA)
+}
 
 
 def instrument_by_id(instrument_id: InstrumentId) -> Instrument:

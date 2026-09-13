@@ -9,8 +9,27 @@ from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, model_validato
 
 Positive = Annotated[Decimal, Field(gt=0, max_digits=24, decimal_places=10)]
 Nonnegative = Annotated[Decimal, Field(ge=0, max_digits=24, decimal_places=10)]
-InstrumentId = Literal["RNVDAUSDT", "RAAPLUSDT", "RMSFTUSDT"]
+InstrumentId = Literal[
+    "RNVDAUSDT",
+    "RAAPLUSDT",
+    "RMSFTUSDT",
+    "RGOOGLUSDT",
+    "RAMZNUSDT",
+    "RTSLAUSDT",
+]
 MetricId = Literal["gaap_margin_pct", "revenue_growth_yoy_pct", "manual"]
+
+
+def canonical_invalidation(metric: MetricId, minimum: Decimal) -> str:
+    """Byte-identical to apps/web `conditionText` for the same metric and floor."""
+    if metric == "manual":
+        return "Requires manual evidence review; no numerical invalidation rule."
+    labels = {
+        "gaap_margin_pct": "GAAP gross margin",
+        "revenue_growth_yoy_pct": "year-over-year revenue growth",
+    }
+    floor = format(minimum.normalize(), "f")
+    return f"Invalidate when reported {labels[metric]} is below {floor}%."
 
 
 class Contract(BaseModel):
@@ -35,19 +54,11 @@ class Assumption(Contract):
 
     @model_validator(mode="after")
     def consistent_condition(self):
-        labels = {
-            "gaap_margin_pct": "GAAP gross margin",
-            "revenue_growth_yoy_pct": "year-over-year revenue growth",
-        }
-        if self.metric in labels:
-            floor = format(self.minimum.normalize(), "f")
-            expected = f"Invalidate when reported {labels[self.metric]} is below {floor}%."
-            if self.invalidation_condition != expected:
-                raise ValueError("The condition text must match the selected metric and floor")
-        elif self.invalidation_condition != (
-            "Requires manual evidence review; no numerical invalidation rule."
-        ):
-            raise ValueError("Manual assumptions must use the explicit manual-review condition")
+        expected = canonical_invalidation(self.metric, self.minimum)
+        if self.invalidation_condition != expected:
+            if self.metric == "manual":
+                raise ValueError("Manual assumptions must use the explicit manual-review condition")
+            raise ValueError("The condition text must match the selected metric and floor")
         return self
 
 
@@ -100,6 +111,13 @@ class ThesisSuggestion(Contract):
 class ResearchQuestionInput(Contract):
     question: str = Field(min_length=5, max_length=500)
     assessment_input_hash: str = Field(min_length=64, max_length=64)
+    detail: bool = False
+
+
+class ConversationInput(Contract):
+    question: str = Field(min_length=5, max_length=500)
+    assessment_input_hash: str = Field(min_length=64, max_length=64)
+    detail: bool = False
 
 
 class ResearchAnswer(Contract):
@@ -114,6 +132,28 @@ class LLMProvenance(Contract):
     model: str
     prompt_version: str
     generated_at: AwareDatetime
+    total_ms: int | None = None
+    ttft_ms: int | None = None
+    repair_attempts: int | None = None
+
+
+class ConversationMessage(Contract):
+    id: str
+    role: Literal["user", "assistant"]
+    kind: Literal["explanation", "followup", "detail"] = "followup"
+    text: str = Field(min_length=1, max_length=4000)
+    question: str | None = None
+    answer: ResearchAnswer | None = None
+    evidence_ids: list[str] = Field(default_factory=list, max_length=20)
+    created_at: AwareDatetime
+
+
+class ConversationThread(Contract):
+    thesis_id: str
+    thesis_version: int = Field(ge=1)
+    assessment_input_hash: str
+    context_hash: str
+    messages: list[ConversationMessage] = Field(default_factory=list, max_length=40)
 
 
 class SavedResearchAnswer(Contract):

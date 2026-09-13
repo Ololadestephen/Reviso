@@ -32,6 +32,9 @@ export const instrumentIdSchema = z.enum([
   "RNVDAUSDT",
   "RAAPLUSDT",
   "RMSFTUSDT",
+  "RGOOGLUSDT",
+  "RAMZNUSDT",
+  "RTSLAUSDT",
 ]);
 
 export const metricSchema = z.enum([
@@ -222,6 +225,9 @@ export const llmProvenanceSchema = z.looseObject({
   model: z.string(),
   prompt_version: z.string(),
   generated_at: timestamp,
+  total_ms: z.number().int().nullable().optional(),
+  ttft_ms: z.number().int().nullable().optional(),
+  repair_attempts: z.number().int().nullable().optional(),
 });
 
 export const llmStatusSchema = z.looseObject({
@@ -232,6 +238,7 @@ export const llmStatusSchema = z.looseObject({
   review_prompt: z.string(),
   suggestion_prompt: z.string().optional(),
   question_prompt: z.string().optional(),
+  streaming: z.string().optional(),
 });
 
 export const assessmentSchema = z.looseObject({
@@ -275,6 +282,7 @@ export const assessmentSchema = z.looseObject({
   market: marketSchema.optional(),
   market_execution: marketExecutionSchema.nullish(),
   narrative_review: narrativeReviewSchema.optional(),
+  narrative_context_hash: z.string().optional(),
   narrative_source_input_hash: z.string().optional(),
   llm_provenance: llmProvenanceSchema.optional(),
 });
@@ -346,6 +354,25 @@ export const savedResearchAnswerSchema = z.looseObject({
   created_at: timestamp,
 });
 
+export const conversationMessageSchema = z.looseObject({
+  id: z.string(),
+  role: z.enum(["user", "assistant"]),
+  kind: z.enum(["explanation", "followup", "detail"]),
+  text: z.string(),
+  question: z.string().nullable(),
+  answer: researchAnswerSchema.nullable(),
+  evidence_ids: z.array(z.string()),
+  created_at: timestamp,
+});
+
+export const conversationThreadSchema = z.looseObject({
+  thesis_id: z.string(),
+  thesis_version: z.number().int(),
+  assessment_input_hash: z.string(),
+  context_hash: z.string(),
+  messages: z.array(conversationMessageSchema),
+});
+
 export type State = z.infer<typeof stateSchema>;
 export type InstrumentId = z.infer<typeof instrumentIdSchema>;
 export type Metric = z.infer<typeof metricSchema>;
@@ -371,3 +398,5 @@ export type ThesisExtractionResult = z.infer<typeof thesisExtractionSchema>;
 export type Instrument = z.infer<typeof instrumentSchema>;
 export type ThesisSuggestion = z.infer<typeof thesisSuggestionSchema>;
 export type SavedResearchAnswer = z.infer<typeof savedResearchAnswerSchema>;
+export type ConversationMessage = z.infer<typeof conversationMessageSchema>;
+export type ConversationThread = z.infer<typeof conversationThreadSchema>;

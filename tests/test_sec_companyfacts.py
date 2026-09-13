@@ -6,8 +6,8 @@ import pytest
 
 from backend.company_disclosures import CompanyDisclosureProvider
 from backend.disclosures import DisclosureSnapshot
-from backend.instruments import APPLE, MICROSOFT
-from backend.sec_companyfacts import SecCompanyFactsProvider, parse_companyfacts
+from backend.instruments import ALPHABET, AMAZON, APPLE, MICROSOFT, TESLA
+from backend.sec_companyfacts import SecCompanyFactsProvider, allowed_url, parse_companyfacts
 
 NOW = datetime(2026, 9, 12, tzinfo=UTC)
 
@@ -57,7 +57,7 @@ def companyfacts(
     }
 
 
-@pytest.mark.parametrize("instrument", [APPLE, MICROSOFT])
+@pytest.mark.parametrize("instrument", [APPLE, MICROSOFT, ALPHABET, AMAZON, TESLA])
 def test_allowlisted_issuers_produce_bound_quarterly_metrics(instrument):
     evidence = parse_companyfacts(
         companyfacts(cik=instrument.issuer_cik, entity_name=instrument.issuer_name),
@@ -74,6 +74,11 @@ def test_allowlisted_issuers_produce_bound_quarterly_metrics(instrument):
     assert evidence.available_at == datetime(2026, 8, 1, tzinfo=UTC)
 
 
+def test_every_supported_companyfacts_url_is_allowlisted():
+    for instrument in (APPLE, MICROSOFT, ALPHABET, AMAZON, TESLA):
+        assert allowed_url(instrument.evidence_source)
+
+
 def test_wrong_issuer_identity_and_unaligned_values_fail_closed():
     wrong = companyfacts(cik=APPLE.issuer_cik, entity_name="Attacker Corp")
     with pytest.raises(ValueError, match="issuer name"):
@@ -85,6 +90,21 @@ def test_wrong_issuer_identity_and_unaligned_values_fail_closed():
     ][-1]["val"] = None
     with pytest.raises(ValueError, match="No supported metric"):
         parse_companyfacts(malformed, APPLE, NOW)
+
+
+def test_newer_revenue_taxonomy_is_used_when_the_preferred_tag_is_old():
+    payload = companyfacts(cik=ALPHABET.issuer_cik, entity_name=ALPHABET.issuer_name)
+    facts = payload["facts"]["us-gaap"]
+    old = facts.pop("RevenueFromContractWithCustomerExcludingAssessedTax")
+    facts["RevenueFromContractWithCustomerExcludingAssessedTax"] = {
+        "units": {"USD": [{**old["units"]["USD"][0], "frame": "CY2024Q2"}]}
+    }
+    facts["Revenues"] = old
+
+    evidence = parse_companyfacts(payload, ALPHABET, NOW)
+
+    assert "CY2026Q2" in evidence.title
+    assert evidence.metrics["revenue_growth_yoy_pct"] == Decimal("17.5")
 
 
 def test_partial_and_stale_provider_states_remain_explicit(monkeypatch):
@@ -127,6 +147,30 @@ def test_partial_and_stale_provider_states_remain_explicit(monkeypatch):
             assert result.warnings
         finally:
             provider.close()
+
+
+def test_single_declared_numerical_metric_is_complete(monkeypatch):
+    payload = companyfacts(
+        cik=AMAZON.issuer_cik,
+        entity_name=AMAZON.issuer_name,
+        gross_profit=None,
+    )
+    monkeypatch.setattr("backend.sec_companyfacts.utc_now", lambda: NOW)
+    provider = SecCompanyFactsProvider(
+        httpx.Client(
+            transport=httpx.MockTransport(
+                lambda _request: httpx.Response(
+                    200,
+                    json=payload,
+                    headers={"content-type": "application/json"},
+                )
+            )
+        )
+    )
+    try:
+        assert provider.snapshot("RAMZNUSDT").availability == "AVAILABLE"
+    finally:
+        provider.close()
 
 
 class StubProvider:

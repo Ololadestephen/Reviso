@@ -220,7 +220,10 @@
             "enum": [
               "RNVDAUSDT",
               "RAAPLUSDT",
-              "RMSFTUSDT"
+              "RMSFTUSDT",
+              "RGOOGLUSDT",
+              "RAMZNUSDT",
+              "RTSLAUSDT"
             ],
             "title": "Instrument Id",
             "type": "string"
@@ -280,6 +283,147 @@
           "expected_version"
         ],
         "title": "Confirmation",
+        "type": "object"
+      },
+      "ConversationInput": {
+        "additionalProperties": false,
+        "properties": {
+          "assessment_input_hash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "title": "Assessment Input Hash",
+            "type": "string"
+          },
+          "detail": {
+            "default": false,
+            "title": "Detail",
+            "type": "boolean"
+          },
+          "question": {
+            "maxLength": 500,
+            "minLength": 5,
+            "title": "Question",
+            "type": "string"
+          }
+        },
+        "required": [
+          "question",
+          "assessment_input_hash"
+        ],
+        "title": "ConversationInput",
+        "type": "object"
+      },
+      "ConversationMessage": {
+        "additionalProperties": false,
+        "properties": {
+          "answer": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ResearchAnswer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "evidence_ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 20,
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "default": "followup",
+            "enum": [
+              "explanation",
+              "followup",
+              "detail"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "question": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Question"
+          },
+          "role": {
+            "enum": [
+              "user",
+              "assistant"
+            ],
+            "title": "Role",
+            "type": "string"
+          },
+          "text": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "role",
+          "text",
+          "created_at"
+        ],
+        "title": "ConversationMessage",
+        "type": "object"
+      },
+      "ConversationThread": {
+        "additionalProperties": false,
+        "properties": {
+          "assessment_input_hash": {
+            "title": "Assessment Input Hash",
+            "type": "string"
+          },
+          "context_hash": {
+            "title": "Context Hash",
+            "type": "string"
+          },
+          "messages": {
+            "items": {
+              "$ref": "#/components/schemas/ConversationMessage"
+            },
+            "maxItems": 40,
+            "title": "Messages",
+            "type": "array"
+          },
+          "thesis_id": {
+            "title": "Thesis Id",
+            "type": "string"
+          },
+          "thesis_version": {
+            "minimum": 1.0,
+            "title": "Thesis Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "thesis_id",
+          "thesis_version",
+          "assessment_input_hash",
+          "context_hash"
+        ],
+        "title": "ConversationThread",
         "type": "object"
       },
       "DecisionInput": {
@@ -354,7 +498,10 @@
                 "enum": [
                   "RNVDAUSDT",
                   "RAAPLUSDT",
-                  "RMSFTUSDT"
+                  "RMSFTUSDT",
+                  "RGOOGLUSDT",
+                  "RAMZNUSDT",
+                  "RTSLAUSDT"
                 ],
                 "type": "string"
               },
@@ -484,7 +631,10 @@
             "enum": [
               "RNVDAUSDT",
               "RAAPLUSDT",
-              "RMSFTUSDT"
+              "RMSFTUSDT",
+              "RGOOGLUSDT",
+              "RAMZNUSDT",
+              "RTSLAUSDT"
             ],
             "title": "Id",
             "type": "string"
@@ -595,6 +745,39 @@
           "provider": {
             "title": "Provider",
             "type": "string"
+          },
+          "repair_attempts": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Repair Attempts"
+          },
+          "total_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Ms"
+          },
+          "ttft_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ttft Ms"
           }
         },
         "required": [
@@ -684,6 +867,11 @@
             "title": "Assessment Input Hash",
             "type": "string"
           },
+          "detail": {
+            "default": false,
+            "title": "Detail",
+            "type": "boolean"
+          },
           "question": {
             "maxLength": 500,
             "minLength": 5,
@@ -761,7 +949,10 @@
             "enum": [
               "RNVDAUSDT",
               "RAAPLUSDT",
-              "RMSFTUSDT"
+              "RMSFTUSDT",
+              "RGOOGLUSDT",
+              "RAMZNUSDT",
+              "RTSLAUSDT"
             ],
             "title": "Instrument Id",
             "type": "string"
@@ -990,7 +1181,10 @@
             "enum": [
               "RNVDAUSDT",
               "RAAPLUSDT",
-              "RMSFTUSDT"
+              "RMSFTUSDT",
+              "RGOOGLUSDT",
+              "RAMZNUSDT",
+              "RTSLAUSDT"
             ],
             "title": "Instrument Id",
             "type": "string"
@@ -1053,7 +1247,10 @@
             "enum": [
               "RNVDAUSDT",
               "RAAPLUSDT",
-              "RMSFTUSDT"
+              "RMSFTUSDT",
+              "RGOOGLUSDT",
+              "RAMZNUSDT",
+              "RTSLAUSDT"
             ],
             "title": "Instrument Id",
             "type": "string"
@@ -1393,7 +1590,10 @@
               "enum": [
                 "RNVDAUSDT",
                 "RAAPLUSDT",
-                "RMSFTUSDT"
+                "RMSFTUSDT",
+                "RGOOGLUSDT",
+                "RAMZNUSDT",
+                "RTSLAUSDT"
               ],
               "title": "Instrument Id",
               "type": "string"
@@ -1454,7 +1654,10 @@
               "enum": [
                 "RNVDAUSDT",
                 "RAAPLUSDT",
-                "RMSFTUSDT"
+                "RMSFTUSDT",
+                "RGOOGLUSDT",
+                "RAMZNUSDT",
+                "RTSLAUSDT"
               ],
               "title": "Instrument Id",
               "type": "string"
@@ -1821,6 +2024,103 @@
         "summary": "Confirm"
       }
     },
+    "/theses/{thesis_id}/conversation": {
+      "get": {
+        "operationId": "research_conversation_theses__thesis_id__conversation_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "thesis_id",
+            "required": true,
+            "schema": {
+              "title": "Thesis Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "assessment_input_hash",
+            "required": true,
+            "schema": {
+              "maxLength": 64,
+              "minLength": 64,
+              "title": "Assessment Input Hash",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConversationThread"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Research Conversation"
+      },
+      "post": {
+        "operationId": "continue_research_conversation_theses__thesis_id__conversation_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "thesis_id",
+            "required": true,
+            "schema": {
+              "title": "Thesis Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConversationInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConversationThread"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Continue Research Conversation"
+      }
+    },
     "/theses/{thesis_id}/decisions": {
       "post": {
         "operationId": "decide_theses__thesis_id__decisions_post",
@@ -1889,7 +2189,8 @@
               "default": "markdown",
               "enum": [
                 "markdown",
-                "json"
+                "json",
+                "pdf"
               ],
               "title": "Format",
               "type": "string"

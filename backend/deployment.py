@@ -25,8 +25,11 @@ PUBLIC_ASSET_PATHS = frozenset(
         "/step-check-idea.svg",
         "/step-write-idea.svg",
         "/stock-logos/apple.svg",
+        "/stock-logos/alphabet.svg",
+        "/stock-logos/amazon.svg",
         "/stock-logos/microsoft.svg",
         "/stock-logos/nvidia.svg",
+        "/stock-logos/tesla.svg",
     }
 )
 

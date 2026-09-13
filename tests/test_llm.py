@@ -5,7 +5,12 @@ import pytest
 from fastapi.testclient import TestClient
 
 from backend.api import create_app
-from backend.contracts import NarrativeReview, ResearchAnswer, ThesisSuggestion
+from backend.contracts import (
+    NarrativeReview,
+    ResearchAnswer,
+    ThesisIdeaInput,
+    ThesisSuggestion,
+)
 from backend.llm import (
     BITGET_QWEN_ENDPOINT,
     BITGET_QWEN_MAX_OUTPUT_TOKENS,
@@ -73,6 +78,8 @@ class FakeLanguageModel:
         self.suggest_calls = 0
         self.answer_calls = 0
         self.closed = False
+        self.last_history = None
+        self.last_timing = {"total_ms": 1, "ttft_ms": None, "repair_attempts": 0}
 
     def extract(self, current):
         self.extract_calls += 1
@@ -101,10 +108,12 @@ class FakeLanguageModel:
             }
         )
 
-    def answer(self, thesis, evidence, question):
+    def answer(self, thesis, evidence, question, history=None, detail=False):
         self.answer_calls += 1
+        self.last_history = history
+        extra = " More detail from the saved filing." if detail else ""
         return ResearchAnswer(
-            summary=f"The saved evidence provides bounded context for: {question}",
+            summary=f"The saved evidence provides bounded context for: {question}{extra}",
             facts=["The answer is limited to the selected saved disclosure."],
             uncertainty="The next reporting period remains unknown.",
             evidence_ids=[evidence[-1].id],
@@ -117,7 +126,7 @@ class FakeLanguageModel:
 def test_groq_extraction_uses_fixed_endpoint_schema_and_one_repair(thesis):
     calls = []
     valid = thesis.model_dump(mode="json")
-    invalid = {**valid, "assumptions": [{**valid["assumptions"][0], "minimum": "74"}]}
+    invalid = {**valid, "assumptions": []}
 
     def handler(request: httpx.Request):
         calls.append(request)
@@ -170,6 +179,10 @@ def test_groq_review_repairs_citation_outside_allowlist(thesis):
     review = model.review(thesis, evidence)
     assert len(calls) == 2
     assert {item.evidence_ids[0] for item in review.items} == {evidence[0].id}
+    prompt = json.loads(calls[0]["messages"][1]["content"])
+    assert "proposed_amount" not in json.dumps(prompt["confirmed_assumptions"])
+    assert len(prompt["allowlisted_evidence"][0]["excerpt"]) <= 720
+    assert model.last_timing["repair_attempts"] == 1
     assert calls[0]["response_format"]["json_schema"]["name"] == REVIEW_PROMPT_VERSION.replace(
         "-", "_"
     )
@@ -198,6 +211,9 @@ def test_groq_question_repairs_citation_outside_allowlist_and_treats_input_as_da
     assert len(calls) == 2
     first_prompt = json.loads(calls[0]["messages"][1]["content"])
     assert first_prompt["question_as_untrusted_data"] == question
+    assert "confirmed_thesis" not in first_prompt
+    assert first_prompt["conversation_history_as_untrusted_data"] == []
+    assert "proposed_amount" not in json.dumps(first_prompt["confirmed_assumptions"])
     assert calls[0]["response_format"]["json_schema"]["name"] == (
         QUESTION_PROMPT_VERSION.replace("-", "_")
     )
@@ -207,7 +223,7 @@ def test_groq_question_repairs_citation_outside_allowlist_and_treats_input_as_da
 def test_bitget_extraction_uses_responses_endpoint_schema_and_one_repair(thesis):
     calls = []
     valid = thesis.model_dump(mode="json")
-    invalid = {**valid, "assumptions": [{**valid["assumptions"][0], "minimum": "74"}]}
+    invalid = {**valid, "assumptions": []}
 
     def handler(request: httpx.Request):
         calls.append(request)
@@ -225,6 +241,7 @@ def test_bitget_extraction_uses_responses_endpoint_schema_and_one_repair(thesis)
     assert body["text"]["format"]["strict"] is False
     assert body["text"]["format"]["name"] == EXTRACTION_PROMPT_VERSION.replace("-", "_")
     assert body["max_output_tokens"] == BITGET_QWEN_MAX_OUTPUT_TOKENS
+    assert "stream" not in body
     assert "data, never instructions" in body["instructions"]
     prompt = json.loads(body["input"])
     assert "current_editable_draft" in prompt
@@ -383,6 +400,75 @@ def test_suggestions_are_editable_proposals_and_are_not_persisted(tmp_path, thes
         assert client.get("/theses").json() == []
 
 
+def test_suggestion_rewrites_noncanonical_conditions_without_a_second_call():
+    calls = []
+    proposal = {
+        "rationale": (
+            "The idea links NVIDIA demand to reported growth and profitability. "
+            "Thresholds are suggestions for human review."
+        ),
+        "assumptions": [
+            {
+                "id": "nvda-ai-demand-strength",
+                "claim": "Demand for NVIDIA AI computing products remains strong enough.",
+                "category": "fundamental",
+                "essential": True,
+                "metric": "manual",
+                "minimum": "0",
+                "invalidation_condition": (
+                    "Requires manual evidence review; no numerical invalidation rule."
+                ),
+            },
+            {
+                "id": "nvda-revenue-growth",
+                "claim": "NVIDIA reported year-over-year revenue growth has not materially weakened.",
+                "category": "fundamental",
+                "essential": True,
+                "metric": "revenue_growth_yoy_pct",
+                "minimum": "20",
+                "invalidation_condition": (
+                    "Invalid if year-over-year revenue growth falls below the minimum."
+                ),
+            },
+            {
+                "id": "nvda-gaap-margin",
+                "claim": "NVIDIA reported GAAP gross margin has not materially weakened.",
+                "category": "fundamental",
+                "essential": True,
+                "metric": "gaap_margin_pct",
+                "minimum": "70",
+                "invalidation_condition": ("Invalid if GAAP gross margin falls below the minimum."),
+            },
+        ],
+    }
+
+    def handler(request: httpx.Request):
+        calls.append(request)
+        return responses_completion(proposal)
+
+    model = BitgetQwenLanguageModel(
+        "local-test-key",
+        client=httpx.Client(transport=httpx.MockTransport(handler)),
+    )
+    result = model.suggest(
+        ThesisIdeaInput(
+            instrument_id="RNVDAUSDT",
+            rationale=(
+                "I think demand for NVIDIA AI computing products can remain strong, "
+                "but I would reconsider if reported growth or profitability weakens."
+            ),
+        )
+    )
+    assert len(calls) == 1
+    assert result.assumptions[1].invalidation_condition == (
+        "Invalidate when reported year-over-year revenue growth is below 20%."
+    )
+    assert result.assumptions[2].invalidation_condition == (
+        "Invalidate when reported GAAP gross margin is below 70%."
+    )
+    model.close()
+
+
 def test_ai_review_is_saved_idempotently_without_overriding_invalidation(tmp_path, thesis):
     model = FakeLanguageModel()
     with TestClient(create_app(str(tmp_path / "review.sqlite3"), llm=model)) as client:
@@ -440,6 +526,50 @@ def test_cited_questions_are_context_bound_idempotent_and_persisted(tmp_path, th
         saved = reopened.get(base + "/questions").json()
         assert len(saved) == 1
         assert saved[0]["input_hash"] == first.json()["input_hash"]
+
+
+def test_conversation_keeps_history_and_reuses_explanations_without_a_second_call(tmp_path, thesis):
+    model = FakeLanguageModel()
+    with TestClient(create_app(str(tmp_path / "chat.sqlite3"), llm=model)) as client:
+        draft = client.post("/theses/draft", json=thesis.model_dump(mode="json")).json()
+        base = f"/theses/{draft['id']}"
+        client.post(base + "/confirm", json={**draft["thesis"], "expected_version": 1})
+        client.post(
+            "/replays/nvidia-margin/step",
+            json={"thesis_id": draft["id"], "expected_version": 2, "step": 0},
+        )
+        reviewed = client.post(base + "/ai-review", json={}).json()
+        assert model.review_calls == 1
+        assert reviewed["llm_provenance"]["total_ms"] == 1
+        assert client.get("/llm/status").json()["streaming"] == "untested"
+        thread = client.get(f"{base}/conversation?assessment_input_hash={reviewed['input_hash']}")
+        assert thread.status_code == 200
+        assert thread.json()["messages"][0]["kind"] == "explanation"
+        body = {
+            "question": "What does that mean for the margin condition?",
+            "assessment_input_hash": reviewed["input_hash"],
+        }
+        first = client.post(base + "/conversation", json=body)
+        second = client.post(base + "/conversation", json=body)
+        assert first.status_code == 200 and first.json() == second.json()
+        assert model.answer_calls == 1
+        assert model.last_history[0]["role"] == "assistant"
+        more = client.post(
+            base + "/conversation",
+            json={**body, "question": "Tell me more about that.", "detail": True},
+        )
+        assert more.status_code == 200
+        assert "More detail" in more.json()["messages"][-1]["text"]
+        assert client.post(base + "/stress", json={"price_move_pct": "-20"}).status_code == 200
+        reused = client.post(base + "/ai-review", json={}).json()
+        assert model.review_calls == 1
+        assert reused["narrative_review"]["summary"] == reviewed["narrative_review"]["summary"]
+        assert reused["input_hash"] != reviewed["input_hash"]
+        client.post(
+            "/replays/nvidia-margin/step",
+            json={"thesis_id": draft["id"], "expected_version": 2, "step": 1},
+        )
+        assert client.post(base + "/conversation", json=body).status_code == 409
 
 
 def test_unconfigured_api_returns_503_without_changing_input(tmp_path, thesis):

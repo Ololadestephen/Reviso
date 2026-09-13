@@ -14,11 +14,17 @@ def test_catalog_exposes_only_the_verified_small_selection(tmp_path):
             "RNVDAUSDT",
             "RAAPLUSDT",
             "RMSFTUSDT",
+            "RGOOGLUSDT",
+            "RAMZNUSDT",
+            "RTSLAUSDT",
         ]
         assert [item["display_name"] for item in instruments] == [
             "NVIDIA",
             "Apple",
             "Microsoft",
+            "Alphabet",
+            "Amazon",
+            "Tesla",
         ]
         assert all(
             item["terms_source"].startswith("https://www.bitget.com/") for item in instruments

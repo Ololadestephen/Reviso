@@ -53,7 +53,9 @@ async def llm_unavailable(_request: Request, error: LLMUnavailableError):
 async def llm_invalid(_request: Request, _error: LLMInvalidOutputError):
     return JSONResponse(
         status_code=502,
-        content={"detail": "Qwen returned an invalid research proposal; no thesis was changed"},
+        content={
+            "detail": "Qwen's draft didn't match the required format, so nothing was changed. Continue manually or try again."
+        },
     )
 
 

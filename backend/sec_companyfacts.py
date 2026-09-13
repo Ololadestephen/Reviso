@@ -13,7 +13,7 @@ import httpx
 
 from backend.contracts import Evidence, InstrumentId, utc_now
 from backend.disclosures import DisclosureSnapshot
-from backend.instruments import Instrument, instrument_by_id
+from backend.instruments import INSTRUMENTS, Instrument, instrument_by_id
 
 ORIGIN = "https://data.sec.gov"
 MAX_BYTES = 12_000_000
@@ -35,7 +35,7 @@ def allowed_url(url: str) -> bool:
 
 
 def instrument_registry() -> list[Instrument]:
-    return [instrument_by_id(item) for item in ("RNVDAUSDT", "RAAPLUSDT", "RMSFTUSDT")]
+    return list(INSTRUMENTS.values())
 
 
 def _as_date(value: object) -> date | None:
@@ -49,9 +49,9 @@ def _as_date(value: object) -> date | None:
 
 def _quarter_values(payload: dict, tags: tuple[str, ...], today: date) -> list[dict]:
     facts = payload.get("facts", {}).get("us-gaap", {})
+    values = []
     for tag in tags:
         entries = facts.get(tag, {}).get("units", {}).get("USD", [])
-        values = []
         for item in entries if isinstance(entries, list) else []:
             frame = item.get("frame")
             start = _as_date(item.get("start"))
@@ -74,11 +74,16 @@ def _quarter_values(payload: dict, tags: tuple[str, ...], today: date) -> list[d
                 continue
             if value.is_finite() and value > 0:
                 values.append(
-                    {**item, "_start": start, "_end": end, "_filed": filed, "_value": value}
+                    {
+                        **item,
+                        "_start": start,
+                        "_end": end,
+                        "_filed": filed,
+                        "_value": value,
+                        "_tag": tag,
+                    }
                 )
-        if values:
-            return values
-    return []
+    return values
 
 
 def _latest(values: list[dict]) -> dict | None:
@@ -231,7 +236,9 @@ class SecCompanyFactsProvider:
                     warnings.append(
                         "Latest aligned quarterly filing is older than the 120-day evidence window."
                     )
-                elif len(evidence.metrics) < 2:
+                elif not {
+                    metric for metric in instrument.supported_metrics if metric != "manual"
+                }.issubset(evidence.metrics):
                     availability = "PARTIAL"
                     warnings.append(
                         "Only some supported metrics were available in aligned filed facts; other assumptions abstain."

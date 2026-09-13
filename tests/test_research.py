@@ -1,9 +1,10 @@
 from datetime import timedelta
+from decimal import Decimal
 
 import pytest
 from pydantic import ValidationError
 
-from backend.contracts import Assumption, State, StressInput
+from backend.contracts import Assumption, State, StressInput, canonical_invalidation
 from backend.replay import CUTOFFS, DOCUMENTS, available_evidence
 from backend.services import aggregate, assessment, evaluate, revision_changes
 
@@ -46,7 +47,7 @@ def test_assessment_determinism_and_neutral_revision(thesis):
     assert any("rationale has changed" in change for change in changes)
 
 
-def test_manual_assumptions_use_an_explicit_non_numerical_condition():
+def test_invented_manual_condition_text_is_rejected():
     with pytest.raises(ValidationError, match="explicit manual-review condition"):
         Assumption(
             id="manual",
@@ -55,3 +56,14 @@ def test_manual_assumptions_use_an_explicit_non_numerical_condition():
             minimum="0",
             invalidation_condition="Trust the model's judgment.",
         )
+
+
+def test_canonical_invalidation_matches_the_frontend_sentence():
+    assert (
+        canonical_invalidation("gaap_margin_pct", Decimal(75))
+        == "Invalidate when reported GAAP gross margin is below 75%."
+    )
+    assert (
+        canonical_invalidation("revenue_growth_yoy_pct", Decimal(20))
+        == "Invalidate when reported year-over-year revenue growth is below 20%."
+    )

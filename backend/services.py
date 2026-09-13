@@ -21,6 +21,24 @@ def digest(value: dict) -> str:
     ).hexdigest()
 
 
+def narrative_context_hash(thesis: ThesisInput, evidence: list[Evidence]) -> str:
+    """Stable key for explanations when the filing and conditions have not changed."""
+    return digest(
+        {
+            "assumptions": [
+                {
+                    "id": item.id,
+                    "claim": item.claim,
+                    "metric": item.metric,
+                    "minimum": str(item.minimum),
+                }
+                for item in thesis.assumptions
+            ],
+            "evidence": [{"id": item.id, "content_hash": item.content_hash} for item in evidence],
+        }
+    )
+
+
 def evaluate(
     thesis: ThesisInput, evidence: list[Evidence], cutoff: datetime
 ) -> list[AssumptionResult]:

@@ -11,6 +11,7 @@ import {
   thesisExtractionSchema,
   thesisSuggestionSchema,
   savedResearchAnswerSchema,
+  conversationThreadSchema,
   thesisRecordSchema,
   thesisSummarySchema,
   type Assessment,
@@ -77,9 +78,32 @@ export const askResearchQuestion = (
     assessment_input_hash: assessmentInputHash,
   });
 
+export const fetchConversation = (
+  id: string,
+  assessmentInputHash: string,
+  signal?: AbortSignal,
+) =>
+  get(
+    `/theses/${id}/conversation?assessment_input_hash=${assessmentInputHash}`,
+    conversationThreadSchema,
+    signal,
+  );
+
+export const continueConversation = (
+  record: ThesisRecord,
+  question: string,
+  assessmentInputHash: string,
+  detail = false,
+) =>
+  post(`/theses/${record.id}/conversation`, conversationThreadSchema, {
+    question,
+    assessment_input_hash: assessmentInputHash,
+    detail,
+  });
+
 export const exportThesisUrl = (
   id: string,
-  format: "markdown" | "json",
+  format: "markdown" | "json" | "pdf",
   version?: number,
 ) =>
   `/api/theses/${id}/export?format=${format}${version ? `&version=${version}` : ""}`;

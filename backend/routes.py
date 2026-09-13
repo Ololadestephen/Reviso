@@ -10,6 +10,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from backend.company_disclosures import CompanyDisclosureProvider
 from backend.contracts import (
     Confirmation,
+    ConversationInput,
+    ConversationThread,
     DecisionInput,
     Evidence,
     InstrumentId,
@@ -25,7 +27,7 @@ from backend.contracts import (
     ThesisSummary,
     utc_now,
 )
-from backend.exports import markdown_snapshot, research_snapshot
+from backend.exports import markdown_snapshot, pdf_snapshot, research_snapshot
 from backend.instruments import INSTRUMENTS, NVIDIA, Instrument, instrument_by_id
 from backend.llm import (
     EXTRACTION_PROMPT_VERSION,
@@ -37,7 +39,8 @@ from backend.llm import (
 from backend.market import market_execution
 from backend.providers import BitgetProvider
 from backend.replay import CASES, CUTOFFS, available_evidence, evidence_by_id
-from backend.services import assessment, digest, revision_changes
+from backend.research_chat import append_exchange, conversation_for
+from backend.services import assessment, digest, narrative_context_hash, revision_changes
 from backend.storage import ConflictError, Repository
 
 router = APIRouter()
@@ -239,28 +242,66 @@ def ai_review(thesis_id: str, repo: Repo, llm: LLM):
     previous = repo.history(thesis_id)["selected_assessment"]
     if not previous or not previous["evidence"]:
         raise HTTPException(409, "Load a disclosure replay or refresh public evidence first")
-    source_hash = previous.get("narrative_source_input_hash", previous["input_hash"])
+    thesis = ThesisInput.model_validate(record["thesis"])
+    evidence = [Evidence.model_validate(item) for item in previous["evidence"]]
+    context_hash = narrative_context_hash(thesis, evidence)
+    if previous.get("narrative_review") and previous.get("narrative_context_hash") == context_hash:
+        conversation_for(repo, thesis_id, previous, record)
+        return previous
     metadata = provenance(llm.descriptor, REVIEW_PROMPT_VERSION)
     input_hash = digest(
         {
-            "source_assessment": source_hash,
+            "narrative_context": context_hash,
             "provider": metadata["provider"],
             "model": metadata["model"],
             "prompt_version": metadata["prompt_version"],
+            "base_assessment": previous["input_hash"],
         }
     )
     cached = repo.assessment_by_hash(thesis_id, input_hash)
     if cached:
-        return repo.assess(thesis_id, record["version"], cached)
-    evidence = [Evidence.model_validate(item) for item in previous["evidence"]]
-    review = llm.review(ThesisInput.model_validate(record["thesis"]), evidence)
+        saved = repo.assess(thesis_id, record["version"], cached)
+        conversation_for(repo, thesis_id, saved, record)
+        return saved
+    reused = repo.assessment_with_narrative(thesis_id, context_hash)
+    if reused and reused.get("narrative_review"):
+        result = attach_review(
+            previous,
+            reused["narrative_review"],
+            reused.get("llm_provenance") or metadata,
+            context_hash,
+            input_hash,
+        )
+        saved = repo.assess(thesis_id, record["version"], result)
+        conversation_for(repo, thesis_id, saved, record)
+        return saved
+    review = llm.review(thesis, evidence)
+    metadata = provenance(llm.descriptor, REVIEW_PROMPT_VERSION, getattr(llm, "last_timing", None))
+    result = attach_review(
+        previous, review.model_dump(mode="json"), metadata, context_hash, input_hash
+    )
+    saved = repo.assess(thesis_id, record["version"], result)
+    conversation_for(repo, thesis_id, saved, record)
+    return saved
+
+
+def attach_review(
+    previous: dict,
+    review: dict,
+    metadata: dict,
+    context_hash: str,
+    input_hash: str,
+) -> dict:
     result = {
         **previous,
         "evaluated_at": utc_now().isoformat(),
-        "narrative_review": review.model_dump(mode="json"),
-        "narrative_source_input_hash": source_hash,
+        "narrative_review": review,
+        "narrative_context_hash": context_hash,
+        "narrative_source_input_hash": previous.get(
+            "narrative_source_input_hash", previous["input_hash"]
+        ),
         "llm_provenance": metadata,
-        "next_question": review.next_question,
+        "next_question": review["next_question"],
         "input_hash": input_hash,
     }
     result["missing"] = [item for item in result["missing"] if "Narrative AI review" not in item]
@@ -271,7 +312,7 @@ def ai_review(thesis_id: str, repo: Repo, llm: LLM):
             "llm": metadata,
         }
     )
-    return repo.assess(thesis_id, record["version"], result)
+    return result
 
 
 @router.get("/theses/{thesis_id}/questions", response_model=list[SavedResearchAnswer])
@@ -318,6 +359,32 @@ def answer_research_question(thesis_id: str, body: ResearchQuestionInput, repo: 
         created_at=utc_now(),
     )
     return repo.save_research_answer(saved.model_dump(mode="json"))
+
+
+@router.get("/theses/{thesis_id}/conversation", response_model=ConversationThread)
+def research_conversation(
+    thesis_id: str,
+    repo: Repo,
+    assessment_input_hash: str = Query(..., min_length=64, max_length=64),
+):
+    record = confirmed(repo, thesis_id)
+    selected = repo.history(thesis_id)["selected_assessment"]
+    if not selected or not selected["evidence"]:
+        raise HTTPException(409, "No saved evidence is available for a cited answer")
+    if selected["input_hash"] != assessment_input_hash:
+        raise HTTPException(409, "The evidence context changed; reload before asking")
+    return conversation_for(repo, thesis_id, selected, record)
+
+
+@router.post("/theses/{thesis_id}/conversation", response_model=ConversationThread)
+def continue_research_conversation(thesis_id: str, body: ConversationInput, repo: Repo, llm: LLM):
+    record = confirmed(repo, thesis_id)
+    selected = repo.history(thesis_id)["selected_assessment"]
+    if not selected or selected["input_hash"] != body.assessment_input_hash:
+        raise HTTPException(409, "The evidence context changed; reload before asking")
+    if not selected["evidence"]:
+        raise HTTPException(409, "No saved evidence is available for a cited answer")
+    return append_exchange(repo, llm, record, selected, body.question.strip(), body.detail)
 
 
 @router.post("/theses/{thesis_id}/revisions")
@@ -376,19 +443,22 @@ def decide(thesis_id: str, body: DecisionInput, repo: Repo):
 def export_thesis(
     thesis_id: str,
     repo: Repo,
-    format: Literal["markdown", "json"] = Query("markdown"),
+    format: Literal["markdown", "json", "pdf"] = Query("markdown"),
     version: int | None = Query(None, ge=1),
 ):
     snapshot = research_snapshot(repo, thesis_id, version)
     ticker = snapshot["instrument"]["ticker"].lower()
-    suffix = "md" if format == "markdown" else "json"
+    suffix = {"markdown": "md", "json": "json", "pdf": "pdf"}[format]
     filename = f"reviso-{ticker}-v{snapshot['thesis']['version']}.{suffix}"
-    content = (
-        markdown_snapshot(snapshot)
-        if format == "markdown"
-        else json.dumps(snapshot, indent=2, ensure_ascii=False) + "\n"
-    )
-    media_type = "text/markdown; charset=utf-8" if format == "markdown" else "application/json"
+    if format == "pdf":
+        content: str | bytes = pdf_snapshot(snapshot)
+        media_type = "application/pdf"
+    elif format == "markdown":
+        content = markdown_snapshot(snapshot)
+        media_type = "text/markdown; charset=utf-8"
+    else:
+        content = json.dumps(snapshot, indent=2, ensure_ascii=False) + "\n"
+        media_type = "application/json"
     return Response(
         content=content,
         media_type=media_type,

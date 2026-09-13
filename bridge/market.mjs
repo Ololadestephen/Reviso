@@ -14,7 +14,14 @@ const config = loadConfig({
 const client = new BitgetRestClient(config);
 const market = buildTools(config).find((tool) => tool.name === "market");
 if (!market) throw new Error("SDK market interface unavailable");
-const allowedSymbols = new Set(["RNVDAUSDT", "RAAPLUSDT", "RMSFTUSDT"]);
+const allowedSymbols = new Set([
+  "RNVDAUSDT",
+  "RAAPLUSDT",
+  "RMSFTUSDT",
+  "RGOOGLUSDT",
+  "RAMZNUSDT",
+  "RTSLAUSDT",
+]);
 const symbol = process.argv[2];
 if (!allowedSymbols.has(symbol))
   throw new Error("Instrument is outside the allowlist");

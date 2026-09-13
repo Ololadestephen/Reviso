@@ -1,8 +1,17 @@
 """Version-bounded research exports assembled only from saved repository state."""
 
+import re
+from pathlib import Path
+
+from fpdf import FPDF
+from fpdf.enums import Align, XPos, YPos
+
 from backend.contracts import utc_now
 from backend.instruments import instrument_by_id
 from backend.storage import Repository
+
+_FONTS = Path(__file__).resolve().parent / "assets" / "fonts"
+_LINK = re.compile(r"\[([^\]]+)\]\((https?://[^)]+)\)")
 
 
 def research_snapshot(repo: Repository, thesis_id: str, version: int | None = None) -> dict:
@@ -130,3 +139,84 @@ def markdown_snapshot(snapshot: dict) -> str:
     lines.extend(["", "## Limitations", ""])
     lines.extend(f"- {item}" for item in snapshot["limitations"])
     return "\n".join(lines) + "\n"
+
+
+class ResearchPdf(FPDF):
+    def __init__(self, running_title: str):
+        super().__init__(format="A4")
+        self.running_title = running_title
+        self.set_auto_page_break(auto=True, margin=22)
+        self.set_margins(18, 16, 18)
+        self.add_font("DejaVu", "", _FONTS / "DejaVuSans.ttf")
+        self.add_font("DejaVu", "B", _FONTS / "DejaVuSans-Bold.ttf")
+
+    def header(self):
+        if self.page_no() == 1:
+            return
+        self.set_font("DejaVu", size=9)
+        self.set_text_color(100, 110, 125)
+        self.cell(0, 8, self.running_title, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+        self.set_draw_color(220, 224, 230)
+        self.line(18, self.get_y(), 192, self.get_y())
+        self.ln(4)
+        self.set_text_color(20, 24, 32)
+
+    def footer(self):
+        self.set_y(-16)
+        self.set_font("DejaVu", size=8)
+        self.set_text_color(110, 118, 130)
+        self.cell(
+            0,
+            8,
+            f"Page {self.page_no()}  ·  Research record only; no trade was placed.",
+            align=Align.C,
+        )
+
+
+def _break_long(text: str, limit: int = 80) -> str:
+    pieces: list[str] = []
+    for token in text.split(" "):
+        if len(token) <= limit:
+            pieces.append(token)
+            continue
+        pieces.append(
+            " ".join(token[index : index + limit] for index in range(0, len(token), limit))
+        )
+    return " ".join(pieces)
+
+
+def _write(
+    pdf: ResearchPdf, text: str, size: int, *, bold: bool = False, indent: float = 0
+) -> None:
+    pdf.set_font("DejaVu", "B" if bold else "", size)
+    pdf.set_text_color(20, 24, 32)
+    pdf.set_x(pdf.l_margin + indent)
+    pdf.multi_cell(pdf.epw - indent, size * 0.5 + 1.5, _break_long(text))
+
+
+def pdf_snapshot(snapshot: dict) -> bytes:
+    """Readable PDF of the same saved snapshot as the Markdown export."""
+    title = f"Reviso research · {snapshot['instrument']['display_name']}"
+    pdf = ResearchPdf(title)
+    pdf.add_page()
+    for raw in markdown_snapshot(snapshot).splitlines():
+        line = _LINK.sub(r"\1 (\2)", raw)
+        if line == "":
+            pdf.ln(3)
+        elif line.startswith("# "):
+            _write(pdf, line[2:], 20, bold=True)
+            pdf.ln(1)
+        elif line.startswith("## "):
+            pdf.ln(2)
+            _write(pdf, line[3:], 13, bold=True)
+            pdf.ln(1)
+        elif line.startswith("### "):
+            pdf.ln(1)
+            _write(pdf, line[4:], 11, bold=True)
+        elif line.startswith("- "):
+            _write(pdf, f"• {line[2:]}", 10)
+        elif line.startswith("  - "):
+            _write(pdf, f"– {line[4:]}", 10, indent=6)
+        else:
+            _write(pdf, line, 10)
+    return bytes(pdf.output())

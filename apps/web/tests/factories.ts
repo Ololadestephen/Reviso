@@ -1,5 +1,6 @@
 import {
   assessmentSchema,
+  conversationThreadSchema,
   evidenceSchema,
   instrumentSchema,
   llmStatusSchema,
@@ -8,6 +9,7 @@ import {
   thesisRecordSchema,
   thesisSummarySchema,
   type Assessment,
+  type ConversationThread,
   type Evidence,
   type Instrument,
   type LLMStatus,
@@ -192,6 +194,35 @@ export function makeResearchAnswer(
     },
     input_hash: "question-input-hash",
     created_at: "2026-09-10T00:00:00Z",
+    ...overrides,
+  });
+}
+
+export function makeConversation(
+  overrides: Overrides<ConversationThread> = {},
+): ConversationThread {
+  return conversationThreadSchema.parse({
+    thesis_id: "thesis-1",
+    thesis_version: 2,
+    assessment_input_hash: "a".repeat(64),
+    context_hash: "b".repeat(64),
+    messages: [
+      {
+        id: "explain-1",
+        role: "assistant",
+        kind: "explanation",
+        text: "The filing supports the confirmed margin condition.",
+        question: null,
+        answer: {
+          summary: "The filing supports the confirmed margin condition.",
+          facts: ["margin: SUPPORTS"],
+          uncertainty: "The next reporting period remains unknown.",
+          evidence_ids: ["source-1"],
+        },
+        evidence_ids: ["source-1"],
+        created_at: "2026-09-10T00:00:00Z",
+      },
+    ],
     ...overrides,
   });
 }

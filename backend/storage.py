@@ -231,6 +231,36 @@ class Repository:
             rows = connection.execute(query, parameters).fetchall()
         return [json.loads(row["body"]) for row in rows]
 
+    def assessment_with_narrative(self, thesis_id: str, context_hash: str) -> dict | None:
+        with self.connect() as connection:
+            rows = connection.execute(
+                "SELECT body FROM assessments WHERE thesis_id=? ORDER BY rowid DESC",
+                (thesis_id,),
+            ).fetchall()
+        for row in rows:
+            body = json.loads(row["body"])
+            if body.get("narrative_context_hash") == context_hash and body.get("narrative_review"):
+                return body
+        return None
+
+    def thread(self, thesis_id: str, context_hash: str) -> dict | None:
+        self.get(thesis_id)
+        with self.connect() as connection:
+            row = connection.execute(
+                "SELECT body FROM research_threads WHERE thesis_id=? AND context_hash=?",
+                (thesis_id, context_hash),
+            ).fetchone()
+        return json.loads(row["body"]) if row else None
+
+    def save_thread(self, thread: dict) -> dict:
+        with self.connect() as connection:
+            connection.execute(
+                "INSERT INTO research_threads (thesis_id, context_hash, body) VALUES (?, ?, ?) "
+                "ON CONFLICT(thesis_id, context_hash) DO UPDATE SET body=excluded.body",
+                (thread["thesis_id"], thread["context_hash"], json.dumps(thread)),
+            )
+        return thread
+
     def evidence(self, evidence_id: str) -> Evidence:
         with self.connect() as connection:
             row = connection.execute(

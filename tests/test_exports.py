@@ -1,7 +1,14 @@
+from io import BytesIO
+
 from fastapi.testclient import TestClient
+from pypdf import PdfReader
 
 from backend.api import create_app
 from tests.test_llm import FakeLanguageModel
+
+
+def pdf_text(content: bytes) -> str:
+    return "\n".join(page.extract_text() or "" for page in PdfReader(BytesIO(content)).pages)
 
 
 def test_export_is_saved_state_only_version_bounded_and_keeps_prior_assessment(tmp_path, thesis):
@@ -52,6 +59,26 @@ def test_export_is_saved_state_only_version_bounded_and_keeps_prior_assessment(t
         assert "## Cited follow-up answers" in markdown.text
         assert "no trade was placed" in markdown.text.lower()
         assert "BITGET_QWEN_API_KEY" not in markdown.text
+
+        pdf = client.get(base + "/export?format=pdf&version=3")
+        assert pdf.status_code == 200
+        assert pdf.headers["content-type"].startswith("application/pdf")
+        assert "reviso-nvda-v3.pdf" in pdf.headers["content-disposition"]
+        assert pdf.content.startswith(b"%PDF")
+        text = pdf_text(pdf.content)
+        assert "Reviso research · NVIDIA" in text
+        assert "Cited follow-up answers" in text
+        assert "Which saved fact bears on this thesis?" in text
+        assert "no trade was placed" in text.lower()
+        assert "BITGET_QWEN_API_KEY" not in text
+        assert b"BITGET_QWEN_API_KEY" not in pdf.content
+
+        original_pdf = client.get(base + "/export?format=pdf&version=1")
+        original_text = pdf_text(original_pdf.content)
+        assert "unconfirmed" in original_text.lower()
+        assert "No saved assessment for this thesis version." in original_text
+        assert "Which saved fact bears on this thesis?" not in original_text
+        assert "The saved evidence still supports continued research." not in original_text
 
 
 def test_unknown_export_version_is_not_found(tmp_path, thesis):

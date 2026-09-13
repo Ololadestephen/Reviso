@@ -2,7 +2,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   confirmDraft,
   askResearchQuestion,
+  continueConversation,
   extractProposal,
+  fetchConversation,
   fetchInstruments,
   fetchResearchAnswers,
   fetchHistory,
@@ -18,7 +20,13 @@ import {
   saveRevision,
   suggestAssumptions,
 } from "../api/endpoints";
-import type { InstrumentId, ThesisInput, ThesisRecord } from "../api/schemas";
+import type {
+  Assessment,
+  History,
+  InstrumentId,
+  ThesisInput,
+  ThesisRecord,
+} from "../api/schemas";
 import { queryKeys } from "./client";
 
 export type StressScenario = Parameters<typeof runStress>[1];
@@ -50,7 +58,7 @@ export function useLlmStatus() {
   return useQuery({
     queryKey: queryKeys.llmStatus,
     queryFn: ({ signal }) => fetchLlmStatus(signal),
-    staleTime: 5 * 60_000,
+    staleTime: 15_000,
   });
 }
 
@@ -70,6 +78,19 @@ export function useResearchAnswers(id: string | null) {
   });
 }
 
+export function useConversation(
+  id: string | null,
+  assessmentInputHash: string | null,
+  enabled = true,
+) {
+  return useQuery({
+    queryKey: queryKeys.conversation(id ?? "", assessmentInputHash ?? ""),
+    queryFn: ({ signal }) =>
+      fetchConversation(id as string, assessmentInputHash as string, signal),
+    enabled: enabled && id !== null && !!assessmentInputHash,
+  });
+}
+
 /**
  * Every write invalidates the thesis key, which prefix-matches its history and
  * assessments too, so a single invalidation refreshes the whole workspace.
@@ -83,6 +104,44 @@ function useThesisMutation<TArgs, TResult>(
     mutationFn: run,
     onSuccess: () => {
       if (id) client.invalidateQueries({ queryKey: queryKeys.thesis(id) });
+      client.invalidateQueries({ queryKey: queryKeys.theses, exact: true });
+    },
+  });
+}
+
+function rememberAssessment(assessment: Assessment) {
+  return (current: History | undefined) => {
+    if (!current) return current;
+    const assessments = current.assessments.some(
+      (item) => item.input_hash === assessment.input_hash,
+    )
+      ? current.assessments.map((item) =>
+          item.input_hash === assessment.input_hash ? assessment : item,
+        )
+      : [...current.assessments, assessment];
+    return {
+      ...current,
+      assessments,
+      selected_assessment: assessment,
+    };
+  };
+}
+
+function useEvidenceMutation<TArgs>(
+  id: string | null,
+  run: (args: TArgs) => Promise<Assessment>,
+) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: run,
+    onSuccess: (assessment) => {
+      if (id) {
+        client.setQueryData(
+          queryKeys.history(id),
+          rememberAssessment(assessment),
+        );
+        client.invalidateQueries({ queryKey: queryKeys.thesis(id) });
+      }
       client.invalidateQueries({ queryKey: queryKeys.theses, exact: true });
     },
   });
@@ -107,19 +166,19 @@ export function useConfirmThesis(record: ThesisRecord | null) {
 }
 
 export function useReplayStep(record: ThesisRecord | null) {
-  return useThesisMutation(record?.id ?? null, (step: number) =>
+  return useEvidenceMutation(record?.id ?? null, (step: number) =>
     replayEvidence(record as ThesisRecord, step),
   );
 }
 
 export function useRefreshEvidence(record: ThesisRecord | null) {
-  return useThesisMutation(record?.id ?? null, () =>
+  return useEvidenceMutation(record?.id ?? null, () =>
     refreshEvidence(record as ThesisRecord),
   );
 }
 
 export function useReviewEvidence(record: ThesisRecord | null) {
-  return useThesisMutation(record?.id ?? null, () =>
+  return useEvidenceMutation(record?.id ?? null, () =>
     reviewEvidence(record as ThesisRecord),
   );
 }
@@ -196,6 +255,35 @@ export function useAskResearchQuestion(record: ThesisRecord | null) {
     onSuccess: () => {
       if (record)
         client.invalidateQueries({ queryKey: queryKeys.questions(record.id) });
+    },
+  });
+}
+
+export function useContinueConversation(record: ThesisRecord | null) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      question,
+      assessmentInputHash,
+      detail = false,
+    }: {
+      question: string;
+      assessmentInputHash: string;
+      detail?: boolean;
+    }) =>
+      continueConversation(
+        record as ThesisRecord,
+        question,
+        assessmentInputHash,
+        detail,
+      ),
+    onSuccess: (thread) => {
+      if (record) {
+        client.setQueryData(
+          queryKeys.conversation(record.id, thread.assessment_input_hash),
+          thread,
+        );
+      }
     },
   });
 }

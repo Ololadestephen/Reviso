@@ -5,12 +5,9 @@ import {
   useParams,
   useSearchParams,
 } from "react-router-dom";
-import AssumptionLedger from "../AssumptionLedger";
+import EvidenceStep from "../features/journey/EvidenceStep";
 import IdeaComposer from "../features/journey/IdeaComposer";
 import JourneyProgress from "../features/journey/JourneyProgress";
-import ReplayPanel from "../ReplayPanel";
-import ResearchQuestions from "../features/journey/ResearchQuestions";
-import ScenarioExplorer from "../ScenarioExplorer";
 import SourceDrawer from "../SourceDrawer";
 import StockPicker from "../features/journey/StockPicker";
 import { CompanyLogo } from "../components/Brand";
@@ -73,9 +70,7 @@ export default function Workspace() {
     llmStatus,
     instruments,
     instrumentsLoading,
-    questions,
     suggestAssumptions,
-    askQuestion,
   } = workspace;
 
   useEffect(() => {
@@ -237,7 +232,7 @@ export default function Workspace() {
               }
             >
               {pending.suggest
-                ? "Qwen is drafting conditions…"
+                ? "Qwen is drafting conditions… this can take up to a minute"
                 : "Help me draft conditions"}
             </button>
             <button
@@ -250,8 +245,8 @@ export default function Workspace() {
           </div>
           <p className="caption">
             {llmStatus.configured
-              ? "Qwen receives your company choice and idea only. Suggestions remain editable and are not saved or confirmed automatically."
-              : "Qwen is unavailable in this environment. Continue manually; nothing will be sent to an AI provider."}
+              ? "Qwen receives your company choice and idea only. Suggestions stay editable. The first reply can take up to a minute; your text is kept if it fails."
+              : "Qwen is not connected on this app. Continue in your own words; nothing will be sent to an AI provider."}
           </p>
         </section>
       )}
@@ -366,133 +361,29 @@ export default function Workspace() {
       )}
 
       {step === 4 && instrument && record?.confirmed && (
-        <>
-          <section className="journey-intro">
-            <h1>Inspect the evidence</h1>
-            <p className="lead">
-              Start with the saved result. Open the source when a finding
-              matters, and keep missing information visible.
-            </p>
-          </section>
-          <div className="workspace-grid evidence-grid">
-            <div>
-              <ReplayPanel
-                writing={writing}
-                pending={pending}
-                active={active}
-                replay={replay}
-                refresh={refresh}
-                latest={latest}
-                reviewWithAI={workspace.reviewWithAI}
-                llmStatus={llmStatus}
-                instrument={instrument}
-              />
-              {latest &&
-                latest.evidence.length === 0 &&
-                lastEvidenceAssessment && (
-                  <section className="panel recovery-panel">
-                    <span className="eyebrow">LAST SAVED EVIDENCE</span>
-                    <h2>The latest check did not erase your prior sources</h2>
-                    <p>
-                      This evidence belongs to the earlier assessment from{" "}
-                      {new Date(
-                        lastEvidenceAssessment.evaluated_at,
-                      ).toLocaleString()}
-                      . It is preserved for context and is not presented as the
-                      current result.
-                    </p>
-                    <div className="evidence-links">
-                      {lastEvidenceAssessment.evidence.map((item) => (
-                        <button
-                          type="button"
-                          key={item.id}
-                          onClick={() => setSource(item)}
-                        >
-                          ↗ {item.title}
-                        </button>
-                      ))}
-                    </div>
-                  </section>
-                )}
-              <AssumptionLedger
-                latest={latest}
-                history={history}
-                setSource={setSource}
-              />
-            </div>
-            <div>
-              {latest?.evidence.length ? (
-                <ResearchQuestions
-                  latest={latest}
-                  answers={questions}
-                  pending={pending.question}
-                  llmStatus={llmStatus}
-                  onAsk={askQuestion}
-                  onSource={setSource}
-                />
-              ) : (
-                <section className="panel unknown">
-                  <span className="eyebrow">NEXT USEFUL ACTION</span>
-                  <h2>Load current evidence</h2>
-                  <p>
-                    Reviso needs a saved company disclosure before it can
-                    provide cited follow-up answers.
-                  </p>
-                </section>
-              )}
-              <details className="advanced-panel">
-                <summary>Advanced controlled stress test</summary>
-                <ScenarioExplorer
-                  key={`${record.id}-${record.version}-${latest?.input_hash}`}
-                  disabled={!active || writing}
-                  pending={pending.stress}
-                  initial={latest?.numerical ?? null}
-                  scenario={latest?.scenario}
-                  onRun={runStress}
-                />
-              </details>
-              <section className="panel unknown">
-                <span className="eyebrow">WHAT REMAINS UNKNOWN</span>
-                <h2>
-                  {latest?.next_question ??
-                    "What evidence would change your view?"}
-                </h2>
-                <ul>
-                  {(
-                    latest?.missing ?? [
-                      "Current company evidence has not been loaded",
-                      "Token terms and redemption availability",
-                    ]
-                  ).map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </section>
-            </div>
-          </div>
-          <div className="actions journey-actions bottom-actions">
-            {active && (
-              <button
-                type="button"
-                onClick={() => {
-                  setEditing(true);
-                  setForm(fromThesisInput(record.thesis));
-                  setStep(3);
-                }}
-              >
-                Change conditions
-              </button>
-            )}
-            <button
-              type="button"
-              className="primary"
-              disabled={!latest}
-              onClick={() => setStep(5)}
-            >
-              Record my decision →
-            </button>
-          </div>
-        </>
+        <EvidenceStep
+          writing={writing}
+          pending={pending}
+          active={active}
+          replay={replay}
+          refresh={refresh}
+          latest={latest}
+          reviewWithAI={workspace.reviewWithAI}
+          reviewFailed={workspace.reviewFailed}
+          llmStatus={llmStatus}
+          instrument={instrument}
+          history={history}
+          runStress={runStress}
+          record={record}
+          lastEvidenceAssessment={lastEvidenceAssessment}
+          onOpenSourceDetails={setSource}
+          onChangeConditions={() => {
+            setEditing(true);
+            setForm(fromThesisInput(record.thesis));
+            setStep(3);
+          }}
+          onRecordDecision={() => setStep(5)}
+        />
       )}
 
       {step === 5 && instrument && record && (
@@ -559,6 +450,13 @@ export default function Workspace() {
               </p>
             </div>
             <div className="actions">
+              <a
+                className="button-link primary"
+                href={exportThesisUrl(record.id, "pdf", record.version)}
+                download
+              >
+                Download PDF
+              </a>
               <a
                 className="button-link"
                 href={exportThesisUrl(record.id, "markdown", record.version)}

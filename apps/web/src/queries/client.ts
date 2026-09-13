@@ -29,4 +29,6 @@ export const queryKeys = {
   llmStatus: ["llm-status"] as const,
   instruments: ["instruments"] as const,
   questions: (id: string) => ["theses", id, "questions"] as const,
+  conversation: (id: string, hash: string) =>
+    ["theses", id, "conversation", hash] as const,
 };

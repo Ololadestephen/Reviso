@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type {
+  Assessment,
   InstrumentId,
   Evidence,
   History,
@@ -15,14 +16,12 @@ import {
   type EditableThesis,
 } from "./domain/defaults";
 import {
-  useAskResearchQuestion,
   useConfirmThesis,
   useExtractProposal,
   useHistory,
   useInstruments,
   useLlmStatus,
   useRecordDecision,
-  useResearchAnswers,
   useRefreshEvidence,
   useReplayStep,
   useReviewEvidence,
@@ -45,7 +44,8 @@ const unconfiguredLlm: LLMStatus = {
   model: "qwen3.8-max",
   configured: false,
   extraction_prompt: "thesis-extraction-v2",
-  review_prompt: "evidence-review-v2",
+  review_prompt: "evidence-review-v3",
+  streaming: "untested",
 };
 
 /**
@@ -97,7 +97,8 @@ export function useWorkspace(
   const historyQuery = useHistory(thesisId);
   const llmQuery = useLlmStatus();
   const instrumentsQuery = useInstruments();
-  const questionsQuery = useResearchAnswers(thesisId);
+  const explainKey = useRef<string | null>(null);
+  const pendingExplain = useRef<Assessment | null>(null);
 
   const record = thesisQuery.data ?? null;
   const history = historyQuery.data ?? emptyHistory;
@@ -118,7 +119,6 @@ export function useWorkspace(
   const stressMutation = useRunStress(thesisId);
   const extractMutation = useExtractProposal();
   const suggestMutation = useSuggestAssumptions();
-  const questionMutation = useAskResearchQuestion(record);
 
   const mutations = [
     draftMutation,
@@ -131,7 +131,6 @@ export function useWorkspace(
     stressMutation,
     extractMutation,
     suggestMutation,
-    questionMutation,
   ];
 
   /**
@@ -144,7 +143,6 @@ export function useWorkspace(
     thesisQuery.error ??
     historyQuery.error ??
     instrumentsQuery.error ??
-    questionsQuery.error ??
     null;
 
   function clearErrors() {
@@ -181,11 +179,37 @@ export function useWorkspace(
     stress: stressMutation.isPending,
     extract: extractMutation.isPending,
     suggest: suggestMutation.isPending,
-    question: questionMutation.isPending,
   };
 
   /** Any write is in flight; a concurrent write would race the version check. */
   const writing = mutations.some((mutation) => mutation.isPending);
+
+  function maybeExplain(assessment: Assessment) {
+    if (!record) return;
+    if (!assessment.evidence.length || assessment.narrative_review) return;
+    if (llmQuery.isPending) {
+      pendingExplain.current = assessment;
+      return;
+    }
+    pendingExplain.current = null;
+    if (!llmQuery.data?.configured) return;
+    const key = `${record.id}:${assessment.input_hash}`;
+    if (explainKey.current === key || reviewMutation.isPending) return;
+    explainKey.current = key;
+    reviewMutation.mutate(undefined, {
+      onError: () => {
+        if (explainKey.current === key) explainKey.current = null;
+      },
+    });
+  }
+
+  useEffect(() => {
+    if (pendingExplain.current && !llmQuery.isPending) {
+      const waiting = pendingExplain.current;
+      pendingExplain.current = null;
+      maybeExplain(waiting);
+    }
+  }, [llmQuery.isPending, llmQuery.data?.configured]);
 
   return {
     thesisId,
@@ -211,7 +235,7 @@ export function useWorkspace(
     llmProvenance,
     instruments: instrumentsQuery.data ?? [],
     instrumentsLoading: instrumentsQuery.isLoading,
-    questions: questionsQuery.data ?? [],
+    reviewFailed: reviewMutation.isError,
     active: !!record?.confirmed && !record.retired,
 
     create: () => withValidThesis((thesis) => draftMutation.mutate(thesis)),
@@ -221,11 +245,15 @@ export function useWorkspace(
       ),
     replay: (step: number) => {
       clearErrors();
-      replayMutation.mutate(step);
+      replayMutation.mutate(step, {
+        onSuccess: (assessment) => maybeExplain(assessment),
+      });
     },
     refresh: () => {
       clearErrors();
-      refreshMutation.mutate();
+      refreshMutation.mutate(undefined, {
+        onSuccess: (assessment) => maybeExplain(assessment),
+      });
     },
     reviewWithAI: () => {
       clearErrors();
@@ -291,19 +319,6 @@ export function useWorkspace(
           },
         ),
       ),
-    askQuestion: (question: string) => {
-      clearErrors();
-      if (!latest) {
-        setLocalError(
-          new Error("Load and save evidence before asking a cited question."),
-        );
-        return;
-      }
-      questionMutation.mutate({
-        question,
-        assessmentInputHash: latest.input_hash,
-      });
-    },
     runStress: stressMutation.mutateAsync,
   };
 }

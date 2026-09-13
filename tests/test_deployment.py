@@ -34,9 +34,12 @@ def test_public_pages_are_open_while_saved_research_requires_authentication(tmp_
         "/reviso-mark.svg",
         "/step-check-idea.svg",
         "/step-write-idea.svg",
+        "/stock-logos/alphabet.svg",
+        "/stock-logos/amazon.svg",
         "/stock-logos/apple.svg",
         "/stock-logos/microsoft.svg",
         "/stock-logos/nvidia.svg",
+        "/stock-logos/tesla.svg",
     )
     for path in public_images:
         image = web / path.removeprefix("/")

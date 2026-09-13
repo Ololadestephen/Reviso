@@ -4,20 +4,20 @@ The installed Desloppify workflow was used for separate coherent backend and fro
 
 ## Latest tool-reported scores
 
-These are scanner outputs, not test coverage percentages or research-accuracy scores. All subjective dimensions are still unassessed; the tool records them as zero. Independent review/triage is incomplete: the latest sandboxed retry could not open Codex state, while the elevated retry completed one of twenty blind batches before being stopped to avoid delaying product work. No partial review was imported. The next queued item in both projects remains the initial subjective review.
+These are scanner outputs, not test coverage percentages or research-accuracy scores. All subjective dimensions are still unassessed; the tool records them as zero. Independent review/triage is incomplete: the latest scans still queue an initial subjective review, which was deferred without fabricated scores because runner-backed review remains gated. Mechanical scans and tests continue.
 
 | Project | Overall (lenient) | Objective | Strict | Verified | Open findings |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| backend | 23.3 | 93.4 | 21.2 | 93.4 | 47 |
-| apps/web | 20.2 | 80.7 | 19.4 | 80.7 | 54 |
+| backend | 22.8 | 91.3 | 21.0 | 91.3 | 56 |
+| apps/web | 20.5 | 82.2 | 19.4 | 82.2 | 57 |
 
 | Mechanical dimension | Backend health | Backend strict | Web health | Web strict |
 | --- | ---: | ---: | ---: | ---: |
-| File health | 92.2 | 88.3 | 97.9 | 97.9 |
-| Code quality | 91.0 | 86.1 | 97.1 | 96.0 |
-| Duplication | 100.0 | 100.0 | 100.0 | 100.0 |
-| Security | 98.3 | 95.0 | 100.0 | 100.0 |
-| Test health | 90.7 | 73.4 | 47.4 | 39.6 |
+| File health | 92.6 | 88.9 | 100.0 | 98.1 |
+| Code quality | 89.3 | 84.9 | 97.7 | 95.6 |
+| Duplication | 100.0 | 100.0 | 99.0 | 99.0 |
+| Security | 98.4 | 95.3 | 100.0 | 100.0 |
+| Test health | 85.2 | 69.8 | 48.0 | 36.5 |
 
 | Subjective dimension | Backend | Web | Assessment status |
 | --- | ---: | ---: | --- |
@@ -59,7 +59,7 @@ Earlier backend mechanical health/strict: file 100/93.6, code 87/84.3, duplicati
 - Provider normalization and stored/API dictionaries need continued typed-contract review. Runtime schemas and OpenAPI snapshot checks now cover the browser/API boundary, but scanner output is not proof of full contract coherence.
 - Backend route coverage is reported as transitive: API integration tests reach the router through `create_app`. No meaningless direct import was added to influence that score.
 - The Bitget Qwen and Groq adapters have contract, repair, failure, provider-selection, idempotence and API-boundary tests using injected fakes or an HTTP mock transport. The new suggestion and cited-question paths include false-citation repair, untrusted-input framing, duplicate submission and outdated-context tests. The frozen newcomer batch used six live requests and is reported separately; its suggestion errors were not suppressed or converted into passes.
-- NVIDIA, Apple and Microsoft evidence fixtures cover issuer identity, aligned quarterly facts, partial/stale states, recovery labeling and cross-company rejection. Live-evaluation harnesses have offline freeze/cap tests and are excluded from automatic live execution by filename. Captured Qwen bare-array and incomplete-response shapes have regression tests. The earlier frozen v2 validation passed all five application contracts; the newer newcomer batch produced two adjudicated passes and three errors under its own frozen corpus. Neither is a general research-accuracy measure. No exception was suppressed. Overall verification now totals 95 backend and 34 frontend tests.
+- NVIDIA, Apple and Microsoft evidence fixtures cover issuer identity, aligned quarterly facts, partial/stale states, recovery labeling and cross-company rejection. Live-evaluation harnesses have offline freeze/cap tests and are excluded from automatic live execution by filename. Captured Qwen bare-array and incomplete-response shapes have regression tests. The earlier frozen v2 validation passed all five application contracts; the newer newcomer batch produced two adjudicated passes and three errors under its own frozen corpus. Neither is a general research-accuracy measure. No exception was suppressed. Overall verification now totals 104 backend and 45 frontend tests.
 - Frontend tests exercise runtime response schemas and the newcomer controls, including blank inputs, the collapsed slippage default, an actually blank manual claim, verified stock choice, manual fallback, locked conditions, unavailable evidence, current-context citations and source opening. The public-page test also verifies that the landing page and prepared example render without an API request. The final local Apple browser journey completed the five-stage flow and deep-link reload; keyboard focus, native dialog restoration and 390px/768px overflow checks passed. The later landing-page browser check covered the public home, example, research library and company picker in the production build. A subsequent visual pass added the local Reviso mark, favicon, company marks, gradient hero and evidence chart; it passed the same frontend suite and a production-browser check. Safari/Firefox, formal accessibility certification and broad interaction/race coverage remain incomplete. The scanner's web test-health result reflects its import/detector model and is not the same quantity as the 34 passing runtime tests.
 - Structural extractions separated API routing, frontend state, timeline, replay, ledger and scenario components. Remaining source-URL and style-size findings are not a reason to remove provenance or hide application files.
 

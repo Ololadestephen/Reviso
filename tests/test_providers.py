@@ -70,5 +70,14 @@ def test_each_allowlisted_stock_has_an_isolated_cache_and_bridge_symbol(monkeypa
     provider = BitgetProvider()
     assert provider.snapshot("RAAPLUSDT")["instrument_id"] == "RAAPLUSDT"
     assert provider.snapshot("RMSFTUSDT")["instrument_id"] == "RMSFTUSDT"
+    assert provider.snapshot("RGOOGLUSDT")["instrument_id"] == "RGOOGLUSDT"
+    assert provider.snapshot("RAMZNUSDT")["instrument_id"] == "RAMZNUSDT"
+    assert provider.snapshot("RTSLAUSDT")["instrument_id"] == "RTSLAUSDT"
     assert provider.snapshot("RAAPLUSDT")["cached"] is True
-    assert calls == ["RAAPLUSDT", "RMSFTUSDT"]
+    assert calls == [
+        "RAAPLUSDT",
+        "RMSFTUSDT",
+        "RGOOGLUSDT",
+        "RAMZNUSDT",
+        "RTSLAUSDT",
+    ]

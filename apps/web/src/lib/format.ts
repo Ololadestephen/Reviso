@@ -14,6 +14,85 @@ export function stateLabel(state: State | NarrativeStance) {
   return state.toLowerCase().replaceAll("_", " ");
 }
 
+/** Plain finding label. Status cannot rely on color alone. */
+export function findingLabel(state: State) {
+  if (state === "SUPPORTED") return "Supported";
+  if (state === "CHALLENGED") return "Needs attention";
+  if (state === "INVALIDATED") return "Did not hold";
+  return "Not enough evidence";
+}
+
+export function resultHeadline(state: State) {
+  if (state === "SUPPORTED") return "This filing supports your idea";
+  if (state === "CHALLENGED") return "This filing needs a closer look";
+  if (state === "INVALIDATED") return "This filing does not support your idea";
+  return "This filing is not enough to check your idea";
+}
+
+export function resultLead(assessment: {
+  state: State;
+  assumptions: { state: State }[];
+  next_question: string;
+}) {
+  const total = assessment.assumptions.length;
+  const checked = assessment.assumptions.filter(
+    (item) => item.state !== "INSUFFICIENT_EVIDENCE",
+  ).length;
+  const missing = total - checked;
+  const counts =
+    total > 0 && missing > 0 && checked > 0
+      ? ` ${checked} condition${checked === 1 ? " has" : "s have"} a number in this filing. ${missing} still ${missing === 1 ? "does" : "do"} not.`
+      : "";
+  if (assessment.state === "INVALIDATED") {
+    return `A condition you said would change your mind did not hold in this report.${counts}`;
+  }
+  if (assessment.state === "INSUFFICIENT_EVIDENCE") {
+    return `This report does not include the numbers needed to check one or more required conditions.${counts}`;
+  }
+  if (assessment.state === "CHALLENGED") {
+    return `At least one required condition looks weaker than you asked for. Read it before you decide.${counts}`;
+  }
+  if (!total) return assessment.next_question;
+  if (missing === total) {
+    return "None of your conditions have a reported number in this filing yet.";
+  }
+  return "The numbers in this report still match the conditions you confirmed.";
+}
+
+/** Engine placeholders are not gaps a visitor can act on. */
+export function humanGaps(items: string[]): string[] {
+  const seen = new Set<string>();
+  const gaps: string[] = [];
+  for (const item of items) {
+    if (item.includes("Narrative AI review")) continue;
+    let text = item;
+    if (item.includes("share reference") || item.includes("unit ratio")) {
+      text =
+        "Reviso cannot compare this token price with the listed share price.";
+    } else if (item.includes("Token terms") || item.includes("redemption")) {
+      text =
+        "Whether you can redeem the token for shares is not part of this check.";
+    } else if (item.includes("no older report substituted")) {
+      text =
+        "The latest filing could not be loaded. An older report was not used instead.";
+    }
+    if (seen.has(text)) continue;
+    seen.add(text);
+    gaps.push(text);
+  }
+  return gaps;
+}
+
+export function aiHelpCopy(configured: boolean, hasEvidence: boolean) {
+  if (!configured) {
+    return "Qwen is not connected on this app, so it cannot explain the filing. You can still read the numbers and record a decision.";
+  }
+  if (!hasEvidence) {
+    return "Load a filing first. Qwen can then explain this check; it cannot change the result.";
+  }
+  return "Qwen reads your conditions and this filing only. Its explanation cannot change the result.";
+}
+
 /** First sentence of an idea, clipped for lists. Never invents a title. */
 export function ideaTitle(rationale: string, limit = 72): string {
   const compact = rationale.replace(/\s+/g, " ").trim();
@@ -35,8 +114,7 @@ export function llmProviderLabel(provider: string) {
 }
 
 /**
- * Must stay byte-identical to `Assumption.consistent_condition` in
- * backend/contracts.py, which rejects any other wording for a known metric.
+ * Must stay byte-identical to `canonical_invalidation` in backend/contracts.py.
  */
 export function conditionText(metric: Metric, minimum: string) {
   if (metric === "manual")

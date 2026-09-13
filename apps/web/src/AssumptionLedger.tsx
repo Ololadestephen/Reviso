@@ -1,79 +1,90 @@
-import { stateLabel } from "./lib/format";
+import { findingLabel } from "./lib/format";
 import type { Assessment, Evidence, History } from "./api/schemas";
+
 export default function AssumptionLedger({
   latest,
   history,
   setSource,
+  selectedId,
 }: {
   latest: Assessment | null;
   history: History;
   setSource: (source: Evidence | null) => void;
+  selectedId?: string | null;
 }) {
   return (
-    <section className="panel">
+    <section className="panel findings-panel" aria-labelledby="findings-title">
       <div className="section-heading">
         <div>
           <span className="eyebrow">YOUR CONDITIONS</span>
-          <h2>What the evidence shows</h2>
+          <h2 id="findings-title">What this filing says</h2>
         </div>
       </div>
       {latest ? (
-        latest.assumptions.map((item) => (
-          <article className="ledger-item" key={item.assumption_id}>
-            <div className="ledger-heading">
-              <strong>
-                {history.versions
-                  .find((v) => v.version === latest.thesis_version)
-                  ?.thesis.assumptions.find((a) => a.id === item.assumption_id)
-                  ?.claim ?? item.assumption_id}
-              </strong>
-              <span className={`badge ${item.state.toLowerCase()}`}>
-                {stateLabel(item.state)}
-              </span>
-            </div>
-            <p>{item.explanation}</p>
-            <div className="evidence-links">
-              {item.evidence_ids.map((id) => (
+        latest.assumptions.map((item) => {
+          const claim =
+            history.versions
+              .find((version) => version.version === latest.thesis_version)
+              ?.thesis.assumptions.find(
+                (assumption) => assumption.id === item.assumption_id,
+              )?.claim ?? item.assumption_id;
+          const cited = item.evidence_ids
+            .map((id) => latest.evidence.find((entry) => entry.id === id))
+            .filter((entry): entry is Evidence => Boolean(entry));
+          const selected = cited.some((entry) => entry.id === selectedId);
+          const heading = (
+            <>
+              <span
+                className={`finding-dot ${
+                  item.state === "SUPPORTED"
+                    ? "supported"
+                    : item.state === "INSUFFICIENT_EVIDENCE"
+                      ? "unknown"
+                      : "attention"
+                }`}
+                aria-hidden="true"
+              />
+              <strong>{claim}</strong>
+              <small>{findingLabel(item.state)}</small>
+            </>
+          );
+          return (
+            <article
+              className={`finding${selected ? " selected" : ""}`}
+              key={item.assumption_id}
+            >
+              {cited[0] ? (
                 <button
-                  key={id}
-                  onClick={() =>
-                    setSource(latest.evidence.find((e) => e.id === id) ?? null)
-                  }
+                  type="button"
+                  className="finding-heading"
+                  onClick={() => setSource(cited[0])}
                 >
-                  ↗ {latest.evidence.find((e) => e.id === id)?.title ?? id} ·
-                  primary source
+                  {heading}
                 </button>
-              ))}
-            </div>
-          </article>
-        ))
+              ) : (
+                <div className="finding-heading">{heading}</div>
+              )}
+              <p>{item.explanation}</p>
+              {cited.length > 1 && (
+                <div className="evidence-links">
+                  {cited.map((entry) => (
+                    <button
+                      type="button"
+                      key={entry.id}
+                      onClick={() => setSource(entry)}
+                    >
+                      ↗ {entry.title} · primary source
+                    </button>
+                  ))}
+                </div>
+              )}
+            </article>
+          );
+        })
       ) : (
         <div className="empty">
           Confirm your conditions, then load company evidence to see what the
           sources show.
-        </div>
-      )}
-      {latest?.narrative_review && (
-        <div className="ai-review">
-          <div className="ledger-heading">
-            <strong>Qwen’s explanation</strong>
-            <span className="badge amber">AI HELP · CHECK IT</span>
-          </div>
-          <p>{latest.narrative_review.summary}</p>
-          {latest.narrative_review.items.map((item) => (
-            <article key={item.assumption_id}>
-              <strong>
-                {item.assumption_id} · {stateLabel(item.stance)}
-              </strong>
-              <p>{item.explanation}</p>
-              <small>Citations: {item.evidence_ids.join(", ") || "none"}</small>
-            </article>
-          ))}
-          <p className="caption">
-            {latest.llm_provenance?.model} via {latest.llm_provenance?.provider}{" "}
-            · {latest.llm_provenance?.prompt_version}. This explanation does not
-            change the evidence result.
-          </p>
         </div>
       )}
     </section>

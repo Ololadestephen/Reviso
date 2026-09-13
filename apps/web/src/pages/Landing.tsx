@@ -6,12 +6,12 @@ const steps = [
   {
     number: "01",
     title: "Pick a company",
-    copy: "Start with NVIDIA, Apple or Microsoft. Each one has a checked Bitget market identity and official company evidence.",
+    copy: "Choose from six familiar companies. Each one has a checked Bitget market identity and official company evidence.",
     visual: (
       <div className="step-stock-cards" aria-hidden="true">
         <CompanyLogo instrumentId="RNVDAUSDT" />
-        <CompanyLogo instrumentId="RAAPLUSDT" />
-        <CompanyLogo instrumentId="RMSFTUSDT" />
+        <CompanyLogo instrumentId="RGOOGLUSDT" />
+        <CompanyLogo instrumentId="RTSLAUSDT" />
       </div>
     ),
   },
@@ -40,6 +40,15 @@ const steps = [
     ),
   },
 ];
+
+const coveredCompanies = [
+  { instrumentId: "RNVDAUSDT", name: "NVIDIA", pair: "rNVDA / USDT" },
+  { instrumentId: "RAAPLUSDT", name: "Apple", pair: "rAAPL / USDT" },
+  { instrumentId: "RMSFTUSDT", name: "Microsoft", pair: "rMSFT / USDT" },
+  { instrumentId: "RGOOGLUSDT", name: "Alphabet", pair: "rGOOGL / USDT" },
+  { instrumentId: "RAMZNUSDT", name: "Amazon", pair: "rAMZN / USDT" },
+  { instrumentId: "RTSLAUSDT", name: "Tesla", pair: "rTSLA / USDT" },
+] as const;
 
 export default function Landing() {
   return (
@@ -136,34 +145,22 @@ export default function Landing() {
       <section className="coverage-section">
         <div>
           <span className="eyebrow">CURRENT COVERAGE</span>
-          <h2>Start with three checked companies.</h2>
+          <h2>Start with six checked companies.</h2>
           <p>
             Each company is matched to a specific tokenized exposure on Bitget
             and a bounded official evidence source.
           </p>
         </div>
         <div className="company-list">
-          <article>
-            <CompanyLogo instrumentId="RNVDAUSDT" />
-            <div>
-              <strong>NVIDIA</strong>
-              <small>rNVDA / USDT</small>
-            </div>
-          </article>
-          <article>
-            <CompanyLogo instrumentId="RAAPLUSDT" />
-            <div>
-              <strong>Apple</strong>
-              <small>rAAPL / USDT</small>
-            </div>
-          </article>
-          <article>
-            <CompanyLogo instrumentId="RMSFTUSDT" />
-            <div>
-              <strong>Microsoft</strong>
-              <small>rMSFT / USDT</small>
-            </div>
-          </article>
+          {coveredCompanies.map((company) => (
+            <article key={company.instrumentId}>
+              <CompanyLogo instrumentId={company.instrumentId} />
+              <div>
+                <strong>{company.name}</strong>
+                <small>{company.pair}</small>
+              </div>
+            </article>
+          ))}
         </div>
         <p className="coverage-note">
           These products provide tokenized exposure. They are not registered

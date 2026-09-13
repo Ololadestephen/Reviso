@@ -1,4 +1,6 @@
+import { useRef, useState } from "react";
 import type { EditableThesis } from "../../domain/defaults";
+import { examplesFor } from "./ideaExamples";
 
 export default function IdeaComposer({
   value,
@@ -9,15 +11,40 @@ export default function IdeaComposer({
   onChange: (value: EditableThesis) => void;
   locked: boolean;
 }) {
+  const area = useRef<HTMLTextAreaElement>(null);
+  const examples = examplesFor(value.instrument_id);
+  const [pending, setPending] = useState<(typeof examples)[number] | null>(
+    null,
+  );
   const set = (key: keyof EditableThesis, entry: string | number) =>
     onChange({ ...value, [key]: entry });
+
+  function applyExample(text: string) {
+    onChange({ ...value, rationale: text });
+    setPending(null);
+    area.current?.focus();
+  }
+
+  function chooseExample(example: (typeof examples)[number]) {
+    const current = value.rationale.trim();
+    if (current && current !== example.text) {
+      setPending(example);
+      return;
+    }
+    applyExample(example.text);
+  }
+
   return (
     <fieldset disabled={locked} className="editor">
       <label className="full">
         Explain your idea in your own words
         <textarea
+          ref={area}
           value={value.rationale}
-          onChange={(event) => set("rationale", event.target.value)}
+          onChange={(event) => {
+            setPending(null);
+            set("rationale", event.target.value);
+          }}
           placeholder="Example: I think demand for this company can remain strong, but I would reconsider if revenue growth or margins weaken."
           rows={5}
         />
@@ -26,6 +53,47 @@ export default function IdeaComposer({
           will turn this into editable conditions.
         </span>
       </label>
+      {examples.length > 0 && (
+        <div className="idea-examples" role="group" aria-label="Try an example">
+          <p>Try an example</p>
+          <p className="field-help">
+            Starting points, not your own words. They stay editable after they
+            appear in the box.
+          </p>
+          <div className="suggestion-row">
+            {examples.map((example) => (
+              <button
+                type="button"
+                key={example.label}
+                aria-pressed={value.rationale === example.text}
+                onClick={() => chooseExample(example)}
+              >
+                {example.label}
+              </button>
+            ))}
+          </div>
+          {pending && (
+            <div className="example-replace" role="status">
+              <p>
+                {pending.label} would replace what you already wrote. This
+                example is a starting point, not your own words.
+              </p>
+              <div className="actions">
+                <button
+                  type="button"
+                  className="primary"
+                  onClick={() => applyExample(pending.text)}
+                >
+                  Replace with this example
+                </button>
+                <button type="button" onClick={() => setPending(null)}>
+                  Keep what I wrote
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
       <div className="input-grid risk-grid">
         <label>
           Amount you are considering · USDT
