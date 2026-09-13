@@ -27,6 +27,17 @@ Production verification passed:
 - the deployed landing page rendered with the reviewed hero, six-company
   coverage and application CTA.
 
+The disposable local visual review then exposed an invalid foreign key left by
+an earlier experimental `research_threads` schema. Production's clean migration
+004 was unaffected, but existing local databases could return HTTP 500. Commit
+`eafb1c5` adds a data-preserving migration 005 and one-time numbered migration
+execution. The full 105-test backend suite and a copied legacy database passed.
+A second online backup named
+`reviso-before-eafb1c5-20260913T175800Z.sqlite3` passed integrity checking before
+the repair was deployed. Production retained its saved conversation, reported
+migrations 1–5 with database integrity `ok`, and returned HTTP 200 from the
+conversation endpoint.
+
 No Qwen request was made during deployment or smoke testing. Automatic
 Lightsail snapshots remain disabled because billed snapshot storage has not
 been separately approved. The earlier live suggestion timeouts and contract

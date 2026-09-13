@@ -28,8 +28,8 @@ user `reviso-deployer`. Vercel DNS points `revisoagent.xyz` at the static IP and
 configuration, public evidence refresh and SQLite persistence passed on the
 initial temporary hostname; final-domain HTTPS and persisted-state checks also
 passed after cutover. The six-stock, automatic-findings and inline-conversation
-release was subsequently deployed with migration 004 after an integrity-checked
-online SQLite backup; the named data and Caddy volumes were preserved.
+release was subsequently deployed with migration 005 after integrity-checked
+online SQLite backups; the named data and Caddy volumes were preserved.
 
 ## Install the host
 
