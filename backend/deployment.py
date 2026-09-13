@@ -16,7 +16,19 @@ LOCAL_ORIGINS = (
     "http://localhost:8000",
 )
 PUBLIC_WEB_PATHS = frozenset({"/", "/example", "/guide", "/privacy", "/terms"})
-PUBLIC_ASSET_PATHS = frozenset({"/favicon.svg", "/robots.txt", "/manifest.webmanifest"})
+PUBLIC_ASSET_PATHS = frozenset(
+    {
+        "/favicon.svg",
+        "/manifest.webmanifest",
+        "/reviso-mark.svg",
+        "/robots.txt",
+        "/step-check-idea.svg",
+        "/step-write-idea.svg",
+        "/stock-logos/apple.svg",
+        "/stock-logos/microsoft.svg",
+        "/stock-logos/nvidia.svg",
+    }
+)
 
 
 def _flag(name: str) -> bool:

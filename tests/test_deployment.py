@@ -30,6 +30,18 @@ def test_public_pages_are_open_while_saved_research_requires_authentication(tmp_
     assets = web / "assets"
     assets.mkdir()
     (assets / "app.js").write_text("console.log('fixture')")
+    public_images = (
+        "/reviso-mark.svg",
+        "/step-check-idea.svg",
+        "/step-write-idea.svg",
+        "/stock-logos/apple.svg",
+        "/stock-logos/microsoft.svg",
+        "/stock-logos/nvidia.svg",
+    )
+    for path in public_images:
+        image = web / path.removeprefix("/")
+        image.parent.mkdir(parents=True, exist_ok=True)
+        image.write_text("<svg/>")
     monkeypatch.setenv("REVISO_PUBLIC_DEMO", "1")
     monkeypatch.setenv("REVISO_SERVE_WEB", "1")
     monkeypatch.setenv("REVISO_WEB_DIST", str(web))
@@ -43,6 +55,7 @@ def test_public_pages_are_open_while_saved_research_requires_authentication(tmp_
         landing = client.get("/")
         example = client.get("/example")
         asset = client.get("/assets/app.js")
+        image_responses = [client.get(path) for path in public_images]
         protected_app = client.get("/app")
         legacy_saved_link = client.get("/thesis/saved-id")
         assert client.get("/api/health", headers=basic("judge", "wrong")).status_code == 401
@@ -65,6 +78,7 @@ def test_public_pages_are_open_while_saved_research_requires_authentication(tmp_
     assert landing.status_code == 200
     assert example.status_code == 200
     assert asset.status_code == 200
+    assert all(response.status_code == 200 for response in image_responses)
     assert protected_app.status_code == 401
     assert legacy_saved_link.status_code == 401
     assert page.status_code == 200
