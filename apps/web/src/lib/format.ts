@@ -14,6 +14,20 @@ export function stateLabel(state: State | NarrativeStance) {
   return state.toLowerCase().replaceAll("_", " ");
 }
 
+/** First sentence of an idea, clipped for lists. Never invents a title. */
+export function ideaTitle(rationale: string, limit = 72): string {
+  const compact = rationale.replace(/\s+/g, " ").trim();
+  if (!compact) return "Untitled idea";
+  const sentence = compact.match(/^.+?[.!?](?=\s|$)/)?.[0] ?? compact;
+  const core = sentence.replace(/[.!?]+$/, "");
+  if (core.length <= limit) return core;
+  const clipped = core
+    .slice(0, limit)
+    .replace(/\s+\S*$/, "")
+    .replace(/[,:;–-]+$/, "");
+  return `${clipped || core.slice(0, limit)}…`;
+}
+
 export function llmProviderLabel(provider: string) {
   if (provider === "bitget-qwen") return "Bitget Qwen";
   if (provider === "groq") return "Groq";

@@ -6,6 +6,7 @@ import {
   numericalSchema,
   savedResearchAnswerSchema,
   thesisRecordSchema,
+  thesisSummarySchema,
   type Assessment,
   type Evidence,
   type Instrument,
@@ -13,6 +14,7 @@ import {
   type Numerical,
   type SavedResearchAnswer,
   type ThesisRecord,
+  type ThesisSummary,
 } from "../src/api/schemas";
 import { defaultThesis } from "../src/domain/defaults";
 
@@ -116,6 +118,27 @@ export function makeAssessment(
       fee_bps: "0",
       bids: null,
     },
+    ...overrides,
+  });
+}
+
+export function makeThesisSummary(
+  overrides: Overrides<ThesisSummary> = {},
+): ThesisSummary {
+  return thesisSummarySchema.parse({
+    id: "thesis-1",
+    version: 2,
+    confirmed: true,
+    retired: false,
+    created_at: "2026-09-10T00:00:00Z",
+    updated_at: "2026-09-11T00:00:00Z",
+    instrument_id: "RNVDAUSDT",
+    rationale:
+      "Data-centre demand can remain strong. Extra context should not appear in the list.",
+    assumption_count: 3,
+    state: "CHALLENGED",
+    mode: "LIVE_REFRESH",
+    assessed_at: "2026-09-11T00:00:00Z",
     ...overrides,
   });
 }

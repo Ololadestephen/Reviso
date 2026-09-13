@@ -41,39 +41,6 @@ const steps = [
   },
 ];
 
-const features = [
-  [
-    "01",
-    "Clear conditions",
-    "Turn a broad idea into statements you can check later.",
-  ],
-  [
-    "02",
-    "Original sources",
-    "Open the company release or filing behind every cited finding.",
-  ],
-  [
-    "03",
-    "Honest gaps",
-    "See when evidence is missing, old, incomplete or in conflict.",
-  ],
-  [
-    "04",
-    "Questions with citations",
-    "Ask about saved evidence and get answers tied to its sources.",
-  ],
-  [
-    "05",
-    "Saved history",
-    "Later changes make a new version and keep the earlier one readable.",
-  ],
-  [
-    "06",
-    "Simple downloads",
-    "Save the complete research record as Markdown or structured JSON.",
-  ],
-];
-
 export default function Landing() {
   return (
     <>
@@ -84,8 +51,8 @@ export default function Landing() {
             <span>See if the evidence supports it.</span>
           </h1>
           <p>
-            Write down your idea, check company reports, and decide whether to
-            keep it, change it or set it aside.
+            An idea often lasts because nobody wrote what would make them
+            reconsider. Write the conditions, check the filing, then decide.
           </p>
           <div className="hero-actions">
             <Link className="button-link hero-primary" to="/example">
@@ -98,7 +65,7 @@ export default function Landing() {
           <small>You make the decision. Reviso cannot place trades.</small>
         </div>
         <div className="hero-preview-wrap">
-          <ProductPreview />
+          <ProductPreview live />
         </div>
         <div className="hero-proof" aria-label="Reviso product boundaries">
           <span>Public company evidence</span>
@@ -112,7 +79,7 @@ export default function Landing() {
         <div className="public-section-heading centered">
           <span className="eyebrow">HOW IT WORKS</span>
           <h2>From an idea to a clear decision.</h2>
-          <p>Five guided steps, grouped into three simple parts.</p>
+          <p>Company, conditions, decision.</p>
         </div>
         <div className="steps-grid">
           {steps.map((step) => (
@@ -129,105 +96,41 @@ export default function Landing() {
         </div>
       </section>
 
-      <section className="platform-section">
-        <div className="platform-heading">
-          <span className="eyebrow">ONE RESEARCH RECORD</span>
-          <h2>
-            One idea.
-            <span>Every source. Every decision.</span>
-          </h2>
-          <p>
-            Your conditions, sources, questions and decisions stay connected to
-            the saved version they came from.
+      <section
+        className="public-section cited-example"
+        aria-labelledby="cited-example-title"
+      >
+        <article className="cited-example-card">
+          <header>
+            <div>
+              <span className="eyebrow">EXAMPLE · NVIDIA · FY2025 Q3</span>
+              <h2 id="cited-example-title">One condition, one dated print.</h2>
+            </div>
+            <span className="badge invalidated">Invalidated</span>
+          </header>
+          <dl>
+            <div>
+              <dt>Condition</dt>
+              <dd>GAAP gross margin stays at or above 75%</dd>
+            </div>
+            <div>
+              <dt>Reported</dt>
+              <dd>74.6% in the third-quarter release</dd>
+            </div>
+            <div>
+              <dt>Source</dt>
+              <dd>
+                <Link to="/example">
+                  NVIDIA investor relations excerpt · available 21 Nov 2024
+                </Link>
+              </dd>
+            </div>
+          </dl>
+          <p className="cited-example-note">
+            This is a dated research example, not a current view or a
+            recommendation. Open the source in the walkthrough.
           </p>
-        </div>
-        <div className="platform-grid">
-          <div
-            className="platform-art"
-            role="img"
-            aria-label="A visual map from an idea to evidence and a decision"
-          >
-            <div className="platform-stock">
-              <CompanyLogo instrumentId="RNVDAUSDT" />
-              <div>
-                <strong>NVIDIA research</strong>
-                <small>Saved version 2</small>
-              </div>
-              <em>IN REVIEW</em>
-            </div>
-            <div className="idea-block">
-              <small>YOUR IDEA</small>
-              <strong>What do I expect?</strong>
-            </div>
-            <div className="platform-line" aria-hidden="true" />
-            <div className="evidence-block">
-              <small>CITED EVIDENCE</small>
-              <strong>What do the sources show?</strong>
-            </div>
-            <div className="platform-line" aria-hidden="true" />
-            <div className="decision-block">
-              <small>YOUR DECISION</small>
-              <strong>Keep · Change · Set aside</strong>
-            </div>
-          </div>
-          <div className="platform-cells">
-            <article>
-              <span aria-hidden="true">✎</span>
-              <h3>Define the idea</h3>
-              <p>Write what you expect and how long the idea should last.</p>
-            </article>
-            <article>
-              <span aria-hidden="true">◇</span>
-              <h3>Set the conditions</h3>
-              <p>
-                Decide what must stay true and where your view should change.
-              </p>
-            </article>
-            <article>
-              <span aria-hidden="true">↗</span>
-              <h3>Inspect the sources</h3>
-              <p>Read the company evidence, its date and its limits.</p>
-            </article>
-            <article>
-              <span aria-hidden="true">✓</span>
-              <h3>Record your choice</h3>
-              <p>
-                Save your reason and return to it when the evidence changes.
-              </p>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section className="public-section" id="features">
-        <div className="public-section-heading">
-          <span className="eyebrow">WHAT YOU CAN DO</span>
-          <h2>Everything needed to revisit an idea.</h2>
-        </div>
-        <div className="feature-grid">
-          {features.map(([number, title, copy]) => (
-            <article key={number}>
-              <span>{number}</span>
-              <h3>{title}</h3>
-              <p>{copy}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="walkthrough-section">
-        <div className="walkthrough-copy">
-          <span className="eyebrow">PRODUCT WALKTHROUGH</span>
-          <h2>Start with the answer. Then inspect the path behind it.</h2>
-          <p>
-            Reviso shows the result first. Open any finding to see its source,
-            date, measured value and missing information.
-          </p>
-          <Link className="text-link" to="/example">
-            Walk through the NVIDIA example →
-          </Link>
-        </div>
-        <ProductPreview compact />
+        </article>
       </section>
 
       <section className="coverage-section">
@@ -270,11 +173,15 @@ export default function Landing() {
       </section>
 
       <section className="final-cta">
-        <h2>Ready to test your stock idea?</h2>
-        <p>Write it down, check the evidence, and decide what to do next.</p>
+        <h2>Write the condition before the print.</h2>
+        <p>
+          If you already know what would change your mind, Reviso will check it
+          against a dated source. If you don’t, that’s the work.
+        </p>
         <a className="button-link final-cta-button" href="/app">
           Open the research app
         </a>
+        <small>You confirm. Reviso does not trade.</small>
       </section>
     </>
   );

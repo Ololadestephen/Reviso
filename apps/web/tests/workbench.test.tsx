@@ -9,6 +9,7 @@ import {
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import App from "../src/App";
 import ThesisEditor from "../src/ThesisEditor";
 import IdeaComposer from "../src/features/journey/IdeaComposer";
@@ -27,7 +28,7 @@ import {
   emptyThesis,
   manualStarter,
 } from "../src/domain/defaults";
-import { money } from "../src/lib/format";
+import { ideaTitle, money } from "../src/lib/format";
 import {
   idlePending,
   jsonResponse,
@@ -38,6 +39,7 @@ import {
   makeNumerical,
   makeRecord,
   makeResearchAnswer,
+  makeThesisSummary,
 } from "./factories";
 
 afterEach(() => {
@@ -46,6 +48,42 @@ afterEach(() => {
 });
 
 const numerical = makeNumerical();
+
+function renderApp(path: string) {
+  const client = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  });
+  return render(
+    <QueryClientProvider client={client}>
+      <MemoryRouter initialEntries={[path]}>
+        <App />
+      </MemoryRouter>
+    </QueryClientProvider>,
+  );
+}
+
+function requestUrl(input: RequestInfo | URL) {
+  if (typeof input === "string") return input;
+  if (input instanceof URL) return input.href;
+  return input.url;
+}
+
+test("library titles use the first sentence of an idea", () => {
+  expect(
+    ideaTitle(
+      "Data-centre demand can remain strong. Extra context should stay off the list.",
+    ),
+  ).toBe("Data-centre demand can remain strong");
+  expect(ideaTitle("")).toBe("Untitled idea");
+  expect(
+    ideaTitle(
+      "A very long research idea without punctuation that would overflow a saved-research row if it were shown in full",
+    ),
+  ).toMatch(/…$/);
+});
 
 test("editing a floor keeps the confirmed condition consistent without mutating the saved input", () => {
   const changed = vi.fn();
@@ -340,7 +378,12 @@ test("public landing and example explain the product without calling an API", ()
 
   expect(screen.getByText("Have a stock idea?")).toBeTruthy();
   expect(screen.queryByText("AI-ASSISTED STOCK RESEARCH")).toBeNull();
+  expect(screen.queryByText("Know what would change your mind.")).toBeNull();
   expect(screen.getByText("No trade execution")).toBeTruthy();
+  expect(screen.getByText("Company, conditions, decision.")).toBeTruthy();
+  expect(screen.getByText("View filing")).toBeTruthy();
+  expect(screen.queryByRole("button", { name: "View filing" })).toBeNull();
+  expect(screen.queryByText("Evidence coverage")).toBeNull();
   expect(
     screen.getByRole("img", {
       name: "Reviso screen for writing an NVIDIA research idea",
@@ -351,17 +394,31 @@ test("public landing and example explain the product without calling an API", ()
       name: "Reviso screen showing cited evidence and a recorded decision",
     }),
   ).toBeTruthy();
-  expect(screen.getByText("Every source. Every decision.")).toBeTruthy();
   expect(
     screen
       .getByRole("link", { name: "Start my research" })
       .getAttribute("href"),
   ).toBe("/app");
+  expect(screen.queryByText(/ugly print/i)).toBeNull();
+  expect(screen.queryByText(/the invalidation was never/i)).toBeNull();
+  expect(
+    screen.getByText("Write the condition before the print."),
+  ).toBeTruthy();
+  expect(screen.getByText("Invalidated")).toBeTruthy();
+  expect(screen.getByText("74.6% in the third-quarter release")).toBeTruthy();
+  expect(
+    screen
+      .getByRole("link", {
+        name: /NVIDIA investor relations excerpt/,
+      })
+      .getAttribute("href"),
+  ).toBe("/example");
   expect(
     screen
       .getByRole("link", { name: "Open the research app" })
       .getAttribute("href"),
   ).toBe("/app");
+  expect(screen.queryByText("Ready to test your stock idea?")).toBeNull();
   expect(fetcher).not.toHaveBeenCalled();
 
   landing.unmount();
@@ -373,6 +430,55 @@ test("public landing and example explain the product without calling an API", ()
   expect(screen.getByText(/read-only example/i)).toBeTruthy();
   expect(screen.getByText(/prepared walkthrough/i)).toBeTruthy();
   expect(fetcher).not.toHaveBeenCalled();
+});
+
+test("the research app is a workbench instead of a second landing page", async () => {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (input: RequestInfo | URL) => {
+      const url = requestUrl(input);
+      if (url.includes("/instruments")) {
+        return jsonResponse([makeInstrument()]);
+      }
+      if (url.includes("/llm/status")) {
+        return jsonResponse(makeLlmStatus());
+      }
+      if (url.includes("/theses")) {
+        return jsonResponse([makeThesisSummary()]);
+      }
+      return jsonResponse({ detail: "missing" }, 404);
+    }),
+  );
+
+  const library = renderApp("/app");
+  const nav = screen.getByRole("navigation", { name: "App sections" });
+  expect(screen.getByRole("heading", { name: "Your research" })).toBeTruthy();
+  expect(screen.queryByText("Know what would change your mind.")).toBeNull();
+  expect(screen.queryByText("Your theses")).toBeNull();
+  expect(screen.queryByText("PROTECTED DEMO")).toBeNull();
+  expect(screen.queryByText("RESEARCH APP")).toBeNull();
+  expect(nav.textContent).toContain("My research");
+  expect(nav.textContent).toContain("New research");
+  expect(nav.textContent).not.toContain("Decision history");
+  expect(screen.getAllByRole("link", { name: "New research" })).toHaveLength(2);
+  expect(
+    await screen.findByRole("link", {
+      name: "Data-centre demand can remain strong",
+    }),
+  ).toBeTruthy();
+  expect(
+    screen.queryByText(/Extra context should not appear in the list/),
+  ).toBeNull();
+  library.unmount();
+
+  renderApp("/app/thesis/new");
+  expect(
+    await screen.findByRole("heading", {
+      name: "Which company are you researching?",
+    }),
+  ).toBeTruthy();
+  expect(screen.queryByText("Know what would change your mind.")).toBeNull();
+  expect(screen.queryByText("STEP 1 OF 5")).toBeNull();
 });
 
 test("public disclosure failures remain visible while refresh stays available", () => {

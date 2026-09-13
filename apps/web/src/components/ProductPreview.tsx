@@ -2,9 +2,11 @@ import type { ReactNode } from "react";
 import { CompanyLogo, RevisoMark } from "./Brand";
 
 function ConditionRow({
+  beat,
   state,
   children,
 }: {
+  beat: 1 | 2 | 3;
   state: "supported" | "attention" | "unknown";
   children: ReactNode;
 }) {
@@ -15,7 +17,7 @@ function ConditionRow({
         ? "Needs attention"
         : "Not enough evidence";
   return (
-    <div className="preview-condition">
+    <div className="preview-condition" data-beat={beat}>
       <span className={`preview-status ${state}`} aria-hidden="true" />
       <span>{children}</span>
       <small>{label}</small>
@@ -23,16 +25,12 @@ function ConditionRow({
   );
 }
 
-export default function ProductPreview({
-  compact = false,
-}: {
-  compact?: boolean;
-}) {
+export default function ProductPreview({ live = false }: { live?: boolean }) {
   return (
     <div
-      className={`product-preview ${compact ? "compact" : ""}`}
+      className={live ? "product-preview preview-live" : "product-preview"}
       role="img"
-      aria-label="Example Reviso screen showing an NVIDIA research idea, three conditions, and cited evidence"
+      aria-label="Example Reviso screen showing an NVIDIA research idea, three conditions, and a dated source"
     >
       <div className="preview-sidebar" aria-hidden="true">
         <RevisoMark className="preview-logo" />
@@ -41,9 +39,10 @@ export default function ProductPreview({
         <span className="preview-nav-item">◫</span>
       </div>
       <div className="preview-workspace">
+        <div className="preview-live-sheen" aria-hidden="true" />
         <div className="preview-topbar">
           <span>Research idea</span>
-          <span className="preview-version">Saved version 2</span>
+          <span className="preview-version">Saved version 2 · example</span>
         </div>
         <div className="preview-title-row">
           <div>
@@ -67,13 +66,13 @@ export default function ProductPreview({
           <section className="preview-card">
             <small>WHAT NEEDS TO STAY TRUE</small>
             <h3>Your conditions</h3>
-            <ConditionRow state="supported">
+            <ConditionRow beat={1} state="supported">
               Reported revenue growth remains positive
             </ConditionRow>
-            <ConditionRow state="attention">
+            <ConditionRow beat={2} state="attention">
               Gross margin stays above your chosen level
             </ConditionRow>
-            <ConditionRow state="unknown">
+            <ConditionRow beat={3} state="unknown">
               Customer demand remains broad
             </ConditionRow>
           </section>
@@ -84,41 +83,14 @@ export default function ProductPreview({
               Two conditions have reported measures. One still needs manual
               research.
             </p>
-            <div className="preview-chart" aria-label="Evidence coverage chart">
-              <div className="preview-chart-heading">
-                <span>Evidence coverage</span>
-                <strong>2 of 3 measured</strong>
-              </div>
-              <svg viewBox="0 0 300 100" aria-hidden="true">
-                <path
-                  className="chart-grid"
-                  d="M16 20H290M16 50H290M16 80H290"
-                />
-                <path
-                  className="chart-area"
-                  d="M16 78C55 70 66 53 102 59S158 37 191 43s58-24 99-22v59H16Z"
-                />
-                <path
-                  className="chart-line"
-                  d="M16 78C55 70 66 53 102 59S158 37 191 43s58-24 99-22"
-                />
-                <circle cx="290" cy="21" r="5" />
-              </svg>
-              <div className="preview-chart-labels">
-                <span>Older filing</span>
-                <span>Latest release</span>
-              </div>
-            </div>
             <div className="preview-source">
-              <span>↗</span>
+              <span aria-hidden="true">↗</span>
               <div>
                 <strong>Quarterly company release</strong>
-                <small>Official source · date shown in app</small>
+                <small>Official source · date shown in the app</small>
               </div>
             </div>
-            <button type="button" tabIndex={-1}>
-              Open source
-            </button>
+            <span className="preview-filing">View filing</span>
           </section>
         </div>
       </div>

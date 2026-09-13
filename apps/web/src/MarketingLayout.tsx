@@ -27,7 +27,6 @@ export default function MarketingLayout() {
         </Link>
         <div className="public-nav-links">
           <a href="/#how-it-works">How it works</a>
-          <a href="/#features">Features</a>
           <NavLink to="/guide" className={navClass}>
             Guide
           </NavLink>

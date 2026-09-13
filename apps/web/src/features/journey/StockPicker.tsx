@@ -17,7 +17,6 @@ export default function StockPicker({
       className="panel journey-panel"
       aria-labelledby="choose-stock-title"
     >
-      <span className="eyebrow">STEP 1 OF 5</span>
       <h1 id="choose-stock-title">Which company are you researching?</h1>
       <p className="lead">
         Choose one of the companies with verified Bitget market identity and

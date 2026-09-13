@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useInstruments, useTheses } from "../queries/workspace";
-import { stateLabel } from "../lib/format";
+import { ideaTitle, stateLabel } from "../lib/format";
 import type { ThesisSummary } from "../api/schemas";
 
 function statusBadge(thesis: ThesisSummary) {
@@ -16,34 +16,18 @@ export default function Library() {
 
   return (
     <>
-      <header>
-        <div>Research</div>
+      <header className="library-header">
+        <div>
+          <h1>Your research</h1>
+          <p className="lead">
+            Write the condition, check a dated source, then record your
+            decision.
+          </p>
+        </div>
         <Link className="button-link primary" to="/app/thesis/new">
           New research
         </Link>
       </header>
-      <div className="page-heading">
-        <div>
-          <span className="eyebrow">YOUR SAVED RESEARCH</span>
-          <h1>
-            Know what would
-            <br />
-            change your mind.
-          </h1>
-          <p className="muted">
-            Choose a company, explain your idea, decide what would change your
-            mind, and check that rule against cited evidence.
-          </p>
-          <div className="actions">
-            <Link className="button-link primary" to="/app/thesis/new">
-              Start new research
-            </Link>
-            <Link className="button-link" to="/example">
-              View the NVIDIA example
-            </Link>
-          </div>
-        </div>
-      </div>
 
       {error && (
         <div role="alert" className="error">
@@ -51,25 +35,25 @@ export default function Library() {
         </div>
       )}
 
-      <section className="panel">
-        <div className="section-heading">
-          <div>
-            <span className="eyebrow">RESEARCH LIBRARY</span>
-            <h2>{theses ? `${theses.length} saved` : "Your theses"}</h2>
-          </div>
-        </div>
-
+      <section className="panel" aria-label="Saved research">
         {isLoading && (
           <div className="empty" role="status">
-            Loading your saved theses…
+            Loading your saved research…
           </div>
         )}
 
         {theses?.length === 0 && (
           <div className="empty">
-            No saved research yet. The guided flow takes you from a company and
-            an idea to a cited decision record.
+            <p>
+              No saved research yet. Start with a company, write what would
+              change your mind, and check a dated source.
+            </p>
+            <Link to="/example">View the NVIDIA example</Link>
           </div>
+        )}
+
+        {theses && theses.length > 0 && (
+          <p className="caption library-count">{theses.length} saved</p>
         )}
 
         {theses?.map((thesis) => {
@@ -82,7 +66,7 @@ export default function Library() {
               <div className="ledger-heading">
                 <strong>
                   <Link to={`/app/thesis/${thesis.id}`}>
-                    {thesis.rationale}
+                    {ideaTitle(thesis.rationale)}
                   </Link>
                 </strong>
                 <span className={`badge ${badge.tone}`}>{badge.label}</span>
@@ -94,8 +78,8 @@ export default function Library() {
               </p>
               <p className="caption">
                 {thesis.assessed_at
-                  ? `Last assessed ${new Date(thesis.assessed_at).toLocaleString()} · ${thesis.mode?.replaceAll("_", " ").toLowerCase()}`
-                  : "Evidence not checked yet. Confirm the conditions, then load the sources."}
+                  ? `Last assessed ${new Date(thesis.assessed_at).toLocaleString()}`
+                  : "Evidence not checked yet."}
               </p>
             </article>
           );

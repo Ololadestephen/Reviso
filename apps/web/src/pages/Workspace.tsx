@@ -147,37 +147,29 @@ export default function Workspace() {
             className="button-link"
             to={`/app/thesis/${record.id}/timeline`}
           >
-            Decision history →
+            Decision history
           </Link>
         )}
       </header>
 
-      <div className="journey-heading">
-        <div>
-          <span className="eyebrow">YOUR RESEARCH IDEA</span>
-          <h1>Know what would change your mind.</h1>
-          <p className="muted">
-            Set clear conditions, check dated sources, then record your own
-            decision. Reviso cannot place a trade.
-          </p>
-        </div>
-        {instrument && (
-          <div className="instrument">
-            <CompanyLogo instrumentId={instrument.id} className="symbol" />
-            <div>
-              <strong>{instrument.display_name}</strong>
-              <p>{instrument.base_coin} / USDT · Bitget</p>
+      {instrument && step !== 1 && (
+        <div className="workspace-context">
+          <CompanyLogo instrumentId={instrument.id} className="symbol" />
+          <div>
+            <strong>{instrument.display_name}</strong>
+            <p>
+              {instrument.base_coin} / USDT · Bitget ·{" "}
               <a
                 href={instrument.terms_source}
                 target="_blank"
                 rel="noreferrer"
               >
-                Instrument terms ↗
+                Instrument terms
               </a>
-            </div>
+            </p>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       <JourneyProgress
         current={step}
@@ -210,7 +202,6 @@ export default function Workspace() {
 
       {step === 2 && instrument && (
         <section className="panel journey-panel" aria-labelledby="idea-title">
-          <span className="eyebrow">STEP 2 OF 5</span>
           <h1 id="idea-title">Explain your idea</h1>
           {example && !record && (
             <div className="example-banner">
@@ -270,7 +261,6 @@ export default function Workspace() {
           className="panel journey-panel"
           aria-labelledby="assumptions-title"
         >
-          <span className="eyebrow">STEP 3 OF 5</span>
           <div className="section-heading">
             <div>
               <h1 id="assumptions-title">Review your conditions</h1>
@@ -378,7 +368,6 @@ export default function Workspace() {
       {step === 4 && instrument && record?.confirmed && (
         <>
           <section className="journey-intro">
-            <span className="eyebrow">STEP 4 OF 5</span>
             <h1>Inspect the evidence</h1>
             <p className="lead">
               Start with the saved result. Open the source when a finding
@@ -508,7 +497,6 @@ export default function Workspace() {
 
       {step === 5 && instrument && record && (
         <section className="panel journey-panel decision-step">
-          <span className="eyebrow">STEP 5 OF 5</span>
           <h1>Record your decision</h1>
           <div className="decision-state">
             <span>Current evidence result</span>
