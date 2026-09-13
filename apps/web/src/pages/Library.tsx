@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import AppTopbar from "../components/AppTopbar";
 import { useInstruments, useTheses } from "../queries/workspace";
 import { ideaTitle, stateLabel } from "../lib/format";
 import type { ThesisSummary } from "../api/schemas";
@@ -16,18 +17,15 @@ export default function Library() {
 
   return (
     <>
-      <header className="library-header">
-        <div>
-          <h1>Your research</h1>
-          <p className="lead">
-            Write the condition, check a dated source, then record your
-            decision.
-          </p>
-        </div>
-        <Link className="button-link primary" to="/app/thesis/new">
+      <AppTopbar>
+        <h1>Your research</h1>
+        <Link className="button-link app-topbar-cta" to="/app/thesis/new">
           New research
         </Link>
-      </header>
+      </AppTopbar>
+      <p className="lead library-lead">
+        Write the condition, check a dated source, then record your decision.
+      </p>
 
       {error && (
         <div role="alert" className="error">

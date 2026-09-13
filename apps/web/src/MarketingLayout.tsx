@@ -1,5 +1,6 @@
 import { Link, NavLink, Outlet } from "react-router-dom";
 import { RevisoMark } from "./components/Brand";
+import { useScrolled } from "./lib/useScrolled";
 
 const navClass = ({ isActive }: { isActive: boolean }) =>
   isActive ? "active" : "";
@@ -14,27 +15,25 @@ export function RevisoLogo() {
 }
 
 export default function MarketingLayout() {
+  const scrolled = useScrolled(64);
   return (
     <div className="public-shell">
-      <div className="announcement">
-        Bitget AI Base Camp Season 2 project
-        <span aria-hidden="true"> · </span>
-        <Link to="/example">View the NVIDIA example →</Link>
+      <div className={`public-header${scrolled ? " scrolled" : ""}`}>
+        <nav className="public-nav" aria-label="Main navigation">
+          <Link to="/" aria-label="Reviso home">
+            <RevisoLogo />
+          </Link>
+          <div className="public-nav-links">
+            <a href="/#how-it-works">How it works</a>
+            <NavLink to="/guide" className={navClass}>
+              Guide
+            </NavLink>
+          </div>
+          <a className="button-link public-app-link" href="/app">
+            Open app
+          </a>
+        </nav>
       </div>
-      <nav className="public-nav" aria-label="Main navigation">
-        <Link to="/" aria-label="Reviso home">
-          <RevisoLogo />
-        </Link>
-        <div className="public-nav-links">
-          <a href="/#how-it-works">How it works</a>
-          <NavLink to="/guide" className={navClass}>
-            Guide
-          </NavLink>
-        </div>
-        <a className="button-link public-app-link" href="/app">
-          Open app
-        </a>
-      </nav>
       <main className="public-main">
         <Outlet />
       </main>

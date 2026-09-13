@@ -59,7 +59,6 @@ export default function EvidenceStep({
   onRecordDecision: () => void;
 }) {
   const [selected, setSelected] = useState<Evidence | null>(null);
-  const [chatOpen, setChatOpen] = useState(false);
   const currentIds = latest?.evidence.map((item) => item.id).join("|") ?? "";
   const priorIds =
     lastEvidenceAssessment?.evidence.map((item) => item.id).join("|") ?? "";
@@ -96,8 +95,8 @@ export default function EvidenceStep({
       <section className="journey-intro">
         <h1>Does the evidence support your idea?</h1>
         <p className="lead">
-          Here is what the latest filing says about the conditions you
-          confirmed. Read each one, open the report, then decide.
+          The filing result comes first. Qwen then explains it. You still record
+          the decision.
         </p>
       </section>
       <ReplayPanel
@@ -111,8 +110,6 @@ export default function EvidenceStep({
         reviewFailed={reviewFailed}
         llmStatus={llmStatus}
         instrument={instrument}
-        chatOpen={chatOpen}
-        onOpenChat={() => setChatOpen(true)}
         priorAssessment={
           latest && latest.evidence.length === 0
             ? (lastEvidenceAssessment ?? null)
@@ -133,6 +130,14 @@ export default function EvidenceStep({
           onOpenDetails={onOpenSourceDetails}
         />
       </div>
+      {latest?.evidence.length ? (
+        <EvidenceChat
+          latest={latest}
+          record={record}
+          llmStatus={llmStatus}
+          onSource={setSelected}
+        />
+      ) : null}
       <div className="actions journey-actions bottom-actions">
         {active && (
           <button type="button" onClick={onChangeConditions}>
@@ -162,16 +167,6 @@ export default function EvidenceStep({
           onRun={runStress}
         />
       </details>
-      {chatOpen && latest?.evidence.length ? (
-        <EvidenceChat
-          open={chatOpen}
-          latest={latest}
-          record={record}
-          llmStatus={llmStatus}
-          onClose={() => setChatOpen(false)}
-          onSource={setSelected}
-        />
-      ) : null}
     </>
   );
 }

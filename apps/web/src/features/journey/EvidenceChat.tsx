@@ -17,18 +17,14 @@ const suggestions = [
 ];
 
 export default function EvidenceChat({
-  open,
   latest,
   record,
   llmStatus,
-  onClose,
   onSource,
 }: {
-  open: boolean;
   latest: Assessment;
   record: ThesisRecord;
   llmStatus: LLMStatus;
-  onClose: () => void;
   onSource: (source: Evidence) => void;
 }) {
   const [question, setQuestion] = useState("");
@@ -40,10 +36,12 @@ export default function EvidenceChat({
   const conversation = useConversation(
     record.id,
     latest.input_hash,
-    open && latest.evidence.length > 0,
+    latest.evidence.length > 0,
   );
   const ask = useContinueConversation(record);
-  const messages = conversation.data?.messages ?? [];
+  const messages = (conversation.data?.messages ?? []).filter(
+    (item) => item.kind !== "explanation",
+  );
   const lastAssistant = [...messages]
     .reverse()
     .find((item) => item.role === "assistant");
@@ -63,20 +61,10 @@ export default function EvidenceChat({
   }, [latest.input_hash]);
 
   useEffect(() => {
-    if (!open) return;
-    field.current?.focus();
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
-
-  useEffect(() => {
     const node = log.current;
-    if (!open || !node) return;
+    if (!node) return;
     node.scrollTop = node.scrollHeight;
-  }, [messages.length, ask.isPending, open]);
+  }, [messages.length, ask.isPending]);
 
   function send(text: string, detail = false) {
     const trimmed = text.trim();
@@ -105,108 +93,91 @@ export default function EvidenceChat({
   }
 
   return (
-    <>
-      {open && (
-        <button
-          type="button"
-          className="chat-backdrop"
-          aria-label="Close chat"
-          onClick={onClose}
-        />
-      )}
-      <aside
-        className={`evidence-chat-panel${open ? " open" : ""}`}
-        aria-hidden={!open}
-        aria-labelledby="evidence-chat-title"
-      >
-        <div className="drawer-head">
-          <div>
-            <span className="eyebrow">CHAT ABOUT THIS RESULT</span>
-            <h2 id="evidence-chat-title">Ask about the saved filing</h2>
-          </div>
-          <button type="button" onClick={onClose} aria-label="Close chat">
-            Close ×
-          </button>
+    <section
+      className="panel evidence-chat"
+      aria-labelledby="evidence-chat-title"
+    >
+      <div className="drawer-head">
+        <div>
+          <span className="eyebrow">FOLLOW-UP</span>
+          <h2 id="evidence-chat-title">Ask about this filing</h2>
         </div>
-        {newResult && (
-          <p className="chat-banner" role="status">
-            This conversation is about the new evidence result. Earlier answers
-            stay saved with the previous filing.
+      </div>
+      {newResult && (
+        <p className="chat-banner" role="status">
+          This conversation is about the new evidence result. Earlier answers
+          stay saved with the previous filing.
+        </p>
+      )}
+      <div className="chat-log" ref={log}>
+        {messages.length === 0 && (
+          <p className="chat-empty">
+            The findings above are the AI result. Ask why it came out this way,
+            or what you should read next. Answers stay bound to this saved
+            filing.
           </p>
         )}
-        <div className="chat-log" ref={log}>
-          {messages.length === 0 && (
-            <p className="muted">
-              Suggested questions stay bound to this saved assessment. Qwen can
-              explain the record; it cannot change the numerical result.
-            </p>
-          )}
-          {messages.map((item) => (
-            <article className={`chat-turn ${item.role}`} key={item.id}>
-              <strong>
-                {item.role === "assistant"
-                  ? item.kind === "explanation"
-                    ? "Explanation"
-                    : "Qwen"
-                  : "You"}
-              </strong>
-              <p>{item.text}</p>
-              {item.answer?.uncertainty && item.role === "assistant" && (
-                <p className="caption">Unknown: {item.answer.uncertainty}</p>
-              )}
-              {item.evidence_ids.length > 0 && (
-                <div className="evidence-links">
-                  {item.evidence_ids.map((id) => {
-                    const source = latest.evidence.find(
-                      (entry) => entry.id === id,
-                    );
-                    return source ? (
-                      <button
-                        type="button"
-                        key={id}
-                        onClick={() => onSource(source)}
-                      >
-                        ↗ {source.title}
-                      </button>
-                    ) : null;
-                  })}
-                </div>
-              )}
-            </article>
-          ))}
-          {ask.isPending && (
-            <p className="caption" role="status">
-              Qwen is answering from this filing…
-            </p>
-          )}
-        </div>
-        {canAskMore && (
+        {messages.map((item) => (
+          <article className={`chat-turn ${item.role}`} key={item.id}>
+            <strong>{item.role === "assistant" ? "Qwen" : "You"}</strong>
+            <p>{item.text}</p>
+            {item.answer?.uncertainty && item.role === "assistant" && (
+              <p className="caption">Unknown: {item.answer.uncertainty}</p>
+            )}
+            {item.evidence_ids.length > 0 && (
+              <div className="evidence-links">
+                {item.evidence_ids.map((id) => {
+                  const source = latest.evidence.find(
+                    (entry) => entry.id === id,
+                  );
+                  return source ? (
+                    <button
+                      type="button"
+                      key={id}
+                      onClick={() => onSource(source)}
+                    >
+                      ↗ {source.title}
+                    </button>
+                  ) : null;
+                })}
+              </div>
+            )}
+          </article>
+        ))}
+        {ask.isPending && (
+          <p className="caption" role="status">
+            Qwen is answering from this filing…
+          </p>
+        )}
+      </div>
+      {canAskMore && (
+        <button
+          type="button"
+          className="text-action"
+          disabled={ask.isPending || !llmStatus.configured}
+          onClick={() => send("Tell me more about that.", true)}
+        >
+          Tell me more
+        </button>
+      )}
+      <div className="suggestion-row">
+        {suggestions.map((item) => (
           <button
             type="button"
-            className="text-action"
+            key={item}
             disabled={ask.isPending || !llmStatus.configured}
-            onClick={() => send("Tell me more about that.", true)}
+            onClick={() => send(item)}
           >
-            Tell me more
+            {item}
           </button>
-        )}
-        <div className="suggestion-row">
-          {suggestions.map((item) => (
-            <button
-              type="button"
-              key={item}
-              disabled={ask.isPending || !llmStatus.configured}
-              onClick={() => send(item)}
-            >
-              {item}
-            </button>
-          ))}
-        </div>
+        ))}
+      </div>
+      <div className="chat-composer">
         <label>
           Your question
           <textarea
             ref={field}
-            rows={2}
+            rows={3}
             maxLength={500}
             value={question}
             onChange={(event) => setQuestion(event.target.value)}
@@ -223,19 +194,19 @@ export default function EvidenceChat({
         >
           {ask.isPending ? "Sending…" : "Send"}
         </button>
-        {!llmStatus.configured && (
-          <p className="caption">
-            Chat is off because Qwen is not connected. You can still read the
-            filing.
-          </p>
-        )}
-        {conversation.isError && (
-          <p className="caption" role="status">
-            The evidence context changed. Close this panel and open chat on the
-            current result.
-          </p>
-        )}
-      </aside>
-    </>
+      </div>
+      {!llmStatus.configured && (
+        <p className="caption">
+          Chat is off because Qwen is not connected. You can still read the
+          filing.
+        </p>
+      )}
+      {conversation.isError && (
+        <p className="caption" role="status">
+          The evidence context changed. Reload this result to chat about the
+          current filing.
+        </p>
+      )}
+    </section>
   );
 }

@@ -292,7 +292,7 @@ test("FastAPI field validation errors are reported per field", async () => {
   );
 });
 
-test("Qwen evidence review is gated by server configuration and selected evidence", () => {
+test("Qwen evidence review starts from evidence without a second click", async () => {
   const review = vi.fn().mockResolvedValue(undefined);
   const status = makeLlmStatus();
   const { rerender } = render(
@@ -327,11 +327,11 @@ test("Qwen evidence review is gated by server configuration and selected evidenc
       instrument={makeInstrument()}
     />,
   );
-  fireEvent.click(screen.getByRole("button", { name: "Explain this result" }));
-  expect(review).toHaveBeenCalledOnce();
   expect(
-    screen.getAllByRole("button", { name: "Chat about this result" }).length,
-  ).toBe(2);
+    screen.queryByRole("button", { name: "Explain this result" }),
+  ).toBeNull();
+  expect(screen.getByText(/without another click/)).toBeTruthy();
+  await waitFor(() => expect(review).toHaveBeenCalledOnce());
 });
 
 test("Qwen annotation is visibly separate from deterministic ledger state", () => {
@@ -388,6 +388,10 @@ test("public landing and example explain the product without calling an API", ()
   );
 
   expect(screen.getByText("Have a stock idea?")).toBeTruthy();
+  expect(screen.getByText("See if the evidence supports it.")).toBeTruthy();
+  expect(
+    screen.getByRole("link", { name: "Open app" }).getAttribute("href"),
+  ).toBe("/app");
   expect(screen.queryByText("AI-ASSISTED STOCK RESEARCH")).toBeNull();
   expect(screen.queryByText("Know what would change your mind.")).toBeNull();
   expect(screen.getByText("No trade execution")).toBeTruthy();
@@ -433,13 +437,28 @@ test("public landing and example explain the product without calling an API", ()
   expect(fetcher).not.toHaveBeenCalled();
 
   landing.unmount();
-  render(
+  const example = render(
     <MemoryRouter initialEntries={["/example"]}>
       <App />
     </MemoryRouter>,
   );
   expect(screen.getByText(/read-only example/i)).toBeTruthy();
   expect(screen.getByText(/prepared walkthrough/i)).toBeTruthy();
+  expect(fetcher).not.toHaveBeenCalled();
+
+  example.unmount();
+  render(
+    <MemoryRouter initialEntries={["/guide"]}>
+      <App />
+    </MemoryRouter>,
+  );
+  expect(screen.getByText("How a research session works.")).toBeTruthy();
+  expect(screen.getByText("74.6% in the third-quarter release")).toBeTruthy();
+  expect(
+    screen.getByRole("img", {
+      name: "Reviso screen for writing an NVIDIA research idea",
+    }),
+  ).toBeTruthy();
   expect(fetcher).not.toHaveBeenCalled();
 });
 
@@ -610,17 +629,16 @@ test("follow-up answers show only the current evidence context with clickable ci
   render(
     <QueryClientProvider client={client}>
       <EvidenceChat
-        open
         latest={makeAssessment({ evidence: [source], input_hash: hash })}
         record={makeRecord()}
         llmStatus={makeLlmStatus({ configured: true })}
-        onClose={vi.fn()}
         onSource={openSource}
       />
     </QueryClientProvider>,
   );
   expect(await screen.findByText("Why this result?")).toBeTruthy();
   expect(screen.getByText("What should I check next?")).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: "Why this result?" }));
   fireEvent.click(await screen.findByRole("button", { name: /Disclosure/ }));
   expect(openSource).toHaveBeenCalledWith(source);
 });
@@ -719,35 +737,49 @@ test("evidence shows the result, findings and selected source before advanced co
     ],
   });
   const openDetails = vi.fn();
+  const client = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (input: RequestInfo | URL) => {
+      if (requestUrl(input).includes("/conversation")) {
+        return jsonResponse(makeConversation({ messages: [] }));
+      }
+      return jsonResponse({ detail: "missing" }, 404);
+    }),
+  );
   render(
-    <EvidenceStep
-      writing={false}
-      pending={{
-        refresh: false,
-        review: false,
-        replayStep: null,
-        stress: false,
-      }}
-      active
-      replay={vi.fn()}
-      refresh={vi.fn()}
-      latest={latest}
-      reviewWithAI={vi.fn()}
-      llmStatus={makeLlmStatus()}
-      instrument={makeInstrument()}
-      history={{
-        versions: [makeRecord()],
-        events: [],
-        assessments: [latest],
-        selected_assessment: latest,
-      }}
-      runStress={vi.fn()}
-      record={makeRecord()}
-      lastEvidenceAssessment={undefined}
-      onOpenSourceDetails={openDetails}
-      onChangeConditions={vi.fn()}
-      onRecordDecision={vi.fn()}
-    />,
+    <QueryClientProvider client={client}>
+      <EvidenceStep
+        writing={false}
+        pending={{
+          refresh: false,
+          review: false,
+          replayStep: null,
+          stress: false,
+        }}
+        active
+        replay={vi.fn()}
+        refresh={vi.fn()}
+        latest={latest}
+        reviewWithAI={vi.fn()}
+        llmStatus={makeLlmStatus()}
+        instrument={makeInstrument()}
+        history={{
+          versions: [makeRecord()],
+          events: [],
+          assessments: [latest],
+          selected_assessment: latest,
+        }}
+        runStress={vi.fn()}
+        record={makeRecord()}
+        lastEvidenceAssessment={undefined}
+        onOpenSourceDetails={openDetails}
+        onChangeConditions={vi.fn()}
+        onRecordDecision={vi.fn()}
+      />
+    </QueryClientProvider>,
   );
   expect(
     screen.getByRole("heading", { name: "This filing needs a closer look" }),
@@ -765,8 +797,8 @@ test("evidence shows the result, findings and selected source before advanced co
     screen.getByRole("button", { name: "Record my decision →" }),
   ).toBeTruthy();
   expect(
-    screen.getAllByRole("button", { name: "Chat about this result" }).length,
-  ).toBe(2);
+    screen.getByRole("heading", { name: "Ask about this filing" }),
+  ).toBeTruthy();
   expect(screen.getByText("Advanced checks")).toBeTruthy();
   fireEvent.click(screen.getByRole("button", { name: "Source details" }));
   expect(openDetails).toHaveBeenCalledWith(source);

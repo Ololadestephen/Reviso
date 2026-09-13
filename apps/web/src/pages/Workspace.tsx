@@ -5,6 +5,7 @@ import {
   useParams,
   useSearchParams,
 } from "react-router-dom";
+import AppTopbar from "../components/AppTopbar";
 import EvidenceStep from "../features/journey/EvidenceStep";
 import IdeaComposer from "../features/journey/IdeaComposer";
 import JourneyProgress from "../features/journey/JourneyProgress";
@@ -122,7 +123,7 @@ export default function Workspace() {
 
   return (
     <>
-      <header>
+      <AppTopbar>
         <div>
           <Link className="muted" to="/app">
             My research
@@ -139,13 +140,13 @@ export default function Workspace() {
         </div>
         {record && (
           <Link
-            className="button-link"
+            className="button-link app-topbar-cta"
             to={`/app/thesis/${record.id}/timeline`}
           >
             Decision history
           </Link>
         )}
-      </header>
+      </AppTopbar>
 
       {instrument && step !== 1 && (
         <div className="workspace-context">

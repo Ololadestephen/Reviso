@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { CompanyLogo } from "../components/Brand";
+import CitedNvidiaExample from "../components/CitedNvidiaExample";
 import ProductPreview from "../components/ProductPreview";
 
 const steps = [
@@ -55,6 +56,10 @@ export default function Landing() {
     <>
       <section className="public-hero">
         <div className="hero-copy">
+          <p className="hero-announcement">
+            Bitget AI Base Camp Season 2<span aria-hidden="true"> · </span>
+            <Link to="/example">View the NVIDIA example →</Link>
+          </p>
           <h1>
             Have a stock idea?
             <span>See if the evidence supports it.</span>
@@ -109,37 +114,7 @@ export default function Landing() {
         className="public-section cited-example"
         aria-labelledby="cited-example-title"
       >
-        <article className="cited-example-card">
-          <header>
-            <div>
-              <span className="eyebrow">EXAMPLE · NVIDIA · FY2025 Q3</span>
-              <h2 id="cited-example-title">One condition, one dated print.</h2>
-            </div>
-            <span className="badge invalidated">Invalidated</span>
-          </header>
-          <dl>
-            <div>
-              <dt>Condition</dt>
-              <dd>GAAP gross margin stays at or above 75%</dd>
-            </div>
-            <div>
-              <dt>Reported</dt>
-              <dd>74.6% in the third-quarter release</dd>
-            </div>
-            <div>
-              <dt>Source</dt>
-              <dd>
-                <Link to="/example">
-                  NVIDIA investor relations excerpt · available 21 Nov 2024
-                </Link>
-              </dd>
-            </div>
-          </dl>
-          <p className="cited-example-note">
-            This is a dated research example, not a current view or a
-            recommendation. Open the source in the walkthrough.
-          </p>
-        </article>
+        <CitedNvidiaExample sourceToExample />
       </section>
 
       <section className="coverage-section">

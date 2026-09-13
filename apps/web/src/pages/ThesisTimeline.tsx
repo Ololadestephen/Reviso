@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import AppTopbar from "../components/AppTopbar";
 import Timeline from "../Timeline";
 import SourceDrawer from "../SourceDrawer";
 import { useHistory } from "../queries/workspace";
@@ -19,17 +20,17 @@ export default function ThesisTimeline() {
 
   return (
     <>
-      <header>
+      <AppTopbar>
         <div>
           <Link className="muted" to="/app">
             My research
           </Link>
           <span className="muted"> / </span>Decision timeline
         </div>
-        <Link className="button-link" to={`/app/thesis/${id}`}>
+        <Link className="button-link app-topbar-cta" to={`/app/thesis/${id}`}>
           ← Back to research
         </Link>
-      </header>
+      </AppTopbar>
 
       {error && (
         <div role="alert" className="error">

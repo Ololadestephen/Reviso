@@ -4,7 +4,7 @@
 
 First feasible vertical slice: NVIDIA thesis → confirmed assumptions → cited assessment and controlled numerical stresses → stored version → timestamp-gated evidence → retain/revise/retire decision.
 
-The deployed NVIDIA slice remains the current production prototype. The [newcomer experience and stock expansion plan](docs/NEWCOMER-EXPERIENCE-PLAN.md) is now implemented and verified locally: a guided five-step journey, three explicitly verified stocks, evidence recovery, cited follow-up questions, and saved-thesis export. It has not been deployed. Its authorized live-Qwen batch is complete and exposes operational risk in the suggestion path that must be handled before deployment.
+The deployed public/private interface remains the current production prototype. The [newcomer experience and stock expansion plan](docs/NEWCOMER-EXPERIENCE-PLAN.md) is implemented and verified locally: a guided five-step journey, six explicitly verified stocks, evidence recovery, automatic cited Qwen findings, an inline filing-bound follow-up conversation, and Markdown/JSON/PDF export. The six-stock and evidence-conversation release is approved for deployment. Its earlier authorized live-Qwen batch still records operational risk in the suggestion path; this release does not claim that those timeouts are solved.
 
 ## Milestones
 

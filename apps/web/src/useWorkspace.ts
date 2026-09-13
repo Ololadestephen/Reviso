@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import type {
-  Assessment,
   InstrumentId,
   Evidence,
   History,
@@ -97,8 +96,6 @@ export function useWorkspace(
   const historyQuery = useHistory(thesisId);
   const llmQuery = useLlmStatus();
   const instrumentsQuery = useInstruments();
-  const explainKey = useRef<string | null>(null);
-  const pendingExplain = useRef<Assessment | null>(null);
 
   const record = thesisQuery.data ?? null;
   const history = historyQuery.data ?? emptyHistory;
@@ -184,33 +181,6 @@ export function useWorkspace(
   /** Any write is in flight; a concurrent write would race the version check. */
   const writing = mutations.some((mutation) => mutation.isPending);
 
-  function maybeExplain(assessment: Assessment) {
-    if (!record) return;
-    if (!assessment.evidence.length || assessment.narrative_review) return;
-    if (llmQuery.isPending) {
-      pendingExplain.current = assessment;
-      return;
-    }
-    pendingExplain.current = null;
-    if (!llmQuery.data?.configured) return;
-    const key = `${record.id}:${assessment.input_hash}`;
-    if (explainKey.current === key || reviewMutation.isPending) return;
-    explainKey.current = key;
-    reviewMutation.mutate(undefined, {
-      onError: () => {
-        if (explainKey.current === key) explainKey.current = null;
-      },
-    });
-  }
-
-  useEffect(() => {
-    if (pendingExplain.current && !llmQuery.isPending) {
-      const waiting = pendingExplain.current;
-      pendingExplain.current = null;
-      maybeExplain(waiting);
-    }
-  }, [llmQuery.isPending, llmQuery.data?.configured]);
-
   return {
     thesisId,
     record,
@@ -245,15 +215,11 @@ export function useWorkspace(
       ),
     replay: (step: number) => {
       clearErrors();
-      replayMutation.mutate(step, {
-        onSuccess: (assessment) => maybeExplain(assessment),
-      });
+      replayMutation.mutate(step);
     },
     refresh: () => {
       clearErrors();
-      refreshMutation.mutate(undefined, {
-        onSuccess: (assessment) => maybeExplain(assessment),
-      });
+      refreshMutation.mutate();
     },
     reviewWithAI: () => {
       clearErrors();

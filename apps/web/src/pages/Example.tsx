@@ -1,30 +1,43 @@
+import { CompanyLogo } from "../components/Brand";
+import CitedNvidiaExample from "../components/CitedNvidiaExample";
 import ProductPreview from "../components/ProductPreview";
 
-const exampleSteps = [
+const walkthrough = [
   {
-    number: "1",
-    title: "Company",
-    body: "NVIDIA, researched through the verified rNVDA / USDT market identity.",
+    number: "01",
+    title: "Pick NVIDIA",
+    copy: "The walkthrough uses the verified rNVDA / USDT market identity, not a guessed ticker.",
+    visual: (
+      <div className="step-stock-cards" aria-hidden="true">
+        <CompanyLogo instrumentId="RNVDAUSDT" />
+        <CompanyLogo instrumentId="RGOOGLUSDT" />
+        <CompanyLogo instrumentId="RTSLAUSDT" />
+      </div>
+    ),
   },
   {
-    number: "2",
-    title: "Idea",
-    body: "Data-centre demand can remain strong over the chosen research period.",
+    number: "02",
+    title: "Write the idea",
+    copy: "The researcher said data-centre demand can remain strong, then named what would change their mind.",
+    visual: (
+      <img
+        className="step-screen-image"
+        src="/step-write-idea.svg"
+        alt="Reviso screen for writing an NVIDIA research idea"
+      />
+    ),
   },
   {
-    number: "3",
-    title: "Conditions",
-    body: "Revenue growth and reported margin stay above levels chosen by the researcher.",
-  },
-  {
-    number: "4",
-    title: "Evidence",
-    body: "A dated company release is checked. Any condition without a reported measure stays open.",
-  },
-  {
-    number: "5",
-    title: "Decision",
-    body: "The researcher records keep, change or set aside, together with their reason.",
+    number: "03",
+    title: "Check the print",
+    copy: "A dated company release is compared with those conditions. Margin at 74.6% did not hold a 75% floor.",
+    visual: (
+      <img
+        className="step-screen-image"
+        src="/step-check-idea.svg"
+        alt="Reviso screen showing cited evidence and a recorded decision"
+      />
+    ),
   },
 ];
 
@@ -33,50 +46,46 @@ export default function Example() {
     <article className="static-page example-page">
       <header className="static-hero">
         <span className="eyebrow">READ-ONLY EXAMPLE · NO AI CALLS</span>
-        <h1>See how an NVIDIA idea moves through Reviso.</h1>
+        <h1>An NVIDIA idea, checked against one dated filing.</h1>
         <p>
-          This prepared walkthrough explains the process. Its wording is
-          illustrative and is not a current market view or recommendation.
+          This prepared walkthrough shows the same path as the app: company,
+          conditions, print, decision. The wording is illustrative and is not a
+          current market view or recommendation.
         </p>
       </header>
 
       <ProductPreview />
 
-      <section className="example-journey" aria-label="Five example steps">
-        {exampleSteps.map((step) => (
-          <article key={step.number}>
-            <span>{step.number}</span>
-            <div>
-              <h2>{step.title}</h2>
-              <p>{step.body}</p>
-            </div>
-          </article>
-        ))}
+      <section className="example-check" aria-labelledby="cited-example-title">
+        <CitedNvidiaExample />
       </section>
 
-      <section className="example-sources">
-        <div>
-          <span className="eyebrow">SOURCE BOUNDARIES</span>
-          <h2>What the real app checks</h2>
+      <section className="example-walkthrough">
+        <div className="public-section-heading centered">
+          <span className="eyebrow">THE PATH</span>
+          <h2>Company, conditions, then a dated print.</h2>
         </div>
-        <div>
-          <p>
-            Current company evidence comes from a bounded official NVIDIA
-            disclosure path. Market observations come from the allowlisted
-            Bitget instrument.
-          </p>
-          <p>
-            Reviso keeps reported facts, older replay evidence and “what if”
-            calculations visibly separate.
-          </p>
+        <div className="steps-grid">
+          {walkthrough.map((step) => (
+            <article
+              className={`landing-step step-${step.number}`}
+              key={step.number}
+            >
+              <div className="step-visual">{step.visual}</div>
+              <span className="step-number">{step.number}</span>
+              <h3>{step.title}</h3>
+              <p>{step.copy}</p>
+            </article>
+          ))}
         </div>
       </section>
 
       <section className="example-next">
-        <h2>Ready to write your own idea?</h2>
+        <h2>Write your own idea in the app.</h2>
         <p>
           The editable app is protected because this demo uses one shared
-          research store.
+          research store. The example above does not call Qwen or load live
+          filings.
         </p>
         <a className="button-link primary" href="/app">
           Open the protected app
