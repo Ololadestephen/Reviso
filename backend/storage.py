@@ -19,6 +19,17 @@ class Repository:
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         with self.connect() as connection:
             for migration in sorted((Path(__file__).parent / "migrations").glob("*.sql")):
+                version = int(migration.stem.split("_", maxsplit=1)[0])
+                has_migration_table = connection.execute(
+                    "SELECT 1 FROM sqlite_master WHERE type='table' AND name='schema_migrations'"
+                ).fetchone()
+                if (
+                    has_migration_table
+                    and connection.execute(
+                        "SELECT 1 FROM schema_migrations WHERE version=?", (version,)
+                    ).fetchone()
+                ):
+                    continue
                 connection.executescript(migration.read_text())
 
     @contextmanager

@@ -1,3 +1,5 @@
+import sqlite3
+
 import pytest
 
 from backend.storage import Repository
@@ -45,3 +47,42 @@ def test_summaries_report_the_newest_version_and_original_creation(tmp_path, the
 
 def test_summaries_are_empty_before_any_thesis_exists(tmp_path):
     assert Repository(str(tmp_path / "empty.sqlite3")).summaries() == []
+
+
+def test_legacy_research_thread_foreign_key_is_repaired_without_data_loss(tmp_path, thesis):
+    path = tmp_path / "legacy-thread.sqlite3"
+    repo = Repository(str(path))
+    draft = repo.create(thesis.model_dump(mode="json"))
+    thread = {
+        "thesis_id": draft["id"],
+        "context_hash": "legacy-context",
+        "messages": [],
+    }
+    repo.save_thread(thread)
+
+    with sqlite3.connect(path) as connection:
+        connection.executescript(
+            """
+            DELETE FROM schema_migrations WHERE version = 5;
+            ALTER TABLE research_threads RENAME TO research_threads_current;
+            CREATE TABLE research_threads (
+                thesis_id TEXT NOT NULL,
+                context_hash TEXT NOT NULL,
+                body TEXT NOT NULL,
+                PRIMARY KEY (thesis_id, context_hash),
+                FOREIGN KEY (thesis_id) REFERENCES theses(id)
+            );
+            INSERT INTO research_threads SELECT * FROM research_threads_current;
+            DROP TABLE research_threads_current;
+            """
+        )
+
+    repaired = Repository(str(path))
+    assert repaired.thread(draft["id"], "legacy-context") == thread
+    repaired.save_thread({**thread, "messages": [{"role": "user", "content": "Why?"}]})
+
+    with sqlite3.connect(path) as connection:
+        assert connection.execute(
+            "SELECT version FROM schema_migrations WHERE version = 5"
+        ).fetchone() == (5,)
+        assert connection.execute("PRAGMA foreign_key_list(research_threads)").fetchall() == []
