@@ -21,13 +21,15 @@ deployment role with Lightsail permissions, MFA and a short-lived CLI session.
 
 ## Current deployment
 
-As of September 12, 2026, `reviso-prod` is running in `us-east-1a` on the 2 GB
+As of September 13, 2026, `reviso-prod` is running in `us-east-1a` on the 2 GB
 bundle with static IP `13.216.59.120`. It was provisioned through the scoped IAM
 user `reviso-deployer`. Vercel DNS points `revisoagent.xyz` at the static IP and
 `REVISO_HOST` has been switched to that final hostname. HTTPS, Basic Auth, Qwen
 configuration, public evidence refresh and SQLite persistence passed on the
 initial temporary hostname; final-domain HTTPS and persisted-state checks also
-passed after cutover.
+passed after cutover. The six-stock, automatic-findings and inline-conversation
+release was subsequently deployed with migration 004 after an integrity-checked
+online SQLite backup; the named data and Caddy volumes were preserved.
 
 ## Install the host
 
