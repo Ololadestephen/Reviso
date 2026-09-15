@@ -28,6 +28,8 @@ export const queryKeys = {
   history: (id: string) => ["theses", id, "history"] as const,
   llmStatus: ["llm-status"] as const,
   instruments: ["instruments"] as const,
+  market: (instrumentId: string) => ["market", instrumentId] as const,
+  xstocks: (instrumentId: string) => ["xstocks", instrumentId] as const,
   questions: (id: string) => ["theses", id, "questions"] as const,
   conversation: (id: string, hash: string) =>
     ["theses", id, "conversation", hash] as const,

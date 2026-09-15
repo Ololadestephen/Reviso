@@ -594,6 +594,22 @@
         "title": "Evidence",
         "type": "object"
       },
+      "GoogleLoginInput": {
+        "additionalProperties": false,
+        "properties": {
+          "credential": {
+            "maxLength": 8192,
+            "minLength": 20,
+            "title": "Credential",
+            "type": "string"
+          }
+        },
+        "required": [
+          "credential"
+        ],
+        "title": "GoogleLoginInput",
+        "type": "object"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -1069,6 +1085,34 @@
         "title": "SavedResearchAnswer",
         "type": "object"
       },
+      "SimulateLoginInput": {
+        "additionalProperties": false,
+        "properties": {
+          "email": {
+            "anyOf": [
+              {
+                "maxLength": 320,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "subject": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Subject",
+            "type": "string"
+          }
+        },
+        "required": [
+          "subject"
+        ],
+        "title": "SimulateLoginInput",
+        "type": "object"
+      },
       "State": {
         "enum": [
           "SUPPORTED",
@@ -1474,6 +1518,168 @@
         ],
         "title": "ValidationError",
         "type": "object"
+      },
+      "XStocksContext": {
+        "additionalProperties": false,
+        "description": "A separate xStocks product observation; never company filing evidence.",
+        "properties": {
+          "availability": {
+            "enum": [
+              "AVAILABLE",
+              "PARTIAL",
+              "UNAVAILABLE"
+            ],
+            "title": "Availability",
+            "type": "string"
+          },
+          "cached": {
+            "default": false,
+            "title": "Cached",
+            "type": "boolean"
+          },
+          "currency": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currency"
+          },
+          "indicative_price": {
+            "anyOf": [
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,14}|(?=[\\d.]{1,25}0*$)\\d{0,14}\\.\\d{0,10}0*$)",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Indicative Price"
+          },
+          "instrument_id": {
+            "enum": [
+              "RNVDAUSDT",
+              "RAAPLUSDT",
+              "RMSFTUSDT",
+              "RGOOGLUSDT",
+              "RAMZNUSDT",
+              "RTSLAUSDT"
+            ],
+            "title": "Instrument Id",
+            "type": "string"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 10,
+            "title": "Limitations",
+            "type": "array"
+          },
+          "market_open": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Market Open"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "networks": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 20,
+            "title": "Networks",
+            "type": "array"
+          },
+          "research_url": {
+            "title": "Research Url",
+            "type": "string"
+          },
+          "retrieved_at": {
+            "format": "date-time",
+            "title": "Retrieved At",
+            "type": "string"
+          },
+          "source_url": {
+            "title": "Source Url",
+            "type": "string"
+          },
+          "trading_halted": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trading Halted"
+          },
+          "trading_period": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trading Period"
+          },
+          "underlying_symbol": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Underlying Symbol"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 10,
+            "title": "Warnings",
+            "type": "array"
+          },
+          "xstock_symbol": {
+            "title": "Xstock Symbol",
+            "type": "string"
+          }
+        },
+        "required": [
+          "instrument_id",
+          "xstock_symbol",
+          "availability",
+          "retrieved_at",
+          "source_url",
+          "research_url",
+          "limitations"
+        ],
+        "title": "XStocksContext",
+        "type": "object"
       }
     }
   },
@@ -1483,6 +1689,126 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/auth/config": {
+      "get": {
+        "operationId": "auth_config_auth_config_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Auth Config"
+      }
+    },
+    "/auth/google": {
+      "post": {
+        "operationId": "auth_google_auth_google_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GoogleLoginInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Auth Google"
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "operationId": "auth_logout_auth_logout_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Auth Logout"
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "operationId": "auth_me_auth_me_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Auth Me"
+      }
+    },
+    "/auth/simulate": {
+      "post": {
+        "operationId": "auth_simulate_auth_simulate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SimulateLoginInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Auth Simulate"
+      }
+    },
     "/evidence/{evidence_id}": {
       "get": {
         "operationId": "get_evidence_evidence__evidence_id__get",
@@ -2456,6 +2782,54 @@
           }
         },
         "summary": "Run Stress"
+      }
+    },
+    "/xstocks/context": {
+      "get": {
+        "operationId": "xstocks_context_xstocks_context_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "instrument_id",
+            "required": false,
+            "schema": {
+              "default": "RNVDAUSDT",
+              "enum": [
+                "RNVDAUSDT",
+                "RAAPLUSDT",
+                "RMSFTUSDT",
+                "RGOOGLUSDT",
+                "RAMZNUSDT",
+                "RTSLAUSDT"
+              ],
+              "title": "Instrument Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/XStocksContext"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Xstocks Context"
       }
     }
   }

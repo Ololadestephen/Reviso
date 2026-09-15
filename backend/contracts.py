@@ -209,6 +209,28 @@ class Evidence(Contract):
     parser_version: str | None = None
 
 
+class XStocksContext(Contract):
+    """A separate xStocks product observation; never company filing evidence."""
+
+    instrument_id: InstrumentId
+    xstock_symbol: str
+    name: str | None = None
+    underlying_symbol: str | None = None
+    currency: str | None = None
+    indicative_price: Positive | None = None
+    availability: Literal["AVAILABLE", "PARTIAL", "UNAVAILABLE"]
+    retrieved_at: AwareDatetime
+    trading_halted: bool | None = None
+    market_open: bool | None = None
+    trading_period: str | None = None
+    networks: list[str] = Field(default_factory=list, max_length=20)
+    source_url: str
+    research_url: str
+    cached: bool = False
+    warnings: list[str] = Field(default_factory=list, max_length=10)
+    limitations: list[str] = Field(max_length=10)
+
+
 class BookLevel(Contract):
     price: Positive
     quantity: Nonnegative

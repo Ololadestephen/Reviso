@@ -207,6 +207,26 @@ export const marketSchema = z.looseObject({
   cached: z.boolean(),
 });
 
+export const xstocksContextSchema = z.looseObject({
+  instrument_id: instrumentIdSchema,
+  xstock_symbol: z.string(),
+  name: z.string().nullable(),
+  underlying_symbol: z.string().nullable(),
+  currency: z.string().nullable(),
+  indicative_price: numeric.nullable(),
+  availability: z.enum(["AVAILABLE", "PARTIAL", "UNAVAILABLE"]),
+  retrieved_at: timestamp,
+  trading_halted: z.boolean().nullable(),
+  market_open: z.boolean().nullable(),
+  trading_period: z.string().nullable(),
+  networks: z.array(z.string()),
+  source_url: z.string().url(),
+  research_url: z.string().url(),
+  cached: z.boolean(),
+  warnings: z.array(z.string()),
+  limitations: z.array(z.string()),
+});
+
 export const narrativeReviewSchema = z.looseObject({
   summary: z.string(),
   next_question: z.string(),
@@ -239,6 +259,19 @@ export const llmStatusSchema = z.looseObject({
   suggestion_prompt: z.string().optional(),
   question_prompt: z.string().optional(),
   streaming: z.string().optional(),
+});
+
+export const sessionUserSchema = z.looseObject({
+  user_id: z.string(),
+  kind: z.enum(["person", "operator", "local"]),
+  auth: z.enum(["local", "google", "simulated"]),
+  email: z.string().nullable(),
+  display_name: z.string(),
+});
+
+export const authConfigSchema = z.looseObject({
+  mode: z.enum(["local", "google", "simulated"]),
+  google_client_id: z.string().nullable(),
 });
 
 export const assessmentSchema = z.looseObject({
@@ -387,10 +420,13 @@ export type Evidence = z.infer<typeof evidenceSchema>;
 export type Numerical = z.infer<typeof numericalSchema>;
 export type Scenario = z.infer<typeof scenarioSchema>;
 export type MarketObservation = z.infer<typeof marketSchema>;
+export type XStocksContext = z.infer<typeof xstocksContextSchema>;
 export type MarketExecution = z.infer<typeof marketExecutionSchema>;
 export type NarrativeReview = z.infer<typeof narrativeReviewSchema>;
 export type LLMProvenance = z.infer<typeof llmProvenanceSchema>;
 export type LLMStatus = z.infer<typeof llmStatusSchema>;
+export type SessionUser = z.infer<typeof sessionUserSchema>;
+export type AuthConfig = z.infer<typeof authConfigSchema>;
 export type Assessment = z.infer<typeof assessmentSchema>;
 export type DecisionEvent = z.infer<typeof decisionEventSchema>;
 export type History = z.infer<typeof historySchema>;

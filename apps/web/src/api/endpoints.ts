@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { get, post } from "./client";
+import { ApiError, get, post } from "./client";
 import {
   assessmentSchema,
   evidenceSchema,
@@ -7,6 +7,7 @@ import {
   instrumentSchema,
   llmStatusSchema,
   marketSchema,
+  xstocksContextSchema,
   numericalSchema,
   thesisExtractionSchema,
   thesisSuggestionSchema,
@@ -14,6 +15,8 @@ import {
   conversationThreadSchema,
   thesisRecordSchema,
   thesisSummarySchema,
+  sessionUserSchema,
+  authConfigSchema,
   type Assessment,
   type ThesisInput,
   type InstrumentId,
@@ -23,6 +26,24 @@ import {
 export const fetchLlmStatus = (signal?: AbortSignal) =>
   get("/llm/status", llmStatusSchema, signal);
 
+export const fetchAuthConfig = (signal?: AbortSignal) =>
+  get("/auth/config", authConfigSchema, signal);
+
+export const fetchSession = async (signal?: AbortSignal) => {
+  try {
+    return await get("/auth/me", sessionUserSchema, signal);
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 401) return null;
+    throw error;
+  }
+};
+
+export const signInWithGoogle = (credential: string) =>
+  post("/auth/google", sessionUserSchema, { credential });
+
+export const signOutSession = () =>
+  post("/auth/logout", z.object({ ok: z.boolean() }));
+
 export const fetchInstrument = (signal?: AbortSignal) =>
   get("/instrument", instrumentSchema, signal);
 
@@ -31,6 +52,16 @@ export const fetchInstruments = (signal?: AbortSignal) =>
 
 export const fetchMarket = (instrumentId: InstrumentId, signal?: AbortSignal) =>
   get(`/market?instrument_id=${instrumentId}`, marketSchema, signal);
+
+export const fetchXStocksContext = (
+  instrumentId: InstrumentId,
+  signal?: AbortSignal,
+) =>
+  get(
+    `/xstocks/context?instrument_id=${instrumentId}`,
+    xstocksContextSchema,
+    signal,
+  );
 
 export const fetchTheses = (signal?: AbortSignal) =>
   get("/theses", z.array(thesisSummarySchema), signal);

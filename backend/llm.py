@@ -300,6 +300,9 @@ class SchemaLanguageModel(ABC):
         """Return decoded JSON output from one provider request."""
 
     def _post(self, endpoint: str, body: dict) -> dict:
+        from backend.llm_budget import note_provider_request
+
+        note_provider_request()
         try:
             response = self._client.post(
                 endpoint,

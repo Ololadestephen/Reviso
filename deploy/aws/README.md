@@ -24,12 +24,15 @@ deployment role with Lightsail permissions, MFA and a short-lived CLI session.
 As of September 13, 2026, `reviso-prod` is running in `us-east-1a` on the 2 GB
 bundle with static IP `13.216.59.120`. It was provisioned through the scoped IAM
 user `reviso-deployer`. Vercel DNS points `revisoagent.xyz` at the static IP and
-`REVISO_HOST` has been switched to that final hostname. HTTPS, Basic Auth, Qwen
+`REVISO_HOST` has been switched to that final hostname. HTTPS, Qwen
 configuration, public evidence refresh and SQLite persistence passed on the
-initial temporary hostname; final-domain HTTPS and persisted-state checks also
-passed after cutover. The six-stock, automatic-findings and inline-conversation
-release was subsequently deployed with migration 005 after integrity-checked
-online SQLite backups; the named data and Caddy volumes were preserved.
+initial temporary hostname; that check still used HTTP Basic. Final-domain
+HTTPS and persisted-state checks also passed after cutover. The six-stock,
+automatic-findings and inline-conversation release was subsequently deployed
+with migration 005 after integrity-checked online SQLite backups; the named
+data and Caddy volumes were preserved. The next approved deploy replaces
+Basic Auth with Google sign-in and owner-scoped SQLite after a database backup
+and migration 006 rehearsal.
 
 ## Install the host
 
@@ -52,10 +55,10 @@ cp deploy/aws/.env.example deploy/aws/.env
 chmod 600 deploy/aws/.env
 ```
 
-Set the final hostname, a random demo password of at least 16 characters and the
-Bitget Qwen key in `deploy/aws/.env`. The file is ignored by Git through the
-repository-wide `.env.*` rule. The hostname must already resolve to the static
-IP so Caddy can obtain its certificate.
+Set the final hostname, the Google web client ID and the Bitget Qwen key in
+`deploy/aws/.env`. The file is ignored by Git through the repository-wide
+`.env.*` rule. The hostname must already resolve to the static IP so Caddy can
+obtain its certificate.
 
 Validate and start the service:
 
@@ -65,9 +68,9 @@ docker compose --env-file deploy/aws/.env -f deploy/aws/compose.yaml up -d --bui
 docker compose --env-file deploy/aws/.env -f deploy/aws/compose.yaml ps
 ```
 
-Open `https://<REVISO_HOST>` and enter the demo credentials. Verify
+Open `https://<REVISO_HOST>` and continue with Google. Verify
 `https://<REVISO_HOST>/api/health`, create a temporary thesis, restart the
-containers and confirm the thesis remains present.
+containers and confirm that thesis remains present for the same account.
 
 ## Update and roll back
 

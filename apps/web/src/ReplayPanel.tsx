@@ -1,20 +1,18 @@
 import { useEffect } from "react";
 import {
   aiHelpCopy,
-  findingLabel,
   humanGaps,
   llmProviderLabel,
   resultHeadline,
   resultLead,
 } from "./lib/format";
+import { markAutoReviewed, wasAutoReviewed } from "./lib/autoReview";
 import type {
   Assessment,
   Evidence,
   Instrument,
   LLMStatus,
 } from "./api/schemas";
-
-const autoReviewKeys = new Set<string>();
 
 export default function ReplayPanel({
   writing,
@@ -29,6 +27,7 @@ export default function ReplayPanel({
   instrument,
   priorAssessment = null,
   onOpenSource,
+  showExplanation = true,
 }: {
   writing: boolean;
   pending: {
@@ -46,6 +45,7 @@ export default function ReplayPanel({
   instrument: Instrument;
   priorAssessment?: Assessment | null;
   onOpenSource?: (evidence: Evidence) => void;
+  showExplanation?: boolean;
 }) {
   const loadLabel = (step: number) =>
     pending.replayStep === step ? "Loading…" : "Load";
@@ -82,8 +82,8 @@ export default function ReplayPanel({
     ) {
       return;
     }
-    if (autoReviewKeys.has(key)) return;
-    autoReviewKeys.add(key);
+    if (wasAutoReviewed(key)) return;
+    markAutoReviewed(key);
     reviewWithAI();
   }, [
     active,
@@ -101,14 +101,7 @@ export default function ReplayPanel({
   return (
     <>
       <section className="panel evidence-result">
-        <div className="section-heading">
-          <span className="eyebrow">THE RESULT</span>
-          {latest && (
-            <span className={`badge ${latest.state.toLowerCase()}`}>
-              {findingLabel(latest.state)}
-            </span>
-          )}
-        </div>
+        <span className="eyebrow">EVIDENCE RESULT</span>
         <h2>{headline}</h2>
         <p>
           {latest
@@ -126,14 +119,17 @@ export default function ReplayPanel({
           </p>
         )}
         {gaps.length > 0 && (
-          <div className="result-missing">
-            <strong>What this check does not cover</strong>
+          <details className="result-limits">
+            <summary>
+              {gaps.length} {gaps.length === 1 ? "limit" : "limits"} of this
+              check
+            </summary>
             <ul>
               {gaps.map((item) => (
                 <li key={item}>{item}</li>
               ))}
             </ul>
-          </div>
+          </details>
         )}
         {!latest && (
           <div className="result-missing">
@@ -144,17 +140,15 @@ export default function ReplayPanel({
             </p>
           </div>
         )}
-        {retrieval && (
+        {retrieval && retrieval.availability !== "AVAILABLE" && (
           <div
             className={`retrieval-state ${retrieval.availability.toLowerCase()}`}
             role="status"
           >
             <strong>
-              {retrieval.availability === "AVAILABLE"
-                ? "Latest filing loaded"
-                : retrieval.availability === "UNAVAILABLE"
-                  ? "Latest filing unavailable"
-                  : `Latest filing ${retrieval.availability.replaceAll("_", " ").toLowerCase()}`}
+              {retrieval.availability === "UNAVAILABLE"
+                ? "Latest filing unavailable"
+                : `Latest filing ${retrieval.availability.replaceAll("_", " ").toLowerCase()}`}
             </strong>
             <p className="caption">
               Checked {new Date(retrieval.checked_at).toLocaleString()}
@@ -165,12 +159,10 @@ export default function ReplayPanel({
                 {warning}
               </p>
             ))}
-            {retrieval.availability !== "AVAILABLE" && (
-              <p className="recovery-copy">
-                You can try again, open the company site, or record a decision
-                that says this filing was missing or dated.
-              </p>
-            )}
+            <p className="recovery-copy">
+              You can try again, open the company site, or record a decision
+              that says this filing was missing or dated.
+            </p>
           </div>
         )}
         {latest &&
@@ -199,14 +191,24 @@ export default function ReplayPanel({
           )}
         <div className="result-toolbar">
           <button
-            className="wide primary"
+            className={latest ? "quiet" : "wide primary"}
             disabled={writing || !active}
             onClick={refresh}
           >
             {pending.refresh
               ? "Checking the official filing…"
-              : `Check latest ${instrument.display_name} filing`}
+              : latest
+                ? latest.disclosure_retrieval?.availability === "UNAVAILABLE"
+                  ? "Retry filing"
+                  : "Refresh filing"
+                : `Check latest ${instrument.display_name} filing`}
           </button>
+          {latest?.evidence.length ? (
+            <span className="caption">
+              {latest.evidence.length} official source
+              {latest.evidence.length === 1 ? "" : "s"} checked
+            </span>
+          ) : null}
         </div>
         {instrument.historical_replay_available && (
           <details className="historical-replay">
@@ -239,7 +241,7 @@ export default function ReplayPanel({
         )}
       </section>
 
-      {hasEvidence && (
+      {hasEvidence && showExplanation && (
         <section
           className="panel ai-findings"
           aria-labelledby="ai-findings-title"

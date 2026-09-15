@@ -64,16 +64,18 @@ def seed_explanation(thread: dict, review: dict) -> dict:
     return thread
 
 
-def conversation_for(repo: Repository, thesis_id: str, selected: dict, record: dict) -> dict:
+def conversation_for(
+    repo: Repository, owner_id: str, thesis_id: str, selected: dict, record: dict
+) -> dict:
     _thesis, _evidence, context_hash = context_for(record, selected)
-    thread = repo.thread(thesis_id, context_hash) or empty_thread(
+    thread = repo.thread(owner_id, thesis_id, context_hash) or empty_thread(
         thesis_id, selected["thesis_version"], selected["input_hash"], context_hash
     )
     thread["assessment_input_hash"] = selected["input_hash"]
     thread["thesis_version"] = selected["thesis_version"]
     if selected.get("narrative_review"):
         thread = seed_explanation(thread, selected["narrative_review"])
-        repo.save_thread(thread)
+        repo.save_thread(owner_id, thread)
     return thread
 
 
@@ -95,13 +97,15 @@ def last_turn(thread: dict) -> tuple[str | None, bool]:
 def append_exchange(
     repo: Repository,
     llm,
+    owner_id: str,
     record: dict,
     selected: dict,
     question: str,
     detail: bool,
+    run_paid=None,
 ) -> dict:
     thesis, evidence, context_hash = context_for(record, selected)
-    thread = conversation_for(repo, record["id"], selected, record)
+    thread = conversation_for(repo, owner_id, record["id"], selected, record)
     last_question, last_detail = last_turn(thread)
     if last_question == question and last_detail == detail:
         return thread
@@ -117,11 +121,16 @@ def append_exchange(
             "prompt_version": QUESTION_PROMPT_VERSION,
         }
     )
-    cached = repo.research_answer_by_hash(record["id"], input_hash)
+    cached = repo.research_answer_by_hash(owner_id, record["id"], input_hash)
     if cached:
-        return thread_with_cached_turn(thread, cached, repo)
+        return thread_with_cached_turn(owner_id, thread, cached, repo)
 
-    answer = llm.answer(thesis, evidence, question, history=history_payload(thread), detail=detail)
+    def generate():
+        return llm.answer(
+            thesis, evidence, question, history=history_payload(thread), detail=detail
+        )
+
+    answer = run_paid(input_hash, generate) if run_paid else generate()
     metadata = provenance(
         llm.descriptor, QUESTION_PROMPT_VERSION, getattr(llm, "last_timing", None)
     )
@@ -152,7 +161,7 @@ def append_exchange(
             },
         ]
     )
-    repo.save_thread(thread)
+    repo.save_thread(owner_id, thread)
     saved = SavedResearchAnswer(
         id=assistant_id,
         thesis_id=record["id"],
@@ -164,11 +173,11 @@ def append_exchange(
         input_hash=input_hash,
         created_at=utc_now(),
     )
-    repo.save_research_answer(saved.model_dump(mode="json"))
+    repo.save_research_answer(owner_id, saved.model_dump(mode="json"))
     return thread
 
 
-def thread_with_cached_turn(thread: dict, cached: dict, repo: Repository) -> dict:
+def thread_with_cached_turn(owner_id: str, thread: dict, cached: dict, repo: Repository) -> dict:
     if any(item.get("id") == cached["id"] for item in thread["messages"]):
         return thread
     now = cached["created_at"]
@@ -196,4 +205,4 @@ def thread_with_cached_turn(thread: dict, cached: dict, repo: Repository) -> dic
             },
         ]
     )
-    return repo.save_thread(thread)
+    return repo.save_thread(owner_id, thread)

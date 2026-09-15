@@ -1,4 +1,4 @@
-# Local quality report — 2026-09-13
+# Local quality report — 2026-09-15
 
 The installed Desloppify workflow was used for separate coherent backend and frontend scans, with `status` and `next` after each milestone. Exclusions cover dependency/build/cache output; no application files were excluded to raise scores. No suppressions, fabricated subjective evidence or wontfix decisions were entered. No branch, commit, push or external issue was created.
 
@@ -8,16 +8,16 @@ These are scanner outputs, not test coverage percentages or research-accuracy sc
 
 | Project | Overall (lenient) | Objective | Strict | Verified | Open findings |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| backend | 22.8 | 91.3 | 21.0 | 91.3 | 56 |
-| apps/web | 20.5 | 82.2 | 19.4 | 82.2 | 57 |
+| backend | 23.1 | 92.4 | 21.9 | 92.4 | 67 |
+| apps/web | 20.5 | 82.1 | 19.6 | 82.1 | 71 |
 
 | Mechanical dimension | Backend health | Backend strict | Web health | Web strict |
 | --- | ---: | ---: | ---: | ---: |
-| File health | 92.6 | 88.9 | 100.0 | 98.1 |
-| Code quality | 89.3 | 84.9 | 97.7 | 95.6 |
-| Duplication | 100.0 | 100.0 | 99.0 | 99.0 |
-| Security | 98.4 | 95.3 | 100.0 | 100.0 |
-| Test health | 85.2 | 69.8 | 48.0 | 36.5 |
+| File health | 86.0 | 83.2 | 100.0 | 98.6 |
+| Code quality | 89.6 | 86.3 | 97.3 | 95.6 |
+| Duplication | 100.0 | 100.0 | 100.0 | 100.0 |
+| Security | 98.8 | 96.4 | 100.0 | 100.0 |
+| Test health | 87.9 | 76.2 | 42.0 | 31.1 |
 
 | Subjective dimension | Backend | Web | Assessment status |
 | --- | ---: | ---: | --- |
@@ -42,7 +42,7 @@ These are scanner outputs, not test coverage percentages or research-accuracy sc
 | Test strategy | 0 | 0 | Unassessed |
 | Type safety | 0 | 0 | Unassessed |
 
-Scores are transcribed rather than recalculated. The scanner reports strict/lenient gaps even though its wontfix count is zero; this report does not infer a cause or silently replace those values. Its test-health numbers use import/detector heuristics, not measured runtime coverage. The backend scan also reported zero LOC despite scanning 15 production modules, while the web scan reported 2,883 LOC across 26 files. These tool-reporting limitations should be investigated independently before interpreting numerical score changes as engineering progress.
+Scores are transcribed rather than recalculated. The scanner reports strict/lenient gaps even though its wontfix count is zero; this report does not infer a cause or silently replace those values. Its test-health numbers use import/detector heuristics, not measured runtime coverage. The backend scan also reported zero LOC despite scanning 15 production modules, while the web scan reported 2,883 LOC across 26 files. These tool-reporting limitations should be investigated independently before interpreting numerical score changes as engineering progress. Immediately before the owner-isolation scan, the tool had reported backend 22.8/91.3/21.0/91.3 with 56 findings and web 20.5/82.2/19.4/82.2 with 57 findings. After the public-page rewrite, `next` still asked for an initial subjective review; that review was not fabricated.
 
 ## Earlier milestone in this continuation
 
@@ -59,7 +59,7 @@ Earlier backend mechanical health/strict: file 100/93.6, code 87/84.3, duplicati
 - Provider normalization and stored/API dictionaries need continued typed-contract review. Runtime schemas and OpenAPI snapshot checks now cover the browser/API boundary, but scanner output is not proof of full contract coherence.
 - Backend route coverage is reported as transitive: API integration tests reach the router through `create_app`. No meaningless direct import was added to influence that score.
 - The Bitget Qwen and Groq adapters have contract, repair, failure, provider-selection, idempotence and API-boundary tests using injected fakes or an HTTP mock transport. The new suggestion and cited-question paths include false-citation repair, untrusted-input framing, duplicate submission and outdated-context tests. The frozen newcomer batch used six live requests and is reported separately; its suggestion errors were not suppressed or converted into passes.
-- NVIDIA, Apple and Microsoft evidence fixtures cover issuer identity, aligned quarterly facts, partial/stale states, recovery labeling and cross-company rejection. Live-evaluation harnesses have offline freeze/cap tests and are excluded from automatic live execution by filename. Captured Qwen bare-array and incomplete-response shapes have regression tests. The earlier frozen v2 validation passed all five application contracts; the newer newcomer batch produced two adjudicated passes and three errors under its own frozen corpus. Neither is a general research-accuracy measure. No exception was suppressed. Overall verification now totals 104 backend and 45 frontend tests.
+- NVIDIA, Apple and Microsoft evidence fixtures cover issuer identity, aligned quarterly facts, partial/stale states, recovery labeling and cross-company rejection. Live-evaluation harnesses have offline freeze/cap tests and are excluded from automatic live execution by filename. Captured Qwen bare-array and incomplete-response shapes have regression tests. The earlier frozen v2 validation passed all five application contracts; the newer newcomer batch produced two adjudicated passes and three errors under its own frozen corpus. Neither is a general research-accuracy measure. No exception was suppressed. Overall verification now totals 116 backend and 47 frontend tests.
 - Frontend tests exercise runtime response schemas and the newcomer controls, including blank inputs, the collapsed slippage default, an actually blank manual claim, verified stock choice, manual fallback, locked conditions, unavailable evidence, current-context citations and source opening. The public-page test also verifies that the landing page and prepared example render without an API request. The final local Apple browser journey completed the five-stage flow and deep-link reload; keyboard focus, native dialog restoration and 390px/768px overflow checks passed. The later landing-page browser check covered the public home, example, research library and company picker in the production build. A subsequent visual pass added the local Reviso mark, favicon, company marks, gradient hero and evidence chart; it passed the same frontend suite and a production-browser check. Safari/Firefox, formal accessibility certification and broad interaction/race coverage remain incomplete. The scanner's web test-health result reflects its import/detector model and is not the same quantity as the 34 passing runtime tests.
 - Structural extractions separated API routing, frontend state, timeline, replay, ledger and scenario components. Remaining source-URL and style-size findings are not a reason to remove provenance or hide application files.
 

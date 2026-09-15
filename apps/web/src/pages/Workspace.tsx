@@ -9,11 +9,13 @@ import AppTopbar from "../components/AppTopbar";
 import EvidenceStep from "../features/journey/EvidenceStep";
 import IdeaComposer from "../features/journey/IdeaComposer";
 import JourneyProgress from "../features/journey/JourneyProgress";
+import DecisionPanel from "../features/journey/DecisionPanel";
+import RecordHeader from "../features/journey/RecordHeader";
+import ResearchPath from "../features/journey/ResearchPath";
 import SourceDrawer from "../SourceDrawer";
 import StockPicker from "../features/journey/StockPicker";
 import { CompanyLogo } from "../components/Brand";
 import ThesisEditor from "../ThesisEditor";
-import { exportThesisUrl } from "../api/endpoints";
 import type { InstrumentId } from "../api/schemas";
 import {
   emptyThesis,
@@ -21,8 +23,8 @@ import {
   defaultThesis,
   manualStarter,
 } from "../domain/defaults";
-import { stateLabel } from "../lib/format";
 import { useWorkspace } from "../useWorkspace";
+import { useMarket } from "../queries/workspace";
 
 export default function Workspace() {
   const { id } = useParams<{ id: string }>();
@@ -36,6 +38,7 @@ export default function Workspace() {
   );
   const [step, setStep] = useState(example ? 2 : thesisId ? 3 : 1);
   const [hydratedId, setHydratedId] = useState<string | null>(null);
+  const [decisionNote, setDecisionNote] = useState("");
   const errorRef = useRef<HTMLDivElement>(null);
 
   const workspace = useWorkspace(
@@ -69,17 +72,16 @@ export default function Workspace() {
     active,
     runStress,
     llmStatus,
+    llmStatusUnavailable,
     instruments,
     instrumentsLoading,
     suggestAssumptions,
   } = workspace;
 
-  useEffect(() => {
-    if (record && hydratedId !== record.id) {
-      setHydratedId(record.id);
-      setStep(record.retired ? 5 : record.confirmed ? 4 : 3);
-    }
-  }, [hydratedId, record]);
+  if (record && hydratedId !== record.id) {
+    setHydratedId(record.id);
+    setStep(record.retired ? 5 : record.confirmed ? 4 : 3);
+  }
 
   useEffect(() => {
     if (error) errorRef.current?.focus();
@@ -87,12 +89,13 @@ export default function Workspace() {
 
   const instrumentId =
     (record?.thesis.instrument_id ?? form.instrument_id) || null;
+  const market = useMarket(instrumentId);
   const instrument =
     instruments.find((item) => item.id === instrumentId) ?? null;
   const availableStep = latest
     ? 5
     : record?.confirmed
-      ? 4
+      ? 5
       : record || form.assumptions.length > 0
         ? 3
         : form.instrument_id
@@ -101,6 +104,7 @@ export default function Workspace() {
   const lastEvidenceAssessment = [...history.assessments]
     .reverse()
     .find((item) => item.evidence.length > 0);
+  const savedWorkspace = Boolean(record?.confirmed && instrument);
 
   function selectStock(instrumentId: InstrumentId) {
     clearErrors();
@@ -117,77 +121,96 @@ export default function Workspace() {
     setStep(3);
   }
 
+  function startRevision() {
+    if (!record) return;
+    setEditing(true);
+    setForm(fromThesisInput(record.thesis));
+    setStep(3);
+  }
+
   if (loading || (instrumentId && !instrument && instrumentsLoading)) {
     return <p className="page-status">Loading your research…</p>;
   }
 
+  const errorBanner = error && (
+    <div
+      ref={errorRef}
+      role="alert"
+      tabIndex={-1}
+      className="error actionable-error"
+    >
+      <span>{error.message}</span>
+      <button type="button" onClick={clearErrors}>
+        Dismiss
+      </button>
+    </div>
+  );
+
   return (
     <>
-      <AppTopbar>
-        <div>
-          <Link className="muted" to="/app">
-            My research
-          </Link>
-          {instrument && (
-            <>
-              <span className="muted"> / </span>
-              {instrument.display_name}
-            </>
+      {savedWorkspace && record && instrument ? (
+        <>
+          <RecordHeader
+            instrument={instrument}
+            record={record}
+            latest={latest}
+            market={market.data ?? null}
+            marketLoading={market.isLoading || market.isFetching}
+          />
+          <ResearchPath
+            current={editing ? 3 : step}
+            available={availableStep}
+            editing={editing}
+            onNavigate={setStep}
+          />
+        </>
+      ) : (
+        <>
+          <AppTopbar>
+            <div>
+              <Link className="muted" to="/app">
+                My research
+              </Link>
+              {instrument && (
+                <>
+                  <span className="muted"> / </span>
+                  {instrument.display_name}
+                </>
+              )}
+              <span className="version">
+                {record ? `v${record.version}` : example ? "Example" : "New"}
+              </span>
+            </div>
+          </AppTopbar>
+          {instrument && step !== 1 && (
+            <div className="workspace-context">
+              <CompanyLogo instrumentId={instrument.id} className="symbol" />
+              <div>
+                <strong>{instrument.display_name}</strong>
+                <p>
+                  {instrument.base_coin} / USDT · Bitget ·{" "}
+                  <a
+                    href={instrument.terms_source}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Instrument terms
+                  </a>
+                </p>
+              </div>
+            </div>
           )}
-          <span className="version">
-            {record ? `v${record.version}` : example ? "Example" : "New"}
-          </span>
-        </div>
-        {record && (
-          <Link
-            className="button-link app-topbar-cta"
-            to={`/app/thesis/${record.id}/timeline`}
-          >
-            Decision history
-          </Link>
-        )}
-      </AppTopbar>
-
-      {instrument && step !== 1 && (
-        <div className="workspace-context">
-          <CompanyLogo instrumentId={instrument.id} className="symbol" />
-          <div>
-            <strong>{instrument.display_name}</strong>
-            <p>
-              {instrument.base_coin} / USDT · Bitget ·{" "}
-              <a
-                href={instrument.terms_source}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Instrument terms
-              </a>
-            </p>
-          </div>
-        </div>
+          <JourneyProgress
+            current={step}
+            available={Math.max(availableStep, step)}
+            onNavigate={setStep}
+          />
+        </>
       )}
 
-      <JourneyProgress
-        current={step}
-        available={Math.max(availableStep, step)}
-        onNavigate={setStep}
-      />
+      {errorBanner}
 
-      {error && (
-        <div
-          ref={errorRef}
-          role="alert"
-          tabIndex={-1}
-          className="error actionable-error"
-        >
-          <span>{error.message}</span>
-          <button type="button" onClick={clearErrors}>
-            Dismiss
-          </button>
-        </div>
-      )}
-
-      {step === 1 && (
+      {step === 1 && !savedWorkspace && (
         <StockPicker
           instruments={instruments}
           loading={instrumentsLoading}
@@ -196,7 +219,7 @@ export default function Workspace() {
         />
       )}
 
-      {step === 2 && instrument && (
+      {step === 2 && instrument && !savedWorkspace && (
         <section className="panel journey-panel" aria-labelledby="idea-title">
           <h1 id="idea-title">Explain your idea</h1>
           {example && !record && (
@@ -209,6 +232,9 @@ export default function Workspace() {
             value={form}
             onChange={setForm}
             locked={writing || (!!record?.confirmed && !editing)}
+            market={market.data ?? null}
+            marketLoading={market.isLoading || market.isFetching}
+            onRefreshMarket={() => void market.refetch()}
           />
           <div className="actions journey-actions">
             {!record && (
@@ -245,14 +271,40 @@ export default function Workspace() {
             </button>
           </div>
           <p className="caption">
-            {llmStatus.configured
-              ? "Qwen receives your company choice and idea only. Suggestions stay editable. The first reply can take up to a minute; your text is kept if it fails."
-              : "Qwen is not connected on this app. Continue in your own words; nothing will be sent to an AI provider."}
+            {llmStatusUnavailable
+              ? "Could not check whether Qwen is connected. Continue in your own words; nothing will be sent until the status check works."
+              : llmStatus.configured
+                ? "Qwen receives your company choice and idea only. Suggestions stay editable. The first reply can take up to a minute; your text is kept if it fails."
+                : "Qwen is not connected on this app. Continue in your own words; nothing will be sent to an AI provider."}
           </p>
         </section>
       )}
 
-      {step === 3 && instrument && (
+      {savedWorkspace && record && !editing && step === 2 && (
+        <section className="panel journey-panel" aria-labelledby="idea-title">
+          <h2 id="idea-title">Your idea</h2>
+          <p>{record.thesis.rationale}</p>
+          <details className="confirmation-summary">
+            <summary>Position and risk inputs</summary>
+            <ul>
+              <li>{record.thesis.proposed_amount} USDT considered</li>
+              <li>{record.thesis.entry_price} USDT proposed entry</li>
+              <li>{record.thesis.max_loss} USDT maximum loss</li>
+              <li>{record.thesis.holding_days} day time horizon</li>
+              <li>{record.thesis.max_slippage_bps} bps slippage limit</li>
+            </ul>
+          </details>
+          {active && (
+            <div className="actions journey-actions">
+              <button type="button" onClick={startRevision}>
+                Change conditions
+              </button>
+            </div>
+          )}
+        </section>
+      )}
+
+      {step === 3 && instrument && (!savedWorkspace || editing) && (
         <section
           className="panel journey-panel"
           aria-labelledby="assumptions-title"
@@ -361,121 +413,67 @@ export default function Workspace() {
         </section>
       )}
 
-      {step === 4 && instrument && record?.confirmed && (
-        <EvidenceStep
-          writing={writing}
-          pending={pending}
-          active={active}
-          replay={replay}
-          refresh={refresh}
-          latest={latest}
-          reviewWithAI={workspace.reviewWithAI}
-          reviewFailed={workspace.reviewFailed}
-          llmStatus={llmStatus}
-          instrument={instrument}
-          history={history}
-          runStress={runStress}
-          record={record}
-          lastEvidenceAssessment={lastEvidenceAssessment}
-          onOpenSourceDetails={setSource}
-          onChangeConditions={() => {
-            setEditing(true);
-            setForm(fromThesisInput(record.thesis));
-            setStep(3);
-          }}
-          onRecordDecision={() => setStep(5)}
-        />
-      )}
-
-      {step === 5 && instrument && record && (
-        <section className="panel journey-panel decision-step">
-          <h1>Record your decision</h1>
-          <div className="decision-state">
-            <span>Current evidence result</span>
-            <strong
-              className={latest?.state === "INVALIDATED" ? "negative" : ""}
-            >
-              {latest ? stateLabel(latest.state) : "No saved assessment"}
-            </strong>
-          </div>
-          {active ? (
-            <>
-              <label>
-                Why are you making this decision?
-                <textarea
-                  value={explanation}
-                  onChange={(event) => setExplanation(event.target.value)}
-                  placeholder="Which sources matter, what remains uncertain, and why are you making this choice?"
-                  rows={4}
-                />
-              </label>
-              <div className="actions journey-actions">
-                <button
-                  type="button"
-                  disabled={writing || explanation.trim().length < 5}
-                  onClick={() => decide("retain")}
-                >
-                  {pending.decide ? "Saving…" : "Keep idea"}
-                </button>
-                <button
-                  type="button"
-                  className="danger"
-                  disabled={writing || explanation.trim().length < 5}
-                  onClick={() => decide("retire")}
-                >
-                  Set idea aside
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEditing(true);
-                    setForm(fromThesisInput(record.thesis));
-                    setStep(3);
-                  }}
-                >
-                  Change it instead
-                </button>
-              </div>
-            </>
-          ) : (
-            <div className="callout">
-              This idea has been set aside. Its history remains available.
+      {savedWorkspace && record && !editing && step === 3 && (
+        <section
+          className="panel journey-panel"
+          aria-labelledby="assumptions-title"
+        >
+          <h2 id="assumptions-title">Confirmed conditions</h2>
+          <ThesisEditor
+            value={fromThesisInput(record.thesis)}
+            onChange={setForm}
+            locked
+          />
+          {active && (
+            <div className="actions journey-actions">
+              <button type="button" onClick={startRevision}>
+                Change conditions
+              </button>
             </div>
           )}
-          <div className="export-block">
-            <div>
-              <h2>Take your research with you</h2>
-              <p className="muted">
-                Exports use saved data only and keep dates, citations, version
-                history, and limitations.
-              </p>
-            </div>
-            <div className="actions">
-              <a
-                className="button-link primary"
-                href={exportThesisUrl(record.id, "pdf", record.version)}
-                download
-              >
-                Download PDF
-              </a>
-              <a
-                className="button-link"
-                href={exportThesisUrl(record.id, "markdown", record.version)}
-                download
-              >
-                Download Markdown
-              </a>
-              <a
-                className="button-link"
-                href={exportThesisUrl(record.id, "json", record.version)}
-                download
-              >
-                Download JSON
-              </a>
-            </div>
-          </div>
         </section>
       )}
+
+      {(step === 4 || step === 5) &&
+        instrument &&
+        record?.confirmed &&
+        !editing && (
+          <EvidenceStep
+            writing={writing}
+            pending={pending}
+            active={active}
+            replay={replay}
+            refresh={refresh}
+            latest={latest}
+            reviewWithAI={workspace.reviewWithAI}
+            reviewFailed={workspace.reviewFailed}
+            llmStatus={llmStatus}
+            llmStatusUnavailable={llmStatusUnavailable}
+            instrument={instrument}
+            history={history}
+            runStress={runStress}
+            record={record}
+            lastEvidenceAssessment={lastEvidenceAssessment}
+            onOpenSourceDetails={setSource}
+            onChangeConditions={startRevision}
+            onRecordDecision={() => setStep(5)}
+            showDecision={step === 5}
+            decision={
+              <DecisionPanel
+                record={record}
+                latest={latest}
+                active={active}
+                writing={writing}
+                pending={pending.decide}
+                explanation={decisionNote}
+                onExplanation={setDecisionNote}
+                onKeep={() => decide("retain")}
+                onSetAside={() => decide("retire")}
+                onChangeConditions={startRevision}
+              />
+            }
+          />
+        )}
 
       <SourceDrawer evidence={source} onClose={() => setSource(null)} />
     </>

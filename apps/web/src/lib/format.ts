@@ -22,6 +22,14 @@ export function findingLabel(state: State) {
   return "Not enough evidence";
 }
 
+/** Condition-table status. Overall badges keep findingLabel. */
+export function conditionStatusLabel(state: State) {
+  if (state === "SUPPORTED") return "Supported";
+  if (state === "CHALLENGED") return "Challenged";
+  if (state === "INVALIDATED") return "Did not hold";
+  return "Missing";
+}
+
 export function resultHeadline(state: State) {
   if (state === "SUPPORTED") return "This filing supports your idea";
   if (state === "CHALLENGED") return "This filing needs a closer look";

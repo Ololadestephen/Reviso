@@ -16,7 +16,7 @@ Success means a usable journey, not simply a redesigned dashboard or a larger ti
 - Financial arithmetic remains Decimal-based. Company identity, metric definitions, units, periods, and observation times must match before comparison.
 - Distinguish company shares from tokenized exposure, and observed evidence from historical replay and hypothetical scenarios.
 - Keep existing NVIDIA thesis IDs, versions, citations, decisions, and deep links readable. Use additive, repeatable migrations where required; never rewrite old evidence to match new parsing logic.
-- Preserve the private-demo access gate. Public guest access, individual accounts, user isolation, and global spend/rate controls are a separate release scope. This plan does not make the shared database suitable for unrestricted public use.
+- Preserve the private-demo access gate as Google sign-in. Individual accounts, owner-scoped research, and Qwen spend controls are implemented locally; production still needs a Google web client and a separately approved deploy.
 - No production changes, commits, pushes, new paid services, or live Qwen calls without the relevant authorization. Prior testing approvals are not an unlimited allowance for new features.
 
 ## Product decisions

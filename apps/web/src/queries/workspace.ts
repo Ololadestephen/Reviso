@@ -6,11 +6,13 @@ import {
   extractProposal,
   fetchConversation,
   fetchInstruments,
+  fetchMarket,
   fetchResearchAnswers,
   fetchHistory,
   fetchLlmStatus,
   fetchTheses,
   fetchThesis,
+  fetchXStocksContext,
   recordDecision,
   refreshEvidence,
   replayEvidence,
@@ -67,6 +69,26 @@ export function useInstruments() {
     queryKey: queryKeys.instruments,
     queryFn: ({ signal }) => fetchInstruments(signal),
     staleTime: 60 * 60_000,
+  });
+}
+
+export function useMarket(instrumentId: InstrumentId | null) {
+  return useQuery({
+    queryKey: queryKeys.market(instrumentId ?? ""),
+    queryFn: ({ signal }) => fetchMarket(instrumentId as InstrumentId, signal),
+    enabled: instrumentId !== null,
+    staleTime: 30_000,
+  });
+}
+
+export function useXStocksContext(instrumentId: InstrumentId | null) {
+  return useQuery({
+    queryKey: queryKeys.xstocks(instrumentId ?? ""),
+    queryFn: ({ signal }) =>
+      fetchXStocksContext(instrumentId as InstrumentId, signal),
+    enabled: instrumentId !== null,
+    staleTime: (query) =>
+      query.state.data?.availability === "UNAVAILABLE" ? 30_000 : 5 * 60_000,
   });
 }
 

@@ -1,4 +1,4 @@
-const labels = ["Choose", "Explain", "Review", "Evidence", "Decide"];
+const labels = ["Choose", "Explain", "Review"];
 
 export default function JourneyProgress({
   current,

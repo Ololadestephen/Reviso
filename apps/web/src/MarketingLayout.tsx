@@ -15,7 +15,7 @@ export function RevisoLogo() {
 }
 
 export default function MarketingLayout() {
-  const scrolled = useScrolled(64);
+  const scrolled = useScrolled(72, 24);
   return (
     <div className="public-shell">
       <div className={`public-header${scrolled ? " scrolled" : ""}`}>
@@ -24,7 +24,6 @@ export default function MarketingLayout() {
             <RevisoLogo />
           </Link>
           <div className="public-nav-links">
-            <a href="/#how-it-works">How it works</a>
             <NavLink to="/guide" className={navClass}>
               Guide
             </NavLink>

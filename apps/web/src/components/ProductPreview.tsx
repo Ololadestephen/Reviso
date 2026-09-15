@@ -36,7 +36,6 @@ export default function ProductPreview({ live = false }: { live?: boolean }) {
         <RevisoMark className="preview-logo" />
         <span className="preview-nav-item selected">▤</span>
         <span className="preview-nav-item">＋</span>
-        <span className="preview-nav-item">◫</span>
       </div>
       <div className="preview-workspace">
         <div className="preview-live-sheen" aria-hidden="true" />
@@ -59,8 +58,6 @@ export default function ProductPreview({ live = false }: { live?: boolean }) {
           <span className="done">3</span>
           <i />
           <span className="current">4</span>
-          <i />
-          <span>5</span>
         </div>
         <div className="preview-grid">
           <section className="preview-card">

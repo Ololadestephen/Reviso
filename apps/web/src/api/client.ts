@@ -19,6 +19,11 @@ export class ApiError extends Error {
   get isUnavailable() {
     return this.status === 503;
   }
+
+  /** A Qwen allowance or concurrency limit stopped a new provider request. */
+  get isLimited() {
+    return this.status === 429;
+  }
 }
 
 /**
@@ -68,27 +73,43 @@ interface SendOptions {
   signal?: AbortSignal;
 }
 
+function csrfToken() {
+  if (typeof document === "undefined") return "";
+  const match = document.cookie.match(/(?:^|; )reviso_csrf=([^;]*)/);
+  return match ? decodeURIComponent(match[1]) : "";
+}
+
 async function send<T>(
   path: string,
   schema: z.ZodType<T>,
   { method = "GET", body, signal }: SendOptions = {},
 ): Promise<T> {
+  const headers: Record<string, string> = {};
+  if (body !== undefined) headers["Content-Type"] = "application/json";
+  const csrf = csrfToken();
+  if (method !== "GET" && csrf) headers["X-CSRF-Token"] = csrf;
+
   let response: Response;
   try {
     response = await fetch(`/api${path}`, {
       method,
       signal,
-      ...(body === undefined
-        ? {}
-        : {
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body),
-          }),
+      credentials: "include",
+      headers,
+      ...(body === undefined ? {} : { body: JSON.stringify(body) }),
     });
   } catch (error) {
     if (error instanceof DOMException && error.name === "AbortError")
       throw error;
     throw new ApiError(0, "The research API is unreachable. Is it running?");
+  }
+
+  if (
+    response.status === 401 &&
+    path !== "/auth/me" &&
+    typeof window !== "undefined"
+  ) {
+    window.dispatchEvent(new Event("reviso:signed-out"));
   }
 
   const payload = await response.json().catch(() => undefined);

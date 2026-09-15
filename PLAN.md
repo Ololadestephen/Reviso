@@ -17,6 +17,7 @@ The deployed public/private interface now includes the [newcomer experience and 
 - [x] Verify public Bitget market adapter, preserving unavailable responses.
 - [x] Run numerical/calibration checks and separate backend/frontend mechanical quality scans.
 - [ ] Complete independent Desloppify review/triage (runner usage-limit failure; no fabricated scores).
+- [x] Implement owner-scoped research, Google sign-in, CSRF sessions and Qwen spend limits locally, keeping backend contracts, providers, engines, services and SQLite separate.
 - [ ] Confirm the organizer's exact September 21 UTC+8 cutoff time.
 - [x] Wire provider-neutral LLM contracts to sponsored Bitget Qwen 3.8 Max first and Qwen 3.8 27B on Groq as fallback, with schema-constrained local validation, citation bounds, provenance, idempotence and manual fallback.
 - [x] Configure the received Bitget Qwen key locally and verify one approved live extraction call.
@@ -46,6 +47,10 @@ The deployed public/private interface now includes the [newcomer experience and 
 No release-complete claim until the connected lifecycle, real AI integration, evaluation and deployment gates pass.
 
 ## Latest verification — September 13, 2026
+
+116 Python tests and 47 frontend tests, Ruff, Prettier, TypeScript, the production build and a local browser walkthrough pass for owner-scoped research. Existing local SQLite rows now belong to the reserved operator user; the explicit local identity sees an empty library and a 404 on a previously open operator record. Public landing, the NVIDIA example “Continue with Google” CTA, privacy account copy, and the new-research company picker were checked. Google’s live sign-in button was not exercised because loopback uses the local identity. No Qwen request, commit, push or production deploy was made. Production still needs a Google web client, an integrity-checked SQLite backup, migration 006 rehearsal and a separately approved deploy.
+
+## Earlier verification — September 13, 2026
 
 105 Python tests and 45 frontend tests, formatting/static checks, TypeScript, the production build and local visual review pass for the six-stock evidence-conversation release. Commits `a9b615d`, `61a21ab` and the legacy-database repair `eafb1c5` were pushed to `main` and deployed to Lightsail after integrity-checked online SQLite backups. Production migration 005, six instrument identities, configured Bitget Qwen, persisted research, the filing-bound conversation, the public/protected path boundary and the live landing page were verified. No Qwen request was made during deployment. Checking evidence now shows the numerical result immediately and then requests a cached-or-new Qwen explanation without a second click; follow-ups remain bound to the saved filing and conditions. Streaming stays `untested` until an approved live probe.
 

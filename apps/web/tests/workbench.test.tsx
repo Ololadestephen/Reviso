@@ -15,6 +15,8 @@ import ThesisEditor from "../src/ThesisEditor";
 import IdeaComposer from "../src/features/journey/IdeaComposer";
 import EvidenceStep from "../src/features/journey/EvidenceStep";
 import EvidenceChat from "../src/features/journey/EvidenceChat";
+import JourneyProgress from "../src/features/journey/JourneyProgress";
+import XStocksContextPanel from "../src/features/journey/XStocksContextPanel";
 import StockPicker from "../src/features/journey/StockPicker";
 import ScenarioExplorer from "../src/ScenarioExplorer";
 import Timeline from "../src/Timeline";
@@ -28,8 +30,10 @@ import {
   emptyThesis,
   manualStarter,
 } from "../src/domain/defaults";
+import { accountFace } from "../src/lib/accountFace";
 import {
   findingLabel,
+  conditionStatusLabel,
   humanGaps,
   ideaTitle,
   money,
@@ -54,6 +58,22 @@ afterEach(() => {
 });
 
 const numerical = makeNumerical();
+
+function authResponse(url: string) {
+  if (url.includes("/auth/config")) {
+    return jsonResponse({ mode: "local", google_client_id: null });
+  }
+  if (url.includes("/auth/me")) {
+    return jsonResponse({
+      user_id: "local",
+      kind: "local",
+      auth: "local",
+      email: null,
+      display_name: "Local researcher",
+    });
+  }
+  return null;
+}
 
 function renderApp(path: string) {
   const client = new QueryClient({
@@ -162,6 +182,87 @@ test("the idea screen starts blank and keeps execution controls advanced", () =>
   ).toBe("100");
   expect(manualStarter().claim).toBe("");
   expect(screen.queryByText("Try an example")).toBeNull();
+});
+
+test("the idea screen shows a Bitget observation without replacing the user's price", () => {
+  const changed = vi.fn();
+  const value = {
+    ...emptyThesis(),
+    instrument_id: "RNVDAUSDT" as const,
+    entry_price: "200",
+  };
+  render(
+    <IdeaComposer
+      value={value}
+      onChange={changed}
+      locked={false}
+      market={{
+        instrument_id: "RNVDAUSDT",
+        source: "Bitget public SDK",
+        availability: "AVAILABLE",
+        retrieved_at: "2026-09-14T06:01:00Z",
+        observed_at: "2026-09-14T06:00:00Z",
+        book_observed_at: null,
+        last_price: "213.64",
+        bid: null,
+        ask: null,
+        warnings: [],
+        cached: false,
+      }}
+    />,
+  );
+  expect(screen.getByText("213.64 USDT")).toBeTruthy();
+  expect(
+    (screen.getByLabelText(/Price you are considering/) as HTMLInputElement)
+      .value,
+  ).toBe("200");
+  fireEvent.click(screen.getByRole("button", { name: "Use this price" }));
+  expect(changed.mock.calls[0][0].entry_price).toBe("213.64");
+});
+
+test("xStocks is labelled as separate indicative context", () => {
+  render(
+    <XStocksContextPanel
+      loading={false}
+      context={{
+        instrument_id: "RNVDAUSDT",
+        xstock_symbol: "NVDAx",
+        name: "NVIDIA xStock",
+        underlying_symbol: "NVDA",
+        currency: "USD",
+        indicative_price: "213.755",
+        availability: "AVAILABLE",
+        retrieved_at: "2026-09-14T07:19:25Z",
+        trading_halted: false,
+        market_open: true,
+        trading_period: "overnight",
+        networks: ["Ethereum", "Solana"],
+        source_url:
+          "https://api.xstocks.fi/api/v2/public/assets/NVDAx/price-data",
+        research_url: "https://xstocks.fi/us/news",
+        cached: false,
+        warnings: [],
+        limitations: ["A different product."],
+      }}
+    />,
+  );
+  expect(screen.getByText("213.76 USD")).toBeTruthy();
+  expect(screen.getByText(/not registered share ownership/i)).toBeTruthy();
+  expect(screen.getByText(/another tokenized product/i)).toBeTruthy();
+  expect(screen.getByText(/not the selected Bitget USDT quote/i)).toBeTruthy();
+  expect(screen.getByText("A different product.")).toBeTruthy();
+  expect(
+    screen.getByRole("link", { name: /xStocks website/ }).getAttribute("href"),
+  ).toBe("https://xstocks.fi/us/news");
+});
+
+test("the create path names three steps", () => {
+  render(<JourneyProgress current={1} available={2} onNavigate={vi.fn()} />);
+  expect(screen.getByRole("button", { name: /Choose/ })).toBeTruthy();
+  expect(screen.getByRole("button", { name: /Explain/ })).toBeTruthy();
+  expect(screen.getByRole("button", { name: /Review/ })).toBeTruthy();
+  expect(screen.queryByRole("button", { name: /Evidence/ })).toBeNull();
+  expect(screen.queryByRole("button", { name: /Decide/ })).toBeNull();
 });
 
 test("saved scenario controls match the assessment and running it reports the result", async () => {
@@ -392,23 +493,33 @@ test("public landing and example explain the product without calling an API", ()
   expect(
     screen.getByRole("link", { name: "Open app" }).getAttribute("href"),
   ).toBe("/app");
+  const publicNavigation = screen.getByRole("navigation", {
+    name: "Main navigation",
+  });
+  expect(publicNavigation.textContent).not.toContain("How it works");
+  expect(publicNavigation.textContent).toContain("Guide");
+  expect(publicNavigation.textContent).not.toContain("Example");
   expect(screen.queryByText("AI-ASSISTED STOCK RESEARCH")).toBeNull();
   expect(screen.queryByText("Know what would change your mind.")).toBeNull();
   expect(screen.getByText("No trade execution")).toBeTruthy();
-  expect(screen.getByText("Company, conditions, decision.")).toBeTruthy();
+  expect(screen.queryByText("HOW IT WORKS")).toBeNull();
+  expect(screen.queryByText("From an idea to a clear decision.")).toBeNull();
+  expect(screen.queryByText("Company, conditions, decision.")).toBeNull();
+  expect(landing.container.querySelector("#how-it-works")).toBeNull();
+  expect(landing.container.querySelector(".landing-step")).toBeNull();
   expect(screen.getByText("View filing")).toBeTruthy();
   expect(screen.queryByRole("button", { name: "View filing" })).toBeNull();
   expect(screen.queryByText("Evidence coverage")).toBeNull();
   expect(
-    screen.getByRole("img", {
+    screen.queryByRole("img", {
       name: "Reviso screen for writing an NVIDIA research idea",
     }),
-  ).toBeTruthy();
+  ).toBeNull();
   expect(
-    screen.getByRole("img", {
+    screen.queryByRole("img", {
       name: "Reviso screen showing cited evidence and a recorded decision",
     }),
-  ).toBeTruthy();
+  ).toBeNull();
   expect(
     screen
       .getByRole("link", { name: "Start my research" })
@@ -443,22 +554,89 @@ test("public landing and example explain the product without calling an API", ()
     </MemoryRouter>,
   );
   expect(screen.getByText(/read-only example/i)).toBeTruthy();
-  expect(screen.getByText(/prepared walkthrough/i)).toBeTruthy();
+  expect(
+    screen.getByRole("heading", {
+      name: "One NVIDIA idea, two dated filings, and a human decision.",
+    }),
+  ).toBeTruthy();
+  expect(screen.getByText(/does not fetch a live filing/i)).toBeTruthy();
+  expect(
+    screen.getByRole("heading", {
+      name: "Second filing: the result is mixed",
+    }),
+  ).toBeTruthy();
+  expect(
+    screen.getByText("Margin: 74.6% is below 75% — invalidated."),
+  ).toBeTruthy();
+  expect(
+    screen.getByText("Growth: 94% is still at least 80% — supported."),
+  ).toBeTruthy();
+  expect(
+    screen.getByRole("heading", {
+      name: "What Qwen may add, and what it may not",
+    }),
+  ).toBeTruthy();
+  expect(
+    screen.getByRole("link", {
+      name: /fiscal 2025 third-quarter release/i,
+    }),
+  ).toBeTruthy();
+  expect(example.container.querySelector(".landing-step")).toBeNull();
+  expect(example.container.querySelector(".cited-example-card")).toBeNull();
+  expect(example.container.querySelector(".product-preview")).toBeNull();
+  expect(screen.queryByText("Read the Reviso guide")).toBeNull();
+  expect(
+    screen
+      .getByRole("link", { name: "Continue with Google" })
+      .getAttribute("href"),
+  ).toBe("/app");
   expect(fetcher).not.toHaveBeenCalled();
 
   example.unmount();
-  render(
+  const guide = render(
     <MemoryRouter initialEntries={["/guide"]}>
       <App />
     </MemoryRouter>,
   );
-  expect(screen.getByText("How a research session works.")).toBeTruthy();
-  expect(screen.getByText("74.6% in the third-quarter release")).toBeTruthy();
+  expect(
+    screen.getByRole("heading", {
+      name: "Use evidence to test a stock idea before you act.",
+    }),
+  ).toBeTruthy();
+  expect(screen.getByText("What Reviso is for")).toBeTruthy();
+  expect(screen.getByText("What you actually do")).toBeTruthy();
+  expect(screen.getByRole("heading", { name: "How it works" })).toBeTruthy();
+  expect(screen.getByText("Pick a company")).toBeTruthy();
+  expect(screen.getByText("Write your idea")).toBeTruthy();
+  expect(screen.getByText("Check and decide")).toBeTruthy();
+  expect(
+    screen.getByText(
+      /From an idea to a clear decision: company, conditions, then the choice/,
+    ),
+  ).toBeTruthy();
   expect(
     screen.getByRole("img", {
       name: "Reviso screen for writing an NVIDIA research idea",
     }),
   ).toBeTruthy();
+  expect(
+    screen.getByRole("img", {
+      name: "Reviso screen showing cited evidence and a recorded decision",
+    }),
+  ).toBeTruthy();
+  expect(screen.getByText("What counts as evidence")).toBeTruthy();
+  expect(screen.getByText("What Qwen does")).toBeTruthy();
+  expect(screen.getByText("What is saved")).toBeTruthy();
+  expect(guide.container.querySelector(".landing-step")).toBeTruthy();
+  expect(guide.container.querySelector(".steps-grid")).toBeTruthy();
+  expect(guide.container.querySelectorAll(".landing-step")).toHaveLength(3);
+  expect(guide.container.querySelector(".cited-example-card")).toBeNull();
+  expect(screen.queryByText("Read the complete NVIDIA example")).toBeNull();
+  expect(
+    screen
+      .getByRole("link", { name: "Open the research app" })
+      .getAttribute("href"),
+  ).toBe("/app");
   expect(fetcher).not.toHaveBeenCalled();
 });
 
@@ -467,6 +645,8 @@ test("the research app is a workbench instead of a second landing page", async (
     "fetch",
     vi.fn(async (input: RequestInfo | URL) => {
       const url = requestUrl(input);
+      const authed = authResponse(url);
+      if (authed) return authed;
       if (url.includes("/instruments")) {
         return jsonResponse([makeInstrument()]);
       }
@@ -481,8 +661,10 @@ test("the research app is a workbench instead of a second landing page", async (
   );
 
   const library = renderApp("/app");
+  expect(
+    await screen.findByRole("heading", { name: "Your research" }),
+  ).toBeTruthy();
   const nav = screen.getByRole("navigation", { name: "App sections" });
-  expect(screen.getByRole("heading", { name: "Your research" })).toBeTruthy();
   expect(screen.queryByText("Know what would change your mind.")).toBeNull();
   expect(screen.queryByText("Your theses")).toBeNull();
   expect(screen.queryByText("PROTECTED DEMO")).toBeNull();
@@ -490,6 +672,7 @@ test("the research app is a workbench instead of a second landing page", async (
   expect(nav.textContent).toContain("My research");
   expect(nav.textContent).toContain("New research");
   expect(nav.textContent).not.toContain("Decision history");
+  expect(screen.queryByRole("link", { name: "Guide" })).toBeNull();
   expect(screen.getAllByRole("link", { name: "New research" })).toHaveLength(2);
   expect(
     await screen.findByRole("link", {
@@ -509,6 +692,87 @@ test("the research app is a workbench instead of a second landing page", async (
   ).toBeTruthy();
   expect(screen.queryByText("Know what would change your mind.")).toBeNull();
   expect(screen.queryByText("STEP 1 OF 5")).toBeNull();
+});
+
+test("unsigned visitors see Google sign-in instead of another person's library", async () => {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (input: RequestInfo | URL) => {
+      const url = requestUrl(input);
+      if (url.includes("/auth/config")) {
+        return jsonResponse({
+          mode: "google",
+          google_client_id: "test-google-client.apps.googleusercontent.com",
+        });
+      }
+      if (url.includes("/auth/me")) {
+        return jsonResponse({ detail: "Sign in to open your research" }, 401);
+      }
+      if (url.includes("/theses")) {
+        return jsonResponse([makeThesisSummary()]);
+      }
+      return jsonResponse({ detail: "missing" }, 404);
+    }),
+  );
+  renderApp("/app");
+  expect(
+    await screen.findByRole("heading", { name: "Continue with Google" }),
+  ).toBeTruthy();
+  expect(screen.queryByText("Data-centre demand can remain strong")).toBeNull();
+});
+
+test("signing out clears the previous account from the app", async () => {
+  let signedIn = true;
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (input: RequestInfo | URL) => {
+      const url = requestUrl(input);
+      if (url.includes("/auth/config")) {
+        return jsonResponse({
+          mode: "google",
+          google_client_id: "test-google-client.apps.googleusercontent.com",
+        });
+      }
+      if (url.includes("/auth/logout")) {
+        signedIn = false;
+        return jsonResponse({ ok: true });
+      }
+      if (url.includes("/auth/me")) {
+        if (!signedIn) {
+          return jsonResponse({ detail: "Sign in to open your research" }, 401);
+        }
+        return jsonResponse({
+          user_id: "user-a",
+          kind: "person",
+          auth: "google",
+          email: "ada@example.test",
+          display_name: "Ada",
+        });
+      }
+      if (url.includes("/instruments")) {
+        return jsonResponse([makeInstrument()]);
+      }
+      if (url.includes("/llm/status")) {
+        return jsonResponse(makeLlmStatus());
+      }
+      if (url.includes("/theses")) {
+        return jsonResponse(signedIn ? [makeThesisSummary()] : []);
+      }
+      return jsonResponse({ detail: "missing" }, 404);
+    }),
+  );
+  renderApp("/app");
+  expect(
+    await screen.findByRole("link", {
+      name: "Data-centre demand can remain strong",
+    }),
+  ).toBeTruthy();
+  fireEvent.click(screen.getAllByText("Ada")[0]);
+  fireEvent.click(screen.getByRole("button", { name: "Sign out" }));
+  expect(
+    await screen.findByRole("heading", { name: "Continue with Google" }),
+  ).toBeTruthy();
+  expect(screen.queryByText("Data-centre demand can remain strong")).toBeNull();
 });
 
 test("public disclosure failures remain visible while refresh stays available", () => {
@@ -541,9 +805,7 @@ test("public disclosure failures remain visible while refresh stays available", 
   );
   expect(screen.getByRole("status").textContent).toContain("unavailable");
   expect(screen.getByText(/no older report substituted/)).toBeTruthy();
-  fireEvent.click(
-    screen.getByRole("button", { name: "Check latest NVIDIA filing" }),
-  );
+  fireEvent.click(screen.getByRole("button", { name: "Retry filing" }));
   expect(refresh).toHaveBeenCalledOnce();
 });
 
@@ -581,6 +843,8 @@ test("follow-up answers show only the current evidence context with clickable ci
     "fetch",
     vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = requestUrl(input);
+      const authed = authResponse(url);
+      if (authed) return authed;
       const method =
         init?.method ??
         (typeof input !== "string" && !(input instanceof URL)
@@ -643,11 +907,68 @@ test("follow-up answers show only the current evidence context with clickable ci
   expect(openSource).toHaveBeenCalledWith(source);
 });
 
+test("a failed follow-up question stays visible", async () => {
+  const source = makeEvidence();
+  const hash = "a".repeat(64);
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = requestUrl(input);
+      const method =
+        init?.method ??
+        (typeof input !== "string" && !(input instanceof URL)
+          ? input.method
+          : "GET");
+      if (url.includes("/conversation") && method === "POST") {
+        return jsonResponse(
+          {
+            detail:
+              "Today's Qwen allowance for this account is used. Saved findings stay available; continue manually.",
+          },
+          429,
+        );
+      }
+      if (url.includes("/conversation")) {
+        return jsonResponse(makeConversation({ messages: [] }));
+      }
+      return jsonResponse({ detail: "missing" }, 404);
+    }),
+  );
+  const client = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+  render(
+    <QueryClientProvider client={client}>
+      <EvidenceChat
+        latest={makeAssessment({ evidence: [source], input_hash: hash })}
+        record={makeRecord()}
+        llmStatus={makeLlmStatus({ configured: true })}
+        onSource={vi.fn()}
+      />
+    </QueryClientProvider>,
+  );
+  fireEvent.click(
+    await screen.findByRole("button", { name: "Why this result?" }),
+  );
+  expect((await screen.findByRole("alert")).textContent).toMatch(
+    /Today's Qwen allowance/,
+  );
+});
+
+test("the same account keeps the same illustrated face card", () => {
+  expect(accountFace("user-a")).toBe(accountFace("user-a"));
+  expect(accountFace("user-a")).not.toBe(accountFace("user-b"));
+  expect(accountFace("user-a")).toMatch(/^data:image\/svg\+xml/);
+});
+
 test("evidence result labels stay in plain language", () => {
   expect(findingLabel("SUPPORTED")).toBe("Supported");
   expect(findingLabel("CHALLENGED")).toBe("Needs attention");
   expect(findingLabel("INVALIDATED")).toBe("Did not hold");
   expect(findingLabel("INSUFFICIENT_EVIDENCE")).toBe("Not enough evidence");
+  expect(conditionStatusLabel("SUPPORTED")).toBe("Supported");
+  expect(conditionStatusLabel("CHALLENGED")).toBe("Challenged");
+  expect(conditionStatusLabel("INSUFFICIENT_EVIDENCE")).toBe("Missing");
   expect(resultHeadline("CHALLENGED")).toBe("This filing needs a closer look");
   expect(
     humanGaps([
@@ -749,7 +1070,7 @@ test("evidence shows the result, findings and selected source before advanced co
       return jsonResponse({ detail: "missing" }, 404);
     }),
   );
-  render(
+  const { container } = render(
     <QueryClientProvider client={client}>
       <EvidenceStep
         writing={false}
@@ -788,7 +1109,13 @@ test("evidence shows the result, findings and selected source before advanced co
     screen.getByText("Customer concentration is not in this filing"),
   ).toBeTruthy();
   expect(screen.getByText("Supported")).toBeTruthy();
-  expect(screen.getAllByText("Needs attention").length).toBeGreaterThan(1);
+  expect(screen.getByText("Challenged")).toBeTruthy();
+  expect(screen.queryByText("Needs attention")).toBeNull();
+  const sourceSummary = screen.getByText("1 filing checked");
+  const sourceDetails = sourceSummary.closest("details") as HTMLDetailsElement;
+  expect(sourceDetails.open).toBe(false);
+  fireEvent.click(sourceSummary.closest("summary")!);
+  expect(sourceDetails.open).toBe(true);
   expect(
     screen.getByRole("heading", { name: "The report we checked" }),
   ).toBeTruthy();
@@ -797,11 +1124,77 @@ test("evidence shows the result, findings and selected source before advanced co
     screen.getByRole("button", { name: "Record my decision →" }),
   ).toBeTruthy();
   expect(
+    container.querySelectorAll(".dashboard-aside > .workspace-aside-card")
+      .length,
+  ).toBe(1);
+  fireEvent.click(
+    screen.getByRole("button", { name: "Ask about this filing" }),
+  );
+  expect(
     screen.getByRole("heading", { name: "Ask about this filing" }),
   ).toBeTruthy();
   expect(screen.getByText("Advanced checks")).toBeTruthy();
   fireEvent.click(screen.getByRole("button", { name: "Source details" }));
   expect(openDetails).toHaveBeenCalledWith(source);
+});
+
+test("recording a decision keeps the Qwen explanation visible", () => {
+  const latest = makeAssessment({
+    evidence: [makeEvidence({ title: "Quarterly company release" })],
+  });
+  const client = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (input: RequestInfo | URL) => {
+      if (requestUrl(input).includes("/conversation")) {
+        return jsonResponse(makeConversation({ messages: [] }));
+      }
+      return jsonResponse({ detail: "missing" }, 404);
+    }),
+  );
+  render(
+    <QueryClientProvider client={client}>
+      <EvidenceStep
+        writing={false}
+        pending={{
+          refresh: false,
+          review: false,
+          replayStep: null,
+          stress: false,
+        }}
+        active
+        replay={vi.fn()}
+        refresh={vi.fn()}
+        latest={latest}
+        reviewWithAI={vi.fn()}
+        llmStatus={makeLlmStatus()}
+        instrument={makeInstrument()}
+        history={{
+          versions: [makeRecord()],
+          events: [],
+          assessments: [latest],
+          selected_assessment: latest,
+        }}
+        runStress={vi.fn()}
+        record={makeRecord()}
+        lastEvidenceAssessment={undefined}
+        onOpenSourceDetails={vi.fn()}
+        onChangeConditions={vi.fn()}
+        onRecordDecision={vi.fn()}
+        showDecision
+        decision={<p>Decision form</p>}
+      />
+    </QueryClientProvider>,
+  );
+  expect(screen.getByText("Decision form")).toBeTruthy();
+  expect(
+    screen.getByRole("heading", { name: "No AI explanation on this app" }),
+  ).toBeTruthy();
+  expect(
+    screen.queryByRole("button", { name: "Record my decision →" }),
+  ).toBeNull();
 });
 
 test("saved research can be downloaded as a versioned PDF", async () => {
@@ -811,6 +1204,8 @@ test("saved research can be downloaded as a versioned PDF", async () => {
     "fetch",
     vi.fn(async (input: RequestInfo | URL) => {
       const url = requestUrl(input);
+      const authed = authResponse(url);
+      if (authed) return authed;
       if (url.includes("/instruments")) {
         return jsonResponse([makeInstrument()]);
       }
@@ -837,9 +1232,7 @@ test("saved research can be downloaded as a versioned PDF", async () => {
 
   renderApp(`/app/thesis/${record.id}`);
   expect(
-    await screen.findByRole("heading", {
-      name: "Does the evidence support your idea?",
-    }),
+    await screen.findByRole("navigation", { name: "Research path" }),
   ).toBeTruthy();
   fireEvent.click(screen.getByRole("button", { name: "Record my decision →" }));
   expect(
@@ -933,6 +1326,8 @@ test("checking evidence shows the result first and requests an explanation witho
     "fetch",
     vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = requestUrl(input);
+      const authed = authResponse(url);
+      if (authed) return authed;
       const method =
         init?.method ??
         (typeof input !== "string" && !(input instanceof URL)
@@ -972,9 +1367,7 @@ test("checking evidence shows the result first and requests an explanation witho
 
   renderApp(`/app/thesis/${record.id}`);
   expect(
-    await screen.findByRole("heading", {
-      name: "Does the evidence support your idea?",
-    }),
+    await screen.findByRole("navigation", { name: "Research path" }),
   ).toBeTruthy();
   fireEvent.click(
     screen.getByRole("button", { name: "Check latest NVIDIA filing" }),

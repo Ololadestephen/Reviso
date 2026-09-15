@@ -20,11 +20,13 @@ export default function EvidenceChat({
   latest,
   record,
   llmStatus,
+  statusUnavailable = false,
   onSource,
 }: {
   latest: Assessment;
   record: ThesisRecord;
   llmStatus: LLMStatus;
+  statusUnavailable?: boolean;
   onSource: (source: Evidence) => void;
 }) {
   const [question, setQuestion] = useState("");
@@ -149,6 +151,13 @@ export default function EvidenceChat({
             Qwen is answering from this filing…
           </p>
         )}
+        {ask.isError && (
+          <p className="caption" role="alert">
+            {ask.error instanceof Error
+              ? ask.error.message
+              : "Qwen could not answer from this filing. Try again."}
+          </p>
+        )}
       </div>
       {canAskMore && (
         <button
@@ -197,8 +206,9 @@ export default function EvidenceChat({
       </div>
       {!llmStatus.configured && (
         <p className="caption">
-          Chat is off because Qwen is not connected. You can still read the
-          filing.
+          {statusUnavailable
+            ? "Chat is paused because Reviso could not check the Qwen connection."
+            : "Chat is off because Qwen is not connected. You can still read the filing."}
         </p>
       )}
       {conversation.isError && (

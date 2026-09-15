@@ -7,6 +7,11 @@ export default function Terms() {
         <p>The current release is a limited hackathon demo.</p>
       </header>
       <section className="plain-content">
+        <h2>Accounts</h2>
+        <p>
+          Saved research belongs to the signed-in Google account. Do not use
+          someone else’s sign-in. Shared demo passwords are not an access path.
+        </p>
         <h2>Your decisions</h2>
         <p>
           Reviso provides research organisation, cited evidence and controlled

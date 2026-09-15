@@ -1,15 +1,8 @@
-import base64
-
 import pytest
 from fastapi.testclient import TestClient
 
 from backend.api import create_app
 from backend.llm import UnavailableLanguageModel
-
-
-def basic(username: str, password: str) -> dict[str, str]:
-    encoded = base64.b64encode(f"{username}:{password}".encode()).decode()
-    return {"Authorization": f"Basic {encoded}"}
 
 
 def test_public_demo_requires_complete_secure_configuration(monkeypatch):
@@ -23,7 +16,7 @@ def test_public_demo_requires_complete_secure_configuration(monkeypatch):
         create_app(llm=UnavailableLanguageModel())
 
 
-def test_public_pages_are_open_while_saved_research_requires_authentication(tmp_path, monkeypatch):
+def test_public_pages_are_open_while_saved_research_requires_google_sign_in(tmp_path, monkeypatch):
     web = tmp_path / "web"
     web.mkdir()
     (web / "index.html").write_text("<h1>Reviso deployment fixture</h1>")
@@ -50,8 +43,7 @@ def test_public_pages_are_open_while_saved_research_requires_authentication(tmp_
     monkeypatch.setenv("REVISO_WEB_DIST", str(web))
     monkeypatch.setenv("REVISO_ALLOWED_HOSTS", "demo.example")
     monkeypatch.setenv("REVISO_ALLOWED_ORIGINS", "https://demo.example")
-    monkeypatch.setenv("REVISO_DEMO_USERNAME", "judge")
-    monkeypatch.setenv("REVISO_DEMO_PASSWORD", "a-long-demo-password")
+    monkeypatch.setenv("REVISO_GOOGLE_CLIENT_ID", "test-google-client.apps.googleusercontent.com")
 
     app = create_app(str(tmp_path / "deployment.sqlite3"), UnavailableLanguageModel())
     with TestClient(app, base_url="https://demo.example") as client:
@@ -59,36 +51,42 @@ def test_public_pages_are_open_while_saved_research_requires_authentication(tmp_
         example = client.get("/example")
         asset = client.get("/assets/app.js")
         image_responses = [client.get(path) for path in public_images]
-        protected_app = client.get("/app")
-        legacy_saved_link = client.get("/thesis/saved-id")
-        assert client.get("/api/health", headers=basic("judge", "wrong")).status_code == 401
-        page = client.get("/app", headers=basic("judge", "a-long-demo-password"))
-        health = client.get(
-            "/api/health",
-            headers={
-                **basic("judge", "a-long-demo-password"),
-                "Origin": "https://demo.example",
-            },
-        )
+        app_shell = client.get("/app")
+        config = client.get("/api/auth/config")
+        me = client.get("/api/auth/me")
+        theses = client.get("/api/theses")
+        health = client.get("/api/health", headers={"Origin": "https://demo.example"})
         rejected = client.get(
             "/api/health",
-            headers={
-                **basic("judge", "a-long-demo-password"),
-                "Origin": "https://attacker.example",
-            },
+            headers={"Origin": "https://attacker.example"},
+        )
+        basic = client.get(
+            "/api/theses",
+            headers={"Authorization": "Basic anVkZ2U6YS1sb25nLWRlbW8tcGFzc3dvcmQ="},
         )
 
     assert landing.status_code == 200
     assert example.status_code == 200
     assert asset.status_code == 200
     assert all(response.status_code == 200 for response in image_responses)
-    assert protected_app.status_code == 401
-    assert legacy_saved_link.status_code == 401
-    assert page.status_code == 200
-    assert "Reviso deployment fixture" in page.text
+    assert app_shell.status_code == 200
+    assert "Reviso deployment fixture" in app_shell.text
+    assert config.status_code == 200
+    assert config.json()["mode"] == "google"
+    assert me.status_code == 401
+    assert theses.status_code == 401
+    assert basic.status_code == 401
     assert health.status_code == 200
     assert health.json()["mode"] == "private_demo"
+    assert health.json()["auth"] == "google"
     assert rejected.status_code == 403
+    loopback = client.get(
+        "/api/health",
+        headers={"Origin": "http://127.0.0.1:5173"},
+    )
+    assert loopback.status_code == 403
+    docs = client.get("/docs")
+    assert "swagger" not in docs.text.lower()
 
 
 def test_client_routes_survive_a_reload_without_shadowing_the_api(tmp_path, monkeypatch):
@@ -106,18 +104,21 @@ def test_client_routes_survive_a_reload_without_shadowing_the_api(tmp_path, monk
         api = client.get("/api/health")
         missing_record = client.get("/api/theses/does-not-exist")
 
-    # An unknown client path is the router's to resolve, not a 404.
     assert deep_link.status_code == 200
     assert "Reviso deployment fixture" in deep_link.text
     assert real_file.status_code == 200 and "<svg/>" in real_file.text
-    # The fallback must never swallow an API answer and return HTML instead.
     assert api.status_code == 200 and api.json()["status"] == "ok"
     assert api.json()["mode"] == "local_single_user"
+    assert api.json()["auth"] == "local"
     assert missing_record.status_code == 404
     assert missing_record.json()["detail"] == "Record not found"
 
 
-def test_partial_demo_credentials_are_rejected(monkeypatch):
+def test_public_demo_ignores_shared_basic_auth_and_requires_google(monkeypatch, tmp_path):
+    monkeypatch.setenv("REVISO_PUBLIC_DEMO", "1")
+    monkeypatch.setenv("REVISO_ALLOWED_HOSTS", "demo.example")
+    monkeypatch.setenv("REVISO_ALLOWED_ORIGINS", "https://demo.example")
     monkeypatch.setenv("REVISO_DEMO_USERNAME", "judge")
-    with pytest.raises(RuntimeError, match="configured together"):
-        create_app(llm=UnavailableLanguageModel())
+    monkeypatch.setenv("REVISO_DEMO_PASSWORD", "a-long-demo-password")
+    with pytest.raises(RuntimeError, match="Google sign-in"):
+        create_app(str(tmp_path / "missing-google.sqlite3"), UnavailableLanguageModel())

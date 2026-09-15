@@ -1,15 +1,23 @@
 import { useRef, useState } from "react";
 import type { EditableThesis } from "../../domain/defaults";
+import type { MarketObservation } from "../../api/schemas";
+import { money } from "../../lib/format";
 import { examplesFor } from "./ideaExamples";
 
 export default function IdeaComposer({
   value,
   onChange,
   locked,
+  market = null,
+  marketLoading = false,
+  onRefreshMarket,
 }: {
   value: EditableThesis;
   onChange: (value: EditableThesis) => void;
   locked: boolean;
+  market?: MarketObservation | null;
+  marketLoading?: boolean;
+  onRefreshMarket?: () => void;
 }) {
   const area = useRef<HTMLTextAreaElement>(null);
   const examples = examplesFor(value.instrument_id);
@@ -107,9 +115,12 @@ export default function IdeaComposer({
           />
           <span className="field-help">A research input, not an order.</span>
         </label>
-        <label>
-          Price you are considering · USDT per token
+        <div className="field-group">
+          <label htmlFor="entry-price">
+            Price you are considering · USDT per token
+          </label>
           <input
+            id="entry-price"
             type="number"
             min="0.0000000001"
             step="any"
@@ -118,9 +129,45 @@ export default function IdeaComposer({
             placeholder="Enter the price you want to study"
           />
           <span className="field-help">
-            Reviso will not infer this from a quote.
+            Your research input. Reviso will not replace it automatically.
           </span>
-        </label>
+          <div className="observed-price" aria-live="polite">
+            <div>
+              <span>Latest Bitget observation</span>
+              <strong>
+                {marketLoading
+                  ? "Loading…"
+                  : market?.availability === "AVAILABLE" && market.last_price
+                    ? `${money(market.last_price)} USDT`
+                    : "Unavailable"}
+              </strong>
+              {market?.observed_at && (
+                <small>{new Date(market.observed_at).toLocaleString()}</small>
+              )}
+            </div>
+            <div className="observed-price-actions">
+              {market?.availability === "AVAILABLE" && market.last_price && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    set("entry_price", market.last_price as string)
+                  }
+                >
+                  Use this price
+                </button>
+              )}
+              {onRefreshMarket && (
+                <button
+                  type="button"
+                  onClick={onRefreshMarket}
+                  disabled={marketLoading}
+                >
+                  Refresh
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
         <label>
           Most you are prepared to lose · USDT
           <input

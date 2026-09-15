@@ -35,8 +35,9 @@ export default function ThesisEditor({ value, onChange, locked }: Props) {
   return (
     <fieldset disabled={locked} className="editor">
       <p className="muted">
-        Read and edit every condition. Any number shown here is a boundary you
-        choose, not a forecast from Reviso.
+        {locked
+          ? "These are the confirmed conditions for this version. Changing them creates a new version."
+          : "Read and edit every condition. Any number shown here is a boundary you choose, not a forecast from Reviso."}
       </p>
       {value.assumptions.length === 0 && (
         <div className="empty assumption-empty">

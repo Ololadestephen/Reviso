@@ -3,45 +3,6 @@ import { CompanyLogo } from "../components/Brand";
 import CitedNvidiaExample from "../components/CitedNvidiaExample";
 import ProductPreview from "../components/ProductPreview";
 
-const steps = [
-  {
-    number: "01",
-    title: "Pick a company",
-    copy: "Choose from six familiar companies. Each one has a checked Bitget market identity and official company evidence.",
-    visual: (
-      <div className="step-stock-cards" aria-hidden="true">
-        <CompanyLogo instrumentId="RNVDAUSDT" />
-        <CompanyLogo instrumentId="RGOOGLUSDT" />
-        <CompanyLogo instrumentId="RTSLAUSDT" />
-      </div>
-    ),
-  },
-  {
-    number: "02",
-    title: "Write your idea",
-    copy: "Explain why you are interested and what could make you reconsider. You can write the conditions yourself or ask Qwen for help.",
-    visual: (
-      <img
-        className="step-screen-image"
-        src="/step-write-idea.svg"
-        alt="Reviso screen for writing an NVIDIA research idea"
-      />
-    ),
-  },
-  {
-    number: "03",
-    title: "Check and decide",
-    copy: "Read the dated sources, see what is missing, then record whether you want to keep, change or set aside the idea.",
-    visual: (
-      <img
-        className="step-screen-image"
-        src="/step-check-idea.svg"
-        alt="Reviso screen showing cited evidence and a recorded decision"
-      />
-    ),
-  },
-];
-
 const coveredCompanies = [
   { instrumentId: "RNVDAUSDT", name: "NVIDIA", pair: "rNVDA / USDT" },
   { instrumentId: "RAAPLUSDT", name: "Apple", pair: "rAAPL / USDT" },
@@ -76,7 +37,6 @@ export default function Landing() {
               Start my research
             </a>
           </div>
-          <small>You make the decision. Reviso cannot place trades.</small>
         </div>
         <div className="hero-preview-wrap">
           <ProductPreview live />
@@ -89,31 +49,7 @@ export default function Landing() {
         </div>
       </section>
 
-      <section className="public-section" id="how-it-works">
-        <div className="public-section-heading centered">
-          <span className="eyebrow">HOW IT WORKS</span>
-          <h2>From an idea to a clear decision.</h2>
-          <p>Company, conditions, decision.</p>
-        </div>
-        <div className="steps-grid">
-          {steps.map((step) => (
-            <article
-              className={`landing-step step-${step.number}`}
-              key={step.number}
-            >
-              <div className="step-visual">{step.visual}</div>
-              <span className="step-number">{step.number}</span>
-              <h3>{step.title}</h3>
-              <p>{step.copy}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section
-        className="public-section cited-example"
-        aria-labelledby="cited-example-title"
-      >
+      <section className="public-section" aria-labelledby="cited-example-title">
         <CitedNvidiaExample sourceToExample />
       </section>
 

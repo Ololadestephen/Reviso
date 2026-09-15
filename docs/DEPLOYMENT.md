@@ -1,6 +1,6 @@
 # Deployment
 
-AWS Lightsail is the selected host. The private demo runs at `https://revisoagent.xyz` on the 2 GB Ubuntu `reviso-prod` instance in `us-east-1a` with attached static IP `13.216.59.120`. Vercel is authoritative DNS only; the application itself runs on Lightsail. Caddy provides trusted HTTPS and HTTP Basic authentication; SQLite and Caddy state use named Docker volumes. The deployed smoke test passed through the initial temporary hostname and final-domain HTTPS plus persisted-state checks passed again after cutover.
+AWS Lightsail is the selected host. The private demo runs at `https://revisoagent.xyz` on the 2 GB Ubuntu `reviso-prod` instance in `us-east-1a` with attached static IP `13.216.59.120`. Vercel is authoritative DNS only; the application itself runs on Lightsail. Caddy provides trusted HTTPS; SQLite and Caddy state use named Docker volumes. The deployed smoke test passed through the initial temporary hostname and final-domain HTTPS plus persisted-state checks passed again after cutover.
 
 ## Local production-shaped preview
 
@@ -21,14 +21,17 @@ Do not expose the service until a host is selected and HTTPS is available. Publi
 REVISO_PUBLIC_DEMO=1
 REVISO_ALLOWED_HOSTS=demo.example
 REVISO_ALLOWED_ORIGINS=https://demo.example
-REVISO_DEMO_USERNAME=<runtime secret>
-REVISO_DEMO_PASSWORD=<runtime secret of at least 16 characters>
+REVISO_GOOGLE_CLIENT_ID=<public Google web client ID>
+REVISO_QWEN_USER_DAILY_LIMIT=20
+REVISO_QWEN_TOTAL_DAILY_LIMIT=200
 BITGET_QWEN_API_KEY=<runtime secret>
 ```
 
-The browser uses HTTP Basic authentication over the host's required HTTPS connection. This is appropriate for a limited hackathon demo, not a multi-user product. The application still lacks accounts, per-user record isolation, audit administration, rate limiting and encrypted database backups. SQLite requires a persistent volume and a single application replica. Scaling horizontally would require a different repository implementation.
+Public mode serves the landing page without sign-in. `/app` shows Google sign-in. Saved research, exports and Qwen actions require a verified Google session cookie. Shared HTTP Basic credentials are not an access path. SQLite remains one file with `owner_id` on every research row. Existing pre-account records stay on the reserved operator user until they are explicitly linked. There is still no administrative audit UI or encrypted backup beyond host snapshots. One application replica is required while SQLite is the repository.
 
-The reverse proxy must preserve the original `Host` header. Add only the final HTTPS origin and hostname to the allowlists. Never use wildcard hosts, put provider or demo credentials in frontend variables, bake `.env` into the image, or deploy the local Compose port mapping as a public listener.
+The Google web client’s Authorized JavaScript origins must match the browser origin exactly, with no path. Local development needs both `http://127.0.0.1:5173` and `http://localhost:5173`. Production needs `https://revisoagent.xyz`. Reviso already allows both loopback hosts.
+
+The reverse proxy must preserve the original `Host` header. Add only the final HTTPS origin and hostname to the allowlists. Never use wildcard hosts, put provider credentials in frontend variables, bake `.env` into the image, or deploy the local Compose port mapping as a public listener.
 
 ## AWS Lightsail target
 

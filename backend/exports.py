@@ -14,11 +14,13 @@ _FONTS = Path(__file__).resolve().parent / "assets" / "fonts"
 _LINK = re.compile(r"\[([^\]]+)\]\((https?://[^)]+)\)")
 
 
-def research_snapshot(repo: Repository, thesis_id: str, version: int | None = None) -> dict:
-    current = repo.get(thesis_id)
+def research_snapshot(
+    repo: Repository, owner_id: str, thesis_id: str, version: int | None = None
+) -> dict:
+    current = repo.get(owner_id, thesis_id)
     selected_version = version or current["version"]
-    record = repo.get_version(thesis_id, selected_version)
-    history = repo.history(thesis_id)
+    record = repo.get_version(owner_id, thesis_id, selected_version)
+    history = repo.history(owner_id, thesis_id)
     assessments = [
         item for item in history["assessments"] if item["thesis_version"] <= selected_version
     ]
@@ -28,7 +30,7 @@ def research_snapshot(repo: Repository, thesis_id: str, version: int | None = No
     assessment_hash = selected["input_hash"] if selected else None
     answers = [
         item
-        for item in repo.research_answers(thesis_id, selected_version)
+        for item in repo.research_answers(owner_id, thesis_id, selected_version)
         if item["thesis_version"] <= selected_version
         and item["assessment_input_hash"] == assessment_hash
     ]
