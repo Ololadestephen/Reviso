@@ -502,41 +502,48 @@ test("public landing and example explain the product without calling an API", ()
   expect(screen.queryByText("AI-ASSISTED STOCK RESEARCH")).toBeNull();
   expect(screen.queryByText("Know what would change your mind.")).toBeNull();
   expect(screen.getByText("No trade execution")).toBeTruthy();
-  expect(screen.queryByText("HOW IT WORKS")).toBeNull();
-  expect(screen.queryByText("From an idea to a clear decision.")).toBeNull();
-  expect(screen.queryByText("Company, conditions, decision.")).toBeNull();
-  expect(landing.container.querySelector("#how-it-works")).toBeNull();
-  expect(landing.container.querySelector(".landing-step")).toBeNull();
+  expect(screen.getByText("HOW IT WORKS")).toBeTruthy();
+  expect(
+    screen.getByRole("heading", { name: "From an idea to a clear decision." }),
+  ).toBeTruthy();
+  expect(screen.getByText("Company, conditions, decision.")).toBeTruthy();
+  expect(landing.container.querySelector("#how-it-works")).toBeTruthy();
+  expect(landing.container.querySelectorAll(".landing-step")).toHaveLength(3);
+  expect(screen.getByText("Pick a company")).toBeTruthy();
+  expect(screen.getByText("Write your idea")).toBeTruthy();
+  expect(screen.getByText("Check and decide")).toBeTruthy();
   expect(screen.getByText("View filing")).toBeTruthy();
   expect(screen.queryByRole("button", { name: "View filing" })).toBeNull();
   expect(screen.queryByText("Evidence coverage")).toBeNull();
   expect(
-    screen.queryByRole("img", {
+    screen.getByRole("img", {
       name: "Reviso screen for writing an NVIDIA research idea",
     }),
-  ).toBeNull();
+  ).toBeTruthy();
   expect(
-    screen.queryByRole("img", {
+    screen.getByRole("img", {
       name: "Reviso screen showing cited evidence and a recorded decision",
     }),
-  ).toBeNull();
-  expect(
-    screen
-      .getByRole("link", { name: "Start my research" })
-      .getAttribute("href"),
-  ).toBe("/app");
+  ).toBeTruthy();
+  expect(screen.queryByText("Try the example")).toBeNull();
+  expect(screen.queryByText("One condition, one dated print.")).toBeNull();
+  expect(landing.container.querySelector(".cited-example-card")).toBeNull();
+  const startResearch = screen.getByRole("link", { name: "Start my research" });
+  expect(startResearch.getAttribute("href")).toBe("/app");
+  expect(startResearch.className).toContain("hero-primary");
   expect(screen.queryByText(/ugly print/i)).toBeNull();
   expect(screen.queryByText(/the invalidation was never/i)).toBeNull();
   expect(
     screen.getByText("Write the condition before the print."),
   ).toBeTruthy();
-  expect(screen.getByText("Invalidated")).toBeTruthy();
-  expect(screen.getByText("74.6% in the third-quarter release")).toBeTruthy();
+  expect(screen.queryByText("Invalidated")).toBeNull();
+  expect(screen.queryByText("74.6% in the third-quarter release")).toBeNull();
+  expect(
+    screen.getAllByRole("link", { name: "NVIDIA example" }).length,
+  ).toBeGreaterThan(0);
   expect(
     screen
-      .getByRole("link", {
-        name: /NVIDIA investor relations excerpt/,
-      })
+      .getAllByRole("link", { name: "NVIDIA example" })[0]
       .getAttribute("href"),
   ).toBe("/example");
   expect(

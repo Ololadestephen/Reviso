@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { CompanyLogo } from "../components/Brand";
-import CitedNvidiaExample from "../components/CitedNvidiaExample";
+import HowItWorksSteps from "../components/HowItWorksSteps";
 import ProductPreview from "../components/ProductPreview";
 
 const coveredCompanies = [
@@ -19,7 +19,7 @@ export default function Landing() {
         <div className="hero-copy">
           <p className="hero-announcement">
             Bitget AI Base Camp Season 2<span aria-hidden="true"> · </span>
-            <Link to="/example">View the NVIDIA example →</Link>
+            <Link to="/example">NVIDIA example</Link>
           </p>
           <h1>
             Have a stock idea?
@@ -30,10 +30,7 @@ export default function Landing() {
             reconsider. Write the conditions, check the filing, then decide.
           </p>
           <div className="hero-actions">
-            <Link className="button-link hero-primary" to="/example">
-              Try the example
-            </Link>
-            <a className="button-link hero-secondary" href="/app">
+            <a className="button-link hero-primary" href="/app">
               Start my research
             </a>
           </div>
@@ -49,8 +46,13 @@ export default function Landing() {
         </div>
       </section>
 
-      <section className="public-section" aria-labelledby="cited-example-title">
-        <CitedNvidiaExample sourceToExample />
+      <section className="public-section" id="how-it-works">
+        <div className="public-section-heading centered">
+          <span className="eyebrow">HOW IT WORKS</span>
+          <h2>From an idea to a clear decision.</h2>
+          <p>Company, conditions, decision.</p>
+        </div>
+        <HowItWorksSteps />
       </section>
 
       <section className="coverage-section">
