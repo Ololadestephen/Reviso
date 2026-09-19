@@ -32,9 +32,20 @@ type AuthState = {
 
 const AuthContext = createContext<AuthState | null>(null);
 
-function clearPersonalState(queryClient: ReturnType<typeof useQueryClient>) {
+function dropResearchQueries(queryClient: ReturnType<typeof useQueryClient>) {
   resetAutoReviewKeys();
-  queryClient.clear();
+  queryClient.removeQueries({
+    predicate: (query) => query.queryKey[0] !== "auth",
+  });
+}
+
+async function applySession(
+  queryClient: ReturnType<typeof useQueryClient>,
+  next: SessionUser | null,
+) {
+  await queryClient.cancelQueries({ queryKey: SESSION_KEY });
+  dropResearchQueries(queryClient);
+  queryClient.setQueryData(SESSION_KEY, next);
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -62,16 +73,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     previousUser.current = current;
     if (previous === undefined || previous === current) return;
     if (previous === null && current) return;
-    resetAutoReviewKeys();
-    queryClient.removeQueries({
-      predicate: (query) => query.queryKey[0] !== "auth",
-    });
+    dropResearchQueries(queryClient);
   }, [queryClient, user?.user_id]);
 
   useEffect(() => {
     const onSignedOut = () => {
-      clearPersonalState(queryClient);
-      queryClient.setQueryData(SESSION_KEY, null);
+      void (async () => {
+        const current = await fetchSession();
+        if (current) {
+          queryClient.setQueryData(SESSION_KEY, current);
+          return;
+        }
+        await applySession(queryClient, null);
+      })();
     };
     window.addEventListener("reviso:signed-out", onSignedOut);
     return () => window.removeEventListener("reviso:signed-out", onSignedOut);
@@ -80,16 +94,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signInGoogle = useCallback(
     async (credential: string) => {
       const next = await signInWithGoogle(credential);
-      clearPersonalState(queryClient);
-      queryClient.setQueryData(SESSION_KEY, next);
+      await applySession(queryClient, next);
     },
     [queryClient],
   );
 
   const signOut = useCallback(async () => {
     await signOutSession();
-    clearPersonalState(queryClient);
-    queryClient.setQueryData(SESSION_KEY, null);
+    await applySession(queryClient, null);
     navigate("/app", { replace: true });
   }, [navigate, queryClient]);
 

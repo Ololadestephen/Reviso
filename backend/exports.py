@@ -14,6 +14,12 @@ _FONTS = Path(__file__).resolve().parent / "assets" / "fonts"
 _LINK = re.compile(r"\[([^\]]+)\]\((https?://[^)]+)\)")
 
 
+def _latest_source(evidence: list[dict]) -> dict | None:
+    if not evidence:
+        return None
+    return max(evidence, key=lambda item: item["published_at"])
+
+
 def research_snapshot(
     repo: Repository, owner_id: str, thesis_id: str, version: int | None = None
 ) -> dict:
@@ -41,6 +47,7 @@ def research_snapshot(
         "instrument": instrument.model_dump(mode="json"),
         "thesis": record,
         "selected_assessment": selected,
+        "assessments": assessments,
         "research_answers": answers,
         "decision_events": [
             item for item in history["events"] if item["version"] <= selected_version
@@ -49,6 +56,8 @@ def research_snapshot(
             "Research record only; no trade was placed or recommended.",
             "Tokenized exposure is not direct registered ownership of the underlying share.",
             "Evidence and market observations retain their original dates and limitations.",
+            "Qwen did not compute these comparisons. Market price is not used in the finding.",
+            "Reviso does not invent a metric, treat an older report as a successful current check, or let an explanation overwrite the comparison.",
         ],
     }
 
@@ -85,29 +94,32 @@ def markdown_snapshot(snapshot: dict) -> str:
             f"- Holding period: {idea['holding_days']} days",
             f"- Maximum modeled slippage: {idea['max_slippage_bps']} bps",
             "",
-            "## Evidence assessment",
+            "## Saved prints",
             "",
         ]
     )
-    if assessment is None:
+    prints = snapshot.get("assessments") or ([assessment] if assessment is not None else [])
+    if not prints:
         lines.append("No saved assessment for this thesis version.")
-    else:
+    for index, item in enumerate(prints, start=1):
+        source = _latest_source(item["evidence"])
         lines.extend(
             [
-                f"State: {assessment['state']}",
-                f"Mode: {assessment['mode']}",
-                f"Evaluated: {assessment['evaluated_at']}",
+                f"### Print {index} · {item['state']} · {item['mode']}",
+                "",
+                f"Filing date: {source['published_at']}" if source else "No filing available.",
+                f"Evaluated: {item['evaluated_at']}",
                 "",
             ]
         )
-        for result in assessment["assumptions"]:
+        for result in item["assumptions"]:
             lines.append(
                 f"- {result['assumption_id']}: {result['state']} — {result['explanation']}"
             )
-        lines.extend(["", "### Sources", ""])
-        if not assessment["evidence"]:
+        lines.extend(["", "Sources", ""])
+        if not item["evidence"]:
             lines.append("No evidence was available for this assessment.")
-        for source in assessment["evidence"]:
+        for source in item["evidence"]:
             lines.extend(
                 [
                     f"- [{source['title']}]({source['source_url']}) · {source['publisher']}",
@@ -116,6 +128,7 @@ def markdown_snapshot(snapshot: dict) -> str:
                     f"  - Limitations: {source['limitations']}",
                 ]
             )
+        lines.append("")
     lines.extend(["", "## Cited follow-up answers", ""])
     if not snapshot["research_answers"]:
         lines.append("No saved follow-up answers for this assessment.")

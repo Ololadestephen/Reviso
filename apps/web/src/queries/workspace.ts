@@ -211,10 +211,24 @@ export function useRecordDecision(record: ThesisRecord | null) {
     ({
       action,
       explanation,
+      heldAssumptionIds,
+      brokeAssumptionIds,
+      missingAssumptionIds,
     }: {
       action: "retain" | "retire";
       explanation: string;
-    }) => recordDecision(record as ThesisRecord, action, explanation),
+      heldAssumptionIds: string[];
+      brokeAssumptionIds: string[];
+      missingAssumptionIds: string[];
+    }) =>
+      recordDecision(
+        record as ThesisRecord,
+        action,
+        explanation,
+        heldAssumptionIds,
+        brokeAssumptionIds,
+        missingAssumptionIds,
+      ),
   );
 }
 

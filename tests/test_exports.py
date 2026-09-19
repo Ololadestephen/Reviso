@@ -4,6 +4,8 @@ from fastapi.testclient import TestClient
 from pypdf import PdfReader
 
 from backend.api import create_app
+from backend.exports import markdown_snapshot
+from tests.conftest import named_from_assessment
 from tests.test_llm import FakeLanguageModel
 
 
@@ -34,6 +36,7 @@ def test_export_is_saved_state_only_version_bounded_and_keeps_prior_assessment(t
                 "expected_version": 2,
                 "action": "retain",
                 "explanation": "The saved evidence still supports continued research.",
+                **named_from_assessment(assessed),
             },
         )
         assert kept.status_code == 200 and kept.json()["version"] == 3
@@ -46,6 +49,13 @@ def test_export_is_saved_state_only_version_bounded_and_keeps_prior_assessment(t
         assert snapshot["selected_assessment"]["input_hash"] == assessed["input_hash"]
         assert len(snapshot["research_answers"]) == 1
         assert snapshot["decision_events"][-1]["action"] == "retain"
+        assert snapshot["decision_events"][-1]["assessment_input_hash"] == assessed["input_hash"]
+
+        missing_snapshot = {**snapshot, "assessments": [{**assessed, "evidence": []}]}
+        missing_print = markdown_snapshot(missing_snapshot).split("## Saved prints", 1)[1]
+        missing_print = missing_print.split("\n## ", 1)[0]
+        assert "No filing available." in missing_print
+        assert "Filing date:" not in missing_print
 
         original = client.get(base + "/export?format=json&version=1").json()
         assert original["thesis"]["version"] == 1
@@ -58,6 +68,8 @@ def test_export_is_saved_state_only_version_bounded_and_keeps_prior_assessment(t
         assert "# Reviso research · NVIDIA" in markdown.text
         assert "## Cited follow-up answers" in markdown.text
         assert "no trade was placed" in markdown.text.lower()
+        assert "Qwen did not compute these comparisons" in markdown.text
+        assert "## Saved prints" in markdown.text
         assert "BITGET_QWEN_API_KEY" not in markdown.text
 
         pdf = client.get(base + "/export?format=pdf&version=3")
@@ -79,6 +91,16 @@ def test_export_is_saved_state_only_version_bounded_and_keeps_prior_assessment(t
         assert "No saved assessment for this thesis version." in original_text
         assert "Which saved fact bears on this thesis?" not in original_text
         assert "The saved evidence still supports continued research." not in original_text
+
+        newer = client.post(
+            "/replays/nvidia-margin/step",
+            json={"thesis_id": draft["id"], "expected_version": 3, "step": 1},
+        )
+        assert newer.status_code == 200
+        refreshed = client.get(base + "/export?format=json&version=3").json()
+        assert refreshed["selected_assessment"]["input_hash"] == newer.json()["input_hash"]
+        assert refreshed["decision_events"][-1]["assessment_input_hash"] == assessed["input_hash"]
+        assert assessed["input_hash"] != newer.json()["input_hash"]
 
 
 def test_unknown_export_version_is_not_found(tmp_path, thesis):

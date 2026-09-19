@@ -5,6 +5,7 @@ import {
   llmProviderLabel,
   resultHeadline,
   resultLead,
+  TRUST_LINE,
 } from "./lib/format";
 import { markAutoReviewed, wasAutoReviewed } from "./lib/autoReview";
 import type {
@@ -28,6 +29,7 @@ export default function ReplayPanel({
   priorAssessment = null,
   onOpenSource,
   showExplanation = true,
+  compact = false,
 }: {
   writing: boolean;
   pending: {
@@ -46,6 +48,7 @@ export default function ReplayPanel({
   priorAssessment?: Assessment | null;
   onOpenSource?: (evidence: Evidence) => void;
   showExplanation?: boolean;
+  compact?: boolean;
 }) {
   const loadLabel = (step: number) =>
     pending.replayStep === step ? "Loading…" : "Load";
@@ -118,6 +121,7 @@ export default function ReplayPanel({
             {new Date(latest.evaluated_at).toLocaleString()}.
           </p>
         )}
+        <p className="caption">{TRUST_LINE}</p>
         {gaps.length > 0 && (
           <details className="result-limits">
             <summary>
@@ -210,7 +214,7 @@ export default function ReplayPanel({
             </span>
           ) : null}
         </div>
-        {instrument.historical_replay_available && (
+        {!compact && instrument.historical_replay_available && (
           <details className="historical-replay">
             <summary>See an older NVIDIA filing example</summary>
             <p>

@@ -1,5 +1,11 @@
+import { useEffect, useState } from "react";
 import { exportThesisUrl } from "../../api/endpoints";
 import { findingLabel } from "../../lib/format";
+import {
+  conditionsNamed,
+  defaultConditionCall,
+  type ConditionCall,
+} from "../../lib/conditionHonesty";
 import type { Assessment, ThesisRecord } from "../../api/schemas";
 
 export default function DecisionPanel({
@@ -21,51 +27,122 @@ export default function DecisionPanel({
   pending: boolean;
   explanation: string;
   onExplanation: (value: string) => void;
-  onKeep: () => void;
-  onSetAside: () => void;
-  onChangeConditions: () => void;
+  onKeep: (calls: Record<string, ConditionCall>) => void;
+  onSetAside: (calls: Record<string, ConditionCall>) => void;
+  onChangeConditions: (calls: Record<string, ConditionCall>) => void;
 }) {
+  const rows = latest
+    ? latest.assumptions.map((item) => {
+        const claim =
+          record.thesis.assumptions.find(
+            (assumption) => assumption.id === item.assumption_id,
+          )?.claim ?? item.assumption_id;
+        return {
+          id: item.assumption_id,
+          claim,
+          state: item.state,
+        };
+      })
+    : [];
+  const [calls, setCalls] = useState<Record<string, ConditionCall>>({});
+
+  useEffect(() => {
+    setCalls(
+      Object.fromEntries(
+        (latest?.assumptions ?? []).map((item) => [
+          item.assumption_id,
+          defaultConditionCall(item.state),
+        ]),
+      ),
+    );
+  }, [latest?.input_hash]);
+
+  const ready =
+    explanation.trim().length >= 5 &&
+    conditionsNamed(
+      rows.map((item) => item.id),
+      calls,
+    );
+
   return (
     <section
       className="panel workspace-aside-card decision-panel"
       aria-labelledby="decision-title"
     >
       <span className="eyebrow">YOUR DECISION</span>
-      <h2 id="decision-title">Record your decision</h2>
-      <div className="decision-state">
-        <span>Current evidence result</span>
-        <strong className={latest?.state === "INVALIDATED" ? "negative" : ""}>
-          {latest ? findingLabel(latest.state) : "No saved assessment"}
-        </strong>
-      </div>
+      <h2 id="decision-title">Keep, set aside, or change it</h2>
+      <p className="nav-label">
+        {latest
+          ? `Evidence result is ${findingLabel(latest.state)}`
+          : "No saved assessment"}
+      </p>
+      <p className="decision-lead">
+        The filing result stays on the left. Name which conditions still hold
+        before you record what you are doing with the idea.
+      </p>
       {active ? (
         <>
+          {rows.length > 0 && (
+            <div className="decision-conditions">
+              {rows.map((item) => (
+                <fieldset key={item.id} className="decision-condition">
+                  <legend>{item.claim}</legend>
+                  {(
+                    [
+                      ["held", "Still holds"],
+                      ["broke", "Did not hold"],
+                      ["missing", "Missing"],
+                    ] as const
+                  ).map(([value, label]) => (
+                    <label key={value} className="check">
+                      <input
+                        type="radio"
+                        name={`condition-${item.id}`}
+                        checked={calls[item.id] === value}
+                        onChange={() =>
+                          setCalls((current) => ({
+                            ...current,
+                            [item.id]: value,
+                          }))
+                        }
+                      />
+                      {label}
+                    </label>
+                  ))}
+                </fieldset>
+              ))}
+            </div>
+          )}
           <label>
-            Why are you making this decision?
+            Why this choice?
             <textarea
               value={explanation}
               onChange={(event) => onExplanation(event.target.value)}
-              placeholder="Which sources matter, what remains uncertain, and why are you making this choice?"
-              rows={4}
+              placeholder="One sentence: why the idea still exists or dies."
+              rows={3}
             />
           </label>
           <div className="actions journey-actions">
             <button
               type="button"
-              disabled={writing || explanation.trim().length < 5}
-              onClick={onKeep}
+              disabled={writing || !ready}
+              onClick={() => onKeep(calls)}
             >
               {pending ? "Saving…" : "Keep idea"}
             </button>
             <button
               type="button"
               className="danger"
-              disabled={writing || explanation.trim().length < 5}
-              onClick={onSetAside}
+              disabled={writing || !ready}
+              onClick={() => onSetAside(calls)}
             >
               Set idea aside
             </button>
-            <button type="button" onClick={onChangeConditions}>
+            <button
+              type="button"
+              disabled={writing || !ready}
+              onClick={() => onChangeConditions(calls)}
+            >
               Change it instead
             </button>
           </div>
@@ -75,14 +152,12 @@ export default function DecisionPanel({
           This idea has been set aside. Its history remains available.
         </div>
       )}
-      <div className="export-block">
-        <div>
-          <h2>Take your research with you</h2>
-          <p className="muted">
-            Exports use saved data only and keep dates, citations, version
-            history, and limitations.
-          </p>
-        </div>
+      <details className="export-block">
+        <summary>Download this version</summary>
+        <p className="muted">
+          Exports use saved data only and keep dates, citations, version
+          history, and limitations.
+        </p>
         <div className="actions">
           <a
             className="button-link primary"
@@ -106,7 +181,7 @@ export default function DecisionPanel({
             Download JSON
           </a>
         </div>
-      </div>
+      </details>
     </section>
   );
 }

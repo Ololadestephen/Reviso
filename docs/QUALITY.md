@@ -1,23 +1,23 @@
-# Local quality report — 2026-09-15
+# Local quality report — 2026-09-17
 
 The installed Desloppify workflow was used for separate coherent backend and frontend scans, with `status` and `next` after each milestone. Exclusions cover dependency/build/cache output; no application files were excluded to raise scores. No suppressions, fabricated subjective evidence or wontfix decisions were entered. No branch, commit, push or external issue was created.
 
 ## Latest tool-reported scores
 
-These are scanner outputs, not test coverage percentages or research-accuracy scores. All subjective dimensions are still unassessed; the tool records them as zero. Independent review/triage is incomplete: the latest scans still queue an initial subjective review, which was deferred without fabricated scores because runner-backed review remains gated. Mechanical scans and tests continue.
+These are scanner outputs, not test coverage percentages or research-accuracy scores. All subjective dimensions are still unassessed; the tool records them as zero. Independent review/triage is incomplete: after this close-out scan, `next` still queued an initial subjective review, which was deferred without fabricated scores because runner-backed review remains gated. Mechanical scans and tests continue.
 
 | Project | Overall (lenient) | Objective | Strict | Verified | Open findings |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| backend | 23.1 | 92.4 | 21.9 | 92.4 | 67 |
-| apps/web | 20.5 | 82.1 | 19.6 | 82.1 | 71 |
+| backend | 23.1 | 92.3 | 21.9 | 92.3 | 69 |
+| apps/web | 21.0 | 84.1 | 19.8 | 84.1 | 72 |
 
 | Mechanical dimension | Backend health | Backend strict | Web health | Web strict |
 | --- | ---: | ---: | ---: | ---: |
-| File health | 86.0 | 83.2 | 100.0 | 98.6 |
-| Code quality | 89.6 | 86.3 | 97.3 | 95.6 |
+| File health | 86.0 | 83.2 | 98.7 | 98.7 |
+| Code quality | 89.2 | 86.0 | 97.5 | 95.8 |
 | Duplication | 100.0 | 100.0 | 100.0 | 100.0 |
 | Security | 98.8 | 96.4 | 100.0 | 100.0 |
-| Test health | 87.9 | 76.2 | 42.0 | 31.1 |
+| Test health | 87.6 | 76.0 | 46.6 | 31.7 |
 
 | Subjective dimension | Backend | Web | Assessment status |
 | --- | ---: | ---: | --- |

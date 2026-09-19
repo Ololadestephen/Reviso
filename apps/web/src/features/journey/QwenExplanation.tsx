@@ -77,6 +77,7 @@ export default function QwenExplanation({
             Still unknown: {review.next_question}
           </p>
           <p className="caption">
+            This reading is not part of the result.{" "}
             {latest?.llm_provenance?.prompt_version}. This explanation does not
             change the evidence result.
           </p>

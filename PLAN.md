@@ -2,9 +2,44 @@
 
 ## Current objective
 
-First feasible vertical slice: NVIDIA thesis → confirmed assumptions → cited assessment and controlled numerical stresses → stored version → timestamp-gated evidence → retain/revise/retire decision.
+Close Reviso for Season 2 as a **versioned, human-owned falsification notebook**, with Qwen as a clerk. Do not add copilot, scanner, portfolio, or extra-ticker work.
 
-The deployed public/private interface now includes the [newcomer experience and stock expansion plan](docs/NEWCOMER-EXPERIENCE-PLAN.md): a guided five-step journey, six explicitly verified stocks, evidence recovery, automatic cited Qwen findings, an inline filing-bound follow-up conversation, and Markdown/JSON/PDF export. Its earlier authorized live-Qwen batch still records operational risk in the suggestion path; this release does not claim that those timeouts are solved.
+Internal target: submission materials by **20 September Lagos**. Official window ends **21 September UTC+8**; exact hour is still unconfirmed. Do not assume 23:59.
+
+The research slice is already built: NVIDIA thesis → confirmed conditions → cited assessment and controlled stresses → stored version → timestamp-gated evidence → keep / change / set aside. Public demo, six issuers, Google isolation, and exports exist. This close-out makes that object honest on the homepage, at confirm, at decision, and in the export a judge can open.
+
+## Close-out plan — 17 September 2026
+
+Keep the locked hero line: “Have a stock idea? See if the evidence supports it.” Change the proof around it, not that sentence.
+
+### Do not do this cutoff
+
+- More tickers
+- Try-before-Google / delayed sign-in
+- Watch-the-next-print alerts
+- Portfolio, PnL, “would have made money”
+- Arbitrary web browse, auto keep/set aside, price-as-evidence
+- Chat that can edit frozen versions (it already cannot)
+- Independent Desloppify subjective review (still blocked; do not fabricate)
+- Billed Lightsail snapshots unless separately approved
+
+### Sequence
+
+0. **Land the working tree.** Uncommitted locally: Decision-tab / movable chat, Google login race fix, README, Groq follow-up and gpt-oss-20b drafts. Decision/chat/auth is already on `revisoagent.xyz` from a working-tree copy; Git `main` is still `f7a838c`. Commit/push only when asked. Copy `GROQ_API_KEY` onto the host without pasting it in chat.
+
+1. **Honest homepage (judge-first).** Replace the landing preview’s “Customer demand remains broad” with the NVIDIA numeric mixed quarter (GM ≥ 75%, YoY ≥ 80%; Q2 both hold, Q3 margin breaks). Keep `/example` as the written case. Make that case the proof object on the landing, not a quiet afterthought. Put the trust line on the public surface: missing stays missing; Qwen does not compute the comparison; token ≠ share.
+
+2. **Condition honesty before confirm.** Classify each condition as checkable now (allowlisted metric this issuer actually supports) or manual only. Block confirm on qualitative text unless the user explicitly marks it manual. Show a short per-issuer “what Reviso can test” list on the Review step from existing `supported_metrics`. Do not invent new metrics or a “checkable later” source network.
+
+3. **Decision + case-file export.** Keep / change / set aside must name which conditions still hold, which broke, and one sentence why the idea continues or dies. Require a reason on **change**, not only keep/set aside. On “change,” vOld stays frozen. Export PDF/Markdown as the Demo Day object: idea + rToken disclaimer, confirmed conditions, each saved print and result, decisions and reasons, “Qwen did not compute these comparisons.” Repeat the trust sentence on the evidence result in the app, not only `/guide`.
+
+4. **Print history, thin.** Do not rebuild a new timeline product. Use saved assessments as dated prints (filing date → each condition → supported / invalidated / missing → human decision). NVIDIA two-step replay remains the authored mixed-quarter story; other issuers show whatever prints were actually saved. Live check stays “latest allowlisted filing,” never an older report promoted as current.
+
+5. **Ship and submit.** Tests + one signed-in NVIDIA walkthrough on `revisoagent.xyz`. Copy `GROQ_API_KEY` onto the host without pasting it in chat. Commit/push only when asked. Then: X post (`#BitgetHackathon`, `@Bitget_AI`), submission form, optional recording. Snapshots stay off unless billed storage is approved.
+
+### After submission (not now)
+
+Delayed live path before Google; watch the next allowlisted filing (no price alerts); fuller in-app metric dictionary; condition-keyed decision as a richer notebook. Still never: more tickers first, execution, or LLM-owned keep/set aside.
 
 ## Milestones
 
@@ -20,6 +55,7 @@ The deployed public/private interface now includes the [newcomer experience and 
 - [x] Implement owner-scoped research, Google sign-in, CSRF sessions and Qwen spend limits locally, keeping backend contracts, providers, engines, services and SQLite separate.
 - [ ] Confirm the organizer's exact September 21 UTC+8 cutoff time.
 - [x] Wire provider-neutral LLM contracts to sponsored Bitget Qwen 3.8 Max first and Qwen 3.8 27B on Groq as fallback, with schema-constrained local validation, citation bounds, provenance, idempotence and manual fallback.
+- [x] Route filing follow-up answers through Groq Qwen only; route condition drafts through Groq gpt-oss-20b; keep extraction and review on Bitget-first.
 - [x] Configure the received Bitget Qwen key locally and verify one approved live extraction call.
 - [x] Run the first frozen live narrative calibration and plain-prompt baseline; record failures without fixes.
 - [x] Implement offline Qwen response-contract repairs and regression fixtures from batch 01.
@@ -46,7 +82,11 @@ The deployed public/private interface now includes the [newcomer experience and 
 
 No release-complete claim until the connected lifecycle, real AI integration, evaluation and deployment gates pass.
 
-## Latest verification — September 13, 2026
+## Latest verification — September 17, 2026
+
+134 Python tests and 61 frontend tests, Ruff, Prettier, TypeScript and the production build pass. Condition drafts now use Groq `openai/gpt-oss-20b` with `reasoning_effort: "low"`; filing chat stays Groq Qwen 3.8 27B; extract/review stay Bitget-first. One approved unsaved NVIDIA suggest completed in 1.003s (4 editable conditions). Desloppify mechanical scans: backend objective 92.1 / strict 21.9 (25 files); `apps/web` objective 83.9 / strict 19.4 (52 files, `node_modules`/`dist` excluded). Both `next` queues are the 20 unassessed subjective dimensions; those were not reviewed and no scores were fabricated. The two backend security findings remain the existing Bitget SDK subprocess allowlist (B404/B603). Production: integrity-checked backup `reviso-before-groq-draft-20260917T165945Z.sqlite3`; host `GROQ_API_KEY` set (length 56) without pasting it in chat; working-tree copy rebuilt on Lightsail without touching named volumes. Public `/`, `/example`, `/guide`, `/app` and `/api/health` returned HTTP 200; `/app` still shows Google sign-in (not clicked). Migrations 1–6 and four saved theses remain. Snapshots stay off. Git `main` is still uncommitted; commit/push only when asked.
+
+## Earlier verification — September 13, 2026
 
 116 Python tests and 47 frontend tests, Ruff, Prettier, TypeScript, the production build and a local browser walkthrough pass for owner-scoped research. Existing local SQLite rows now belong to the reserved operator user; the explicit local identity sees an empty library and a 404 on a previously open operator record. Public landing, the NVIDIA example “Continue with Google” CTA, privacy account copy, and the new-research company picker were checked. Google’s live sign-in button was not exercised because loopback uses the local identity. No Qwen request, commit, push or production deploy was made. Production still needs a Google web client, an integrity-checked SQLite backup, migration 006 rehearsal and a separately approved deploy.
 

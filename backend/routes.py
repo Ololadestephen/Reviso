@@ -55,7 +55,15 @@ from backend.market import market_execution
 from backend.providers import BitgetProvider
 from backend.replay import CASES, CUTOFFS, available_evidence, evidence_by_id
 from backend.research_chat import append_exchange, conversation_for
-from backend.services import assessment, digest, narrative_context_hash, revision_changes
+from backend.services import (
+    assessment,
+    decision_explanation,
+    digest,
+    named_condition_ids,
+    narrative_context_hash,
+    revision_changes,
+    uncheckable_metrics,
+)
 from backend.storage import ConflictError, LlmLimits, Repository
 from backend.xstocks import XStocksProvider
 
@@ -76,6 +84,14 @@ def get_xstocks(request: Request) -> XStocksProvider:
 
 def get_llm(request: Request) -> LanguageModel:
     return request.app.state.llm
+
+
+def get_chat_llm(request: Request) -> LanguageModel:
+    return request.app.state.chat_llm
+
+
+def get_draft_llm(request: Request) -> LanguageModel:
+    return request.app.state.draft_llm
 
 
 def get_disclosures(request: Request) -> CompanyDisclosureProvider:
@@ -104,6 +120,8 @@ Repo = Annotated[Repository, Depends(get_repository)]
 Provider = Annotated[BitgetProvider, Depends(get_provider)]
 XStocks = Annotated[XStocksProvider, Depends(get_xstocks)]
 LLM = Annotated[LanguageModel, Depends(get_llm)]
+ChatLLM = Annotated[LanguageModel, Depends(get_chat_llm)]
+DraftLLM = Annotated[LanguageModel, Depends(get_draft_llm)]
 Disclosures = Annotated[CompanyDisclosureProvider, Depends(get_disclosures)]
 DeploymentMode = Annotated[
     Literal["local_single_user", "private_demo"], Depends(get_deployment_mode)
@@ -112,6 +130,17 @@ Owner = Annotated[Principal, Depends(require_principal)]
 Limits = Annotated[LlmLimits, Depends(get_limits)]
 Auth = Annotated[AuthSettings, Depends(get_auth_settings)]
 Verifier = Annotated[GoogleTokenVerifier | None, Depends(get_google_verifier)]
+
+
+def require_checkable(thesis: ThesisInput) -> None:
+    blocked = uncheckable_metrics(thesis)
+    if blocked:
+        raise HTTPException(
+            422,
+            "This issuer cannot numerically test "
+            + ", ".join(sorted(set(blocked)))
+            + ". Mark those claims as manual research or pick a supported measure.",
+        )
 
 
 def confirmed(repo: Repository, owner_id: str, thesis_id: str) -> dict:
@@ -179,8 +208,16 @@ def auth_logout(request: Request, repo: Repo, auth: Auth, response: Response):
 
 
 @router.get("/llm/status")
-def llm_status(llm: LLM, owner: Owner):
-    return llm.descriptor.public()
+def llm_status(llm: LLM, chat_llm: ChatLLM, draft_llm: DraftLLM, owner: Owner):
+    return {
+        **llm.descriptor.public(),
+        "chat_provider": chat_llm.descriptor.provider,
+        "chat_model": chat_llm.descriptor.model,
+        "chat_configured": chat_llm.descriptor.configured,
+        "draft_provider": draft_llm.descriptor.provider,
+        "draft_model": draft_llm.descriptor.model,
+        "draft_configured": draft_llm.descriptor.configured,
+    }
 
 
 @router.post("/theses/extract")
@@ -201,7 +238,9 @@ def extract_thesis(body: ThesisExtractionInput, llm: LLM, repo: Repo, owner: Own
 
 
 @router.post("/theses/suggest", response_model=ThesisSuggestion)
-def suggest_assumptions(body: ThesisIdeaInput, llm: LLM, repo: Repo, owner: Owner, limits: Limits):
+def suggest_assumptions(
+    body: ThesisIdeaInput, llm: DraftLLM, repo: Repo, owner: Owner, limits: Limits
+):
     key = digest(
         {
             "action": "suggest",
@@ -248,6 +287,7 @@ def confirm(thesis_id: str, body: Confirmation, repo: Repo, owner: Owner):
     current = repo.get(owner.user_id, thesis_id)
     if current["confirmed"]:
         raise HTTPException(409, "Use an explicit revision for confirmed theses")
+    require_checkable(body)
     return repo.evolve(
         owner.user_id,
         thesis_id,
@@ -427,7 +467,12 @@ def research_questions(thesis_id: str, repo: Repo, owner: Owner):
 
 @router.post("/theses/{thesis_id}/questions", response_model=SavedResearchAnswer)
 def answer_research_question(
-    thesis_id: str, body: ResearchQuestionInput, repo: Repo, llm: LLM, owner: Owner, limits: Limits
+    thesis_id: str,
+    body: ResearchQuestionInput,
+    repo: Repo,
+    chat_llm: ChatLLM,
+    owner: Owner,
+    limits: Limits,
 ):
     confirmed(repo, owner.user_id, thesis_id)
     selected = repo.history(owner.user_id, thesis_id)["selected_assessment"]
@@ -436,7 +481,7 @@ def answer_research_question(
     if not selected["evidence"]:
         raise HTTPException(409, "No saved evidence is available for a cited answer")
     selected_record = repo.get_version(owner.user_id, thesis_id, selected["thesis_version"])
-    metadata = provenance(llm.descriptor, QUESTION_PROMPT_VERSION)
+    metadata = provenance(chat_llm.descriptor, QUESTION_PROMPT_VERSION)
     question = body.question.strip()
     input_hash = digest(
         {
@@ -458,7 +503,7 @@ def answer_research_question(
         owner.user_id,
         input_hash,
         limits,
-        lambda: llm.answer(
+        lambda: chat_llm.answer(
             ThesisInput.model_validate(selected_record["thesis"]), evidence, question
         ),
     )
@@ -494,7 +539,12 @@ def research_conversation(
 
 @router.post("/theses/{thesis_id}/conversation", response_model=ConversationThread)
 def continue_research_conversation(
-    thesis_id: str, body: ConversationInput, repo: Repo, llm: LLM, owner: Owner, limits: Limits
+    thesis_id: str,
+    body: ConversationInput,
+    repo: Repo,
+    chat_llm: ChatLLM,
+    owner: Owner,
+    limits: Limits,
 ):
     record = confirmed(repo, owner.user_id, thesis_id)
     selected = repo.history(owner.user_id, thesis_id)["selected_assessment"]
@@ -508,7 +558,7 @@ def continue_research_conversation(
 
     return append_exchange(
         repo,
-        llm,
+        chat_llm,
         owner.user_id,
         record,
         selected,
@@ -529,6 +579,7 @@ def revise(thesis_id: str, body: RevisionInput, repo: Repo, owner: Owner):
         raise HTTPException(422, "Revision evidence must have appeared in a saved assessment")
     data = body.model_dump(mode="json", exclude={"expected_version", "explanation", "evidence_ids"})
     proposed = ThesisInput.model_validate(data)
+    require_checkable(proposed)
     changes = revision_changes(ThesisInput.model_validate(current["thesis"]), proposed)
     if not changes:
         raise HTTPException(422, "No thesis change; use retain instead")
@@ -562,13 +613,42 @@ def revise(thesis_id: str, body: RevisionInput, repo: Repo, owner: Owner):
 
 @router.post("/theses/{thesis_id}/decisions")
 def decide(thesis_id: str, body: DecisionInput, repo: Repo, owner: Owner):
-    confirmed(repo, owner.user_id, thesis_id)
+    record = confirmed(repo, owner.user_id, thesis_id)
+    selected = repo.history(owner.user_id, thesis_id)["selected_assessment"]
+    named, conflict = named_condition_ids(
+        body.held_assumption_ids, body.broke_assumption_ids, body.missing_assumption_ids
+    )
+    if conflict:
+        raise HTTPException(422, conflict)
+    if selected:
+        expected = {item["assumption_id"] for item in selected["assumptions"]}
+        if named != expected:
+            raise HTTPException(
+                422,
+                "Name every confirmed condition as still hold, did not hold, or missing",
+            )
+        claims = {item["id"]: item["claim"] for item in record["thesis"]["assumptions"]}
+        explanation = decision_explanation(
+            claims,
+            body.held_assumption_ids,
+            body.broke_assumption_ids,
+            body.missing_assumption_ids,
+            body.explanation,
+        )
+    else:
+        if named:
+            raise HTTPException(422, "No saved filing to attach those condition names to")
+        explanation = body.explanation
     return repo.evolve(
         owner.user_id,
         thesis_id,
         body.expected_version,
         {"retired": body.action == "retire"},
-        {"action": body.action, "explanation": body.explanation},
+        {
+            "action": body.action,
+            "explanation": explanation,
+            "assessment_input_hash": selected["input_hash"] if selected else None,
+        },
     )
 
 

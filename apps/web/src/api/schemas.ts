@@ -259,6 +259,12 @@ export const llmStatusSchema = z.looseObject({
   suggestion_prompt: z.string().optional(),
   question_prompt: z.string().optional(),
   streaming: z.string().optional(),
+  chat_provider: z.string().optional(),
+  chat_model: z.string().optional(),
+  chat_configured: z.boolean().optional(),
+  draft_provider: z.string().optional(),
+  draft_model: z.string().optional(),
+  draft_configured: z.boolean().optional(),
 });
 
 export const sessionUserSchema = z.looseObject({
@@ -321,6 +327,7 @@ export const assessmentSchema = z.looseObject({
 });
 
 export const decisionEventSchema = z.looseObject({
+  assessment_input_hash: z.string().nullable().optional(),
   action: z.string(),
   explanation: z.string(),
   version: z.number().int(),

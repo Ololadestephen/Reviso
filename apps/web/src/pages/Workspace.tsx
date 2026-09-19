@@ -18,6 +18,11 @@ import { CompanyLogo } from "../components/Brand";
 import ThesisEditor from "../ThesisEditor";
 import type { InstrumentId } from "../api/schemas";
 import {
+  namedDecisionReason,
+  unsupportedMetrics,
+} from "../lib/conditionHonesty";
+import { draftReady } from "../lib/format";
+import {
   emptyThesis,
   fromThesisInput,
   defaultThesis,
@@ -247,7 +252,7 @@ export default function Workspace() {
               className="ai-action"
               disabled={
                 writing ||
-                !llmStatus.configured ||
+                !draftReady(llmStatus) ||
                 form.rationale.trim().length < 10
               }
               onClick={() =>
@@ -259,7 +264,7 @@ export default function Workspace() {
               }
             >
               {pending.suggest
-                ? "Qwen is drafting conditions… this can take up to a minute"
+                ? "Drafting conditions…"
                 : "Help me draft conditions"}
             </button>
             <button
@@ -272,10 +277,10 @@ export default function Workspace() {
           </div>
           <p className="caption">
             {llmStatusUnavailable
-              ? "Could not check whether Qwen is connected. Continue in your own words; nothing will be sent until the status check works."
-              : llmStatus.configured
-                ? "Qwen receives your company choice and idea only. Suggestions stay editable. The first reply can take up to a minute; your text is kept if it fails."
-                : "Qwen is not connected on this app. Continue in your own words; nothing will be sent to an AI provider."}
+              ? "Could not check whether drafting is connected. Continue in your own words; nothing will be sent until the status check works."
+              : draftReady(llmStatus)
+                ? "Groq drafts editable conditions from your company and idea. Suggestions stay yours to confirm."
+                : "Condition drafting is not on this app. Continue in your own words; nothing will be sent to an AI provider."}
           </p>
         </section>
       )}
@@ -333,6 +338,8 @@ export default function Workspace() {
             locked={
               writing || !!record?.retired || (!!record?.confirmed && !editing)
             }
+            supportedMetrics={instrument.supported_metrics}
+            companyName={instrument.display_name}
           />
           <details className="confirmation-summary">
             <summary>Position and risk inputs being confirmed</summary>
@@ -374,7 +381,13 @@ export default function Workspace() {
               <button
                 type="button"
                 className="primary"
-                disabled={writing}
+                disabled={
+                  writing ||
+                  unsupportedMetrics(
+                    form.assumptions,
+                    instrument.supported_metrics,
+                  ).length > 0
+                }
                 onClick={() => confirm(() => setStep(4))}
               >
                 {pending.confirm ? "Saving…" : "Confirm my conditions →"}
@@ -394,7 +407,14 @@ export default function Workspace() {
                 <button
                   type="button"
                   className="primary"
-                  disabled={writing || explanation.trim().length < 5}
+                  disabled={
+                    writing ||
+                    explanation.trim().length < 5 ||
+                    unsupportedMetrics(
+                      form.assumptions,
+                      instrument.supported_metrics,
+                    ).length > 0
+                  }
                   onClick={() => revise(() => setStep(4))}
                 >
                   {pending.revise ? "Saving…" : "Save new version →"}
@@ -413,7 +433,7 @@ export default function Workspace() {
         </section>
       )}
 
-      {savedWorkspace && record && !editing && step === 3 && (
+      {savedWorkspace && instrument && record && !editing && step === 3 && (
         <section
           className="panel journey-panel"
           aria-labelledby="assumptions-title"
@@ -423,6 +443,8 @@ export default function Workspace() {
             value={fromThesisInput(record.thesis)}
             onChange={setForm}
             locked
+            supportedMetrics={instrument.supported_metrics}
+            companyName={instrument.display_name}
           />
           {active && (
             <div className="actions journey-actions">
@@ -467,9 +489,21 @@ export default function Workspace() {
                 pending={pending.decide}
                 explanation={decisionNote}
                 onExplanation={setDecisionNote}
-                onKeep={() => decide("retain")}
-                onSetAside={() => decide("retire")}
-                onChangeConditions={startRevision}
+                onKeep={(calls) => decide("retain", calls, decisionNote)}
+                onSetAside={(calls) => decide("retire", calls, decisionNote)}
+                onChangeConditions={(calls) => {
+                  const rows = (latest?.assumptions ?? []).map((item) => ({
+                    id: item.assumption_id,
+                    claim:
+                      record.thesis.assumptions.find(
+                        (assumption) => assumption.id === item.assumption_id,
+                      )?.claim ?? item.assumption_id,
+                  }));
+                  setExplanation(
+                    namedDecisionReason(rows, calls, decisionNote),
+                  );
+                  startRevision();
+                }}
               />
             }
           />

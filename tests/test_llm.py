@@ -17,6 +17,7 @@ from backend.llm import (
     BITGET_QWEN_MODEL,
     BITGET_QWEN_TIMEOUT_SECONDS,
     EXTRACTION_PROMPT_VERSION,
+    GROQ_DRAFT_MODEL,
     GROQ_ENDPOINT,
     QUESTION_PROMPT_VERSION,
     REVIEW_PROMPT_VERSION,
@@ -26,6 +27,8 @@ from backend.llm import (
     LLMDescriptor,
     LLMUnavailableError,
     UnavailableLanguageModel,
+    chat_language_model_from_environment,
+    draft_language_model_from_environment,
     language_model_from_environment,
 )
 from backend.replay import CUTOFFS, available_evidence
@@ -70,9 +73,8 @@ def valid_review(thesis, evidence_id: str) -> dict:
 
 
 class FakeLanguageModel:
-    descriptor = LLMDescriptor("groq", "qwen/test", True)
-
-    def __init__(self):
+    def __init__(self, descriptor: LLMDescriptor | None = None):
+        self.descriptor = descriptor or LLMDescriptor("groq", "qwen/test", True)
         self.extract_calls = 0
         self.review_calls = 0
         self.suggest_calls = 0
@@ -153,6 +155,7 @@ def test_groq_extraction_uses_fixed_endpoint_schema_and_one_repair(thesis):
     assert calls[0].headers["authorization"] == "Bearer local-test-key"
     body = json.loads(calls[0].content)
     assert body["model"] == "qwen/qwen3.8-27b"
+    assert "reasoning_effort" not in body
     assert body["response_format"]["json_schema"]["strict"] is False
     assert body["response_format"]["json_schema"]["name"] == EXTRACTION_PROMPT_VERSION.replace(
         "-", "_"
@@ -174,6 +177,58 @@ def test_groq_http_failure_is_not_retried_or_leaked(thesis):
     with pytest.raises(LLMUnavailableError, match="HTTPStatusError"):
         model.extract(thesis)
     assert calls == 1
+    model.close()
+
+
+def test_groq_empty_content_is_unavailable(thesis):
+    def handler(_request: httpx.Request):
+        return httpx.Response(200, json={"choices": [{"message": {"content": ""}}]})
+
+    model = GroqLanguageModel("secret", client=httpx.Client(transport=httpx.MockTransport(handler)))
+    with pytest.raises(LLMUnavailableError, match="empty content"):
+        model.extract(thesis)
+    model.close()
+
+
+def test_groq_draft_sends_low_reasoning_and_gpt_oss_model():
+    calls = []
+    suggestion = {
+        "rationale": "The idea is a suggestion for human review.",
+        "assumptions": [
+            {
+                "id": "manual-catalyst",
+                "claim": "The stated catalyst remains supported.",
+                "category": "fundamental",
+                "essential": True,
+                "metric": "manual",
+                "minimum": "0",
+                "invalidation_condition": (
+                    "Requires manual evidence review; no numerical invalidation rule."
+                ),
+            }
+        ],
+    }
+
+    def handler(request: httpx.Request):
+        calls.append(json.loads(request.content))
+        return completion(suggestion)
+
+    model = GroqLanguageModel(
+        "secret",
+        GROQ_DRAFT_MODEL,
+        client=httpx.Client(transport=httpx.MockTransport(handler)),
+        reasoning_effort="low",
+    )
+    idea = ThesisIdeaInput(
+        instrument_id="RNVDAUSDT",
+        rationale="I want to research whether NVIDIA demand remains durable.",
+    )
+    result = model.suggest(idea)
+    assert result.assumptions[0].metric == "manual"
+    assert len(calls) == 1
+    assert calls[0]["model"] == GROQ_DRAFT_MODEL
+    assert calls[0]["reasoning_effort"] == "low"
+    assert calls[0]["max_completion_tokens"] == 4096
     model.close()
 
 
@@ -360,13 +415,52 @@ def test_environment_prefers_bitget_and_retains_groq_fallback(monkeypatch):
     monkeypatch.setenv("BITGET_QWEN_API_KEY", "bitget-test-key")
     monkeypatch.setenv("GROQ_API_KEY", "groq-test-key")
     preferred = language_model_from_environment()
+    chat = chat_language_model_from_environment()
     assert preferred.descriptor == LLMDescriptor("bitget-qwen", BITGET_QWEN_MODEL, True)
+    assert chat.descriptor.provider == "groq"
+    assert chat.descriptor.configured is True
     preferred.close()
+    chat.close()
+    draft = draft_language_model_from_environment()
+    assert draft.descriptor == LLMDescriptor("groq", GROQ_DRAFT_MODEL, True)
+    assert draft._reasoning_effort == "low"
+    draft.close()
 
     monkeypatch.delenv("BITGET_QWEN_API_KEY")
     fallback = language_model_from_environment()
     assert fallback.descriptor.provider == "groq"
     fallback.close()
+
+
+def test_follow_up_chat_stays_on_groq_when_bitget_is_preferred(monkeypatch, tmp_path):
+    monkeypatch.setenv("BITGET_QWEN_API_KEY", "bitget-test-key")
+    monkeypatch.setenv("GROQ_API_KEY", "groq-test-key")
+    with TestClient(create_app(str(tmp_path / "split-status.sqlite3"))) as client:
+        status = client.get("/llm/status").json()
+        assert status["provider"] == "bitget-qwen"
+        assert status["configured"] is True
+        assert status["chat_provider"] == "groq"
+        assert status["chat_configured"] is True
+        assert status["draft_provider"] == "groq"
+        assert status["draft_model"] == GROQ_DRAFT_MODEL
+        assert status["draft_configured"] is True
+
+
+def test_chat_language_model_is_unavailable_without_groq(monkeypatch):
+    monkeypatch.setenv("BITGET_QWEN_API_KEY", "bitget-test-key")
+    monkeypatch.delenv("GROQ_API_KEY", raising=False)
+    chat = chat_language_model_from_environment()
+    assert chat.descriptor.provider == "groq"
+    assert chat.descriptor.configured is False
+
+
+def test_draft_language_model_is_unavailable_without_groq(monkeypatch):
+    monkeypatch.setenv("BITGET_QWEN_API_KEY", "bitget-test-key")
+    monkeypatch.delenv("GROQ_API_KEY", raising=False)
+    draft = draft_language_model_from_environment()
+    assert draft.descriptor.provider == "groq"
+    assert draft.descriptor.model == GROQ_DRAFT_MODEL
+    assert draft.descriptor.configured is False
 
 
 def test_environment_without_key_is_explicitly_unavailable(monkeypatch, thesis):
@@ -410,6 +504,33 @@ def test_suggestions_are_editable_proposals_and_are_not_persisted(tmp_path, thes
         assert proposal["assumptions"][0]["metric"] == "manual"
         assert model.suggest_calls == 1
         assert client.get("/theses").json() == []
+
+
+def test_condition_drafts_use_draft_llm_not_primary(tmp_path):
+    extract_model = FakeLanguageModel()
+    draft_model = FakeLanguageModel(LLMDescriptor("groq", GROQ_DRAFT_MODEL, True))
+    with TestClient(
+        create_app(
+            str(tmp_path / "split-draft.sqlite3"),
+            llm=extract_model,
+            draft_llm=draft_model,
+        )
+    ) as client:
+        status = client.get("/llm/status").json()
+        assert status["model"] == "qwen/test"
+        assert status["draft_model"] == GROQ_DRAFT_MODEL
+        assert status["draft_configured"] is True
+        response = client.post(
+            "/theses/suggest",
+            json={
+                "instrument_id": "RAAPLUSDT",
+                "rationale": "I want to research whether Apple's demand remains durable.",
+            },
+        )
+        assert response.status_code == 200
+        assert extract_model.suggest_calls == 0
+        assert draft_model.suggest_calls == 1
+    assert extract_model.closed and draft_model.closed
 
 
 def test_suggestion_rewrites_noncanonical_conditions_without_a_second_call():
@@ -582,6 +703,69 @@ def test_conversation_keeps_history_and_reuses_explanations_without_a_second_cal
             json={"thesis_id": draft["id"], "expected_version": 2, "step": 1},
         )
         assert client.post(base + "/conversation", json=body).status_code == 409
+
+
+def test_follow_up_conversation_uses_chat_llm_not_primary(tmp_path, thesis):
+    extract_model = FakeLanguageModel()
+    chat_model = FakeLanguageModel(LLMDescriptor("groq", "qwen/chat-test", True))
+    with TestClient(
+        create_app(str(tmp_path / "split-chat.sqlite3"), llm=extract_model, chat_llm=chat_model)
+    ) as client:
+        draft = client.post("/theses/draft", json=thesis.model_dump(mode="json")).json()
+        base = f"/theses/{draft['id']}"
+        client.post(base + "/confirm", json={**draft["thesis"], "expected_version": 1})
+        client.post(
+            "/replays/nvidia-margin/step",
+            json={"thesis_id": draft["id"], "expected_version": 2, "step": 0},
+        )
+        reviewed = client.post(base + "/ai-review", json={}).json()
+        assert extract_model.review_calls == 1
+        assert chat_model.review_calls == 0
+        status = client.get("/llm/status").json()
+        assert status["model"] == "qwen/test"
+        assert status["chat_model"] == "qwen/chat-test"
+        assert status["chat_configured"] is True
+        body = {
+            "question": "What does that mean for the margin condition?",
+            "assessment_input_hash": reviewed["input_hash"],
+        }
+        first = client.post(base + "/conversation", json=body)
+        assert first.status_code == 200
+        assert extract_model.answer_calls == 0
+        assert chat_model.answer_calls == 1
+        assert first.json()["messages"][-1]["answer"] is not None
+    assert extract_model.closed and chat_model.closed
+
+
+def test_follow_up_is_unavailable_when_groq_chat_is_off(tmp_path, thesis):
+    extract_model = FakeLanguageModel()
+    with TestClient(
+        create_app(
+            str(tmp_path / "chat-off.sqlite3"),
+            llm=extract_model,
+            chat_llm=UnavailableLanguageModel(provider="groq", model="qwen/qwen3.8-27b"),
+        )
+    ) as client:
+        draft = client.post("/theses/draft", json=thesis.model_dump(mode="json")).json()
+        base = f"/theses/{draft['id']}"
+        client.post(base + "/confirm", json={**draft["thesis"], "expected_version": 1})
+        client.post(
+            "/replays/nvidia-margin/step",
+            json={"thesis_id": draft["id"], "expected_version": 2, "step": 0},
+        )
+        reviewed = client.post(base + "/ai-review", json={}).json()
+        status = client.get("/llm/status").json()
+        assert status["configured"] is True
+        assert status["chat_configured"] is False
+        response = client.post(
+            base + "/conversation",
+            json={
+                "question": "What does that mean for the margin condition?",
+                "assessment_input_hash": reviewed["input_hash"],
+            },
+        )
+        assert response.status_code == 503
+        assert extract_model.answer_calls == 0
 
 
 def test_unconfigured_api_returns_503_without_changing_input(tmp_path, thesis):

@@ -29,10 +29,17 @@ export default function Landing() {
             An idea often lasts because nobody wrote what would make them
             reconsider. Write the conditions, check the filing, then decide.
           </p>
+          <p className="hero-trust">
+            Missing numbers stay missing. Qwen does not compute the comparison.
+            Tokenized Bitget products are not registered shares.
+          </p>
           <div className="hero-actions">
             <a className="button-link hero-primary" href="/app">
               Start my research
             </a>
+            <Link className="button-link" to="/example">
+              Read the NVIDIA example
+            </Link>
           </div>
         </div>
         <div className="hero-preview-wrap">
