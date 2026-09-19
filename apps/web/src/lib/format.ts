@@ -1,6 +1,6 @@
 import type { Metric, NarrativeStance, State } from "../api/schemas";
 
-/** Shown on the public site and on the evidence result. */
+/** Research-honesty sentence kept for Guide and exports, not the result page. */
 export const TRUST_LINE =
   "Reviso does not invent a metric, treat an older report as a successful current check, or let an explanation overwrite the comparison. Market price is not used in this result.";
 
@@ -39,6 +39,41 @@ export function resultHeadline(state: State) {
   if (state === "CHALLENGED") return "This filing needs a closer look";
   if (state === "INVALIDATED") return "This filing does not support your idea";
   return "This filing is not enough to check your idea";
+}
+
+/** One-line result: what held, what broke, what is still missing. */
+export function resultTally(
+  state: State,
+  assumptions: { state: State }[],
+): string {
+  if (!assumptions.length) return resultHeadline(state);
+  const supported = assumptions.filter(
+    (item) => item.state === "SUPPORTED",
+  ).length;
+  const failed = assumptions.filter(
+    (item) => item.state === "INVALIDATED",
+  ).length;
+  const missing = assumptions.filter(
+    (item) =>
+      item.state === "INSUFFICIENT_EVIDENCE" || item.state === "CHALLENGED",
+  ).length;
+  const parts: string[] = [];
+  if (supported) {
+    parts.push(
+      supported === 1
+        ? "1 condition supported"
+        : `${supported} conditions supported`,
+    );
+  }
+  if (failed) {
+    parts.push(failed === 1 ? "1 did not hold" : `${failed} did not hold`);
+  }
+  if (missing) {
+    parts.push(
+      missing === 1 ? "1 needs more evidence" : `${missing} need more evidence`,
+    );
+  }
+  return parts.join(" · ") || resultHeadline(state);
 }
 
 export function resultLead(assessment: {
@@ -93,6 +128,10 @@ export function humanGaps(items: string[]): string[] {
     gaps.push(text);
   }
   return gaps;
+}
+
+export function isGeneralLimitation(text: string) {
+  return text.includes("token price") || text.includes("redeem the token");
 }
 
 export function aiHelpCopy(configured: boolean, hasEvidence: boolean) {

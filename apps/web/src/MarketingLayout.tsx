@@ -49,7 +49,7 @@ export default function MarketingLayout() {
         </div>
         <p className="public-footer-note">
           Reviso is a research tool. It cannot place trades or make decisions
-          for you.
+          for you. Tokenized Bitget products are not registered shares.
         </p>
       </footer>
     </div>

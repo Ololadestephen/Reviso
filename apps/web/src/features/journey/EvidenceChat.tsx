@@ -13,8 +13,8 @@ import { followUpReady } from "../../lib/format";
 
 const suggestions = [
   "Why this result?",
+  "What's missing?",
   "What should I check next?",
-  "What does that mean?",
 ];
 
 export default function EvidenceChat({
@@ -113,14 +113,23 @@ export default function EvidenceChat({
       <div className="chat-log" ref={log}>
         {messages.length === 0 && (
           <p className="chat-empty">
-            The findings above are the AI result. Ask why it came out this way,
-            or what you should read next. Answers stay bound to this saved
-            filing.
+            Ask about the result, missing evidence, or what to check next.
           </p>
         )}
         {messages.map((item) => (
           <article className={`chat-turn ${item.role}`} key={item.id}>
-            <strong>{item.role === "assistant" ? "Qwen" : "You"}</strong>
+            <div className="chat-turn-meta">
+              <strong>{item.role === "assistant" ? "Qwen" : "You"}</strong>
+              <time
+                dateTime={item.created_at}
+                title={new Date(item.created_at).toLocaleString()}
+              >
+                {new Date(item.created_at).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </time>
+            </div>
             <p>{item.text}</p>
             {item.answer?.uncertainty && item.role === "assistant" && (
               <p className="caption">Unknown: {item.answer.uncertainty}</p>
@@ -205,7 +214,7 @@ export default function EvidenceChat({
         <p className="caption">
           {statusUnavailable
             ? "Chat is paused because Reviso could not check the Qwen connection."
-            : "Follow-up chat is off because Groq Qwen is not connected. You can still read the filing."}
+            : "Follow-up chat is off on this app. You can still read the filing."}
         </p>
       )}
       {conversation.isError && (

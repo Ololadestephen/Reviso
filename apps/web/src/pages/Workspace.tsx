@@ -155,13 +155,7 @@ export default function Workspace() {
     <>
       {savedWorkspace && record && instrument ? (
         <>
-          <RecordHeader
-            instrument={instrument}
-            record={record}
-            latest={latest}
-            market={market.data ?? null}
-            marketLoading={market.isLoading || market.isFetching}
-          />
+          <RecordHeader instrument={instrument} record={record} />
           <ResearchPath
             current={editing ? 3 : step}
             available={availableStep}
@@ -239,7 +233,6 @@ export default function Workspace() {
             locked={writing || (!!record?.confirmed && !editing)}
             market={market.data ?? null}
             marketLoading={market.isLoading || market.isFetching}
-            onRefreshMarket={() => void market.refetch()}
           />
           <div className="actions journey-actions">
             {!record && (
@@ -279,7 +272,7 @@ export default function Workspace() {
             {llmStatusUnavailable
               ? "Could not check whether drafting is connected. Continue in your own words; nothing will be sent until the status check works."
               : draftReady(llmStatus)
-                ? "Groq drafts editable conditions from your company and idea. Suggestions stay yours to confirm."
+                ? "Get help writing your idea. Suggestions stay yours to confirm."
                 : "Condition drafting is not on this app. Continue in your own words; nothing will be sent to an AI provider."}
           </p>
         </section>

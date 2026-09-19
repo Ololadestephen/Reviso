@@ -48,6 +48,7 @@ import {
   ideaTitle,
   money,
   resultHeadline,
+  resultTally,
 } from "../src/lib/format";
 import {
   idlePending,
@@ -202,11 +203,41 @@ test("the idea screen starts blank and keeps execution controls advanced", () =>
   ).toBe("");
   expect(screen.getByText("More options")).toBeTruthy();
   expect(screen.getByText(/research input, not an order/i)).toBeTruthy();
+  expect(screen.queryByText("Latest Bitget observation")).toBeNull();
+  expect(screen.queryByText("Unavailable")).toBeNull();
+  expect(screen.queryByRole("button", { name: "Refresh" })).toBeNull();
   expect(
     (screen.getByLabelText(/Maximum slippage used/) as HTMLInputElement).value,
   ).toBe("100");
   expect(manualStarter().claim).toBe("");
   expect(screen.queryByText("Try an example")).toBeNull();
+});
+
+test("the idea screen hides a missing Bitget quote instead of showing Unavailable", () => {
+  render(
+    <IdeaComposer
+      value={{ ...emptyThesis(), instrument_id: "RNVDAUSDT" }}
+      onChange={vi.fn()}
+      locked={false}
+      market={{
+        instrument_id: "RNVDAUSDT",
+        source: "Bitget public SDK",
+        availability: "UNAVAILABLE",
+        retrieved_at: "2026-09-14T06:01:00Z",
+        observed_at: null,
+        book_observed_at: null,
+        last_price: null,
+        bid: null,
+        ask: null,
+        warnings: ["Bitget ticker unavailable"],
+        cached: false,
+      }}
+    />,
+  );
+  expect(screen.queryByText("Latest Bitget observation")).toBeNull();
+  expect(screen.queryByText("Unavailable")).toBeNull();
+  expect(screen.queryByRole("button", { name: "Use this price" })).toBeNull();
+  expect(screen.queryByRole("button", { name: "Refresh" })).toBeNull();
 });
 
 test("the idea screen shows a Bitget observation without replacing the user's price", () => {
@@ -236,13 +267,15 @@ test("the idea screen shows a Bitget observation without replacing the user's pr
       }}
     />,
   );
-  expect(screen.getByText("213.64 USDT")).toBeTruthy();
+  expect(screen.getByText("Bitget 213.64 USDT")).toBeTruthy();
   expect(
     (screen.getByLabelText(/Price you are considering/) as HTMLInputElement)
       .value,
   ).toBe("200");
   fireEvent.click(screen.getByRole("button", { name: "Use this price" }));
   expect(changed.mock.calls[0][0].entry_price).toBe("213.64");
+  expect(screen.queryByText("Latest Bitget observation")).toBeNull();
+  expect(screen.queryByRole("button", { name: "Refresh" })).toBeNull();
 });
 
 test("xStocks is labelled as separate indicative context", () => {
@@ -456,7 +489,7 @@ test("Qwen evidence review starts from evidence without a second click", async (
   expect(
     screen.queryByRole("button", { name: "Explain this result" }),
   ).toBeNull();
-  expect(screen.getByText(/without another click/)).toBeTruthy();
+  expect(screen.getByText(/Writing a short explanation/)).toBeTruthy();
   await waitFor(() => expect(review).toHaveBeenCalledOnce());
 });
 
@@ -497,12 +530,18 @@ test("Qwen annotation is visibly separate from deterministic ledger state", () =
       instrument={makeInstrument()}
     />,
   );
-  expect(screen.getByText("What this evidence means")).toBeTruthy();
-  expect(screen.getByText(/does not change the evidence result/)).toBeTruthy();
   expect(
-    screen.getByText("The cited passage reports a lower margin."),
+    screen.getByText(
+      "The passage is relevant but the deterministic floor still controls invalidation.",
+    ),
   ).toBeTruthy();
-  expect(screen.getByText(/does not invent a metric/)).toBeTruthy();
+  expect(
+    screen.getByText("Still missing: What will the next disclosure report?"),
+  ).toBeTruthy();
+  expect(screen.getByText("Technical details")).toBeTruthy();
+  expect(screen.getByText(/qwen\/qwen3.8-27b/)).toBeTruthy();
+  expect(screen.queryByText("What this evidence means")).toBeNull();
+  expect(screen.queryByText(/does not invent a metric/)).toBeNull();
 });
 
 test("public landing and example explain the product without calling an API", () => {
@@ -557,6 +596,14 @@ test("public landing and example explain the product without calling an API", ()
   const startResearch = screen.getByRole("link", { name: "Start my research" });
   expect(startResearch.getAttribute("href")).toBe("/app");
   expect(startResearch.className).toContain("hero-primary");
+  expect(screen.queryByText("You confirm. Reviso does not trade.")).toBeNull();
+  expect(screen.queryByText(/ask Qwen for help/i)).toBeNull();
+  expect(screen.getByText(/Get help writing your idea/)).toBeTruthy();
+  expect(
+    screen.getByText(
+      /Reviso is a research tool. It cannot place trades or make decisions/,
+    ),
+  ).toBeTruthy();
   expect(screen.queryByText(/ugly print/i)).toBeNull();
   expect(screen.queryByText(/the invalidation was never/i)).toBeNull();
   expect(
@@ -568,10 +615,10 @@ test("public landing and example explain the product without calling an API", ()
       .getAttribute("href"),
   ).toBe("/example");
   expect(
-    screen.getByText(
+    screen.queryByText(
       /Missing numbers stay missing. Qwen does not compute the comparison/,
     ),
-  ).toBeTruthy();
+  ).toBeNull();
   expect(screen.getByText(/The result is mixed/)).toBeTruthy();
   expect(screen.getByText(/Margin 74.6% is below 75%/)).toBeTruthy();
   expect(
@@ -677,6 +724,11 @@ test("public landing and example explain the product without calling an API", ()
   ).toBeTruthy();
   expect(screen.getByText("What counts as evidence")).toBeTruthy();
   expect(screen.getByText("What Qwen does")).toBeTruthy();
+  expect(
+    screen.getByText(
+      /Missing numbers stay missing. Reviso does not invent a metric/,
+    ),
+  ).toBeTruthy();
   expect(screen.getByText("What is saved")).toBeTruthy();
   expect(guide.container.querySelector(".landing-step")).toBeTruthy();
   expect(guide.container.querySelector(".steps-grid")).toBeTruthy();
@@ -1119,9 +1171,7 @@ test("follow-up chat stays off when Groq is not connected", async () => {
     </QueryClientProvider>,
   );
   expect(
-    await screen.findByText(
-      /Follow-up chat is off because Groq Qwen is not connected/,
-    ),
+    await screen.findByText(/Follow-up chat is off on this app/),
   ).toBeTruthy();
   expect(
     (screen.getByRole("button", { name: "Send" }) as HTMLButtonElement)
@@ -1151,6 +1201,16 @@ test("evidence result labels stay in plain language", () => {
   expect(conditionStatusLabel("CHALLENGED")).toBe("Challenged");
   expect(conditionStatusLabel("INSUFFICIENT_EVIDENCE")).toBe("Missing");
   expect(resultHeadline("CHALLENGED")).toBe("This filing needs a closer look");
+  expect(
+    resultTally("CHALLENGED", [
+      { state: "SUPPORTED" },
+      { state: "INSUFFICIENT_EVIDENCE" },
+    ]),
+  ).toBe("1 condition supported · 1 needs more evidence");
+  expect(resultTally("SUPPORTED", [])).toBe("This filing supports your idea");
+  expect(resultTally("INVALIDATED", [{ state: "INVALIDATED" }])).toBe(
+    "1 did not hold",
+  );
   expect(
     humanGaps([
       "Compatible current share reference and unit ratio",
@@ -1284,35 +1344,50 @@ test("evidence shows the result, findings and selected source before advanced co
     </QueryClientProvider>,
   );
   expect(
-    screen.getByRole("heading", { name: "This filing needs a closer look" }),
-  ).toBeTruthy();
-  expect(
     screen.getByRole("heading", {
-      name: "Saved checks across versions",
+      name: "1 condition supported · 1 needs more evidence",
     }),
   ).toBeTruthy();
+  expect(screen.getByText("Previous checks")).toBeTruthy();
+  expect(screen.getByText("Market details")).toBeTruthy();
+  expect(
+    (
+      screen
+        .getByText("Previous checks")
+        .closest("details") as HTMLDetailsElement
+    ).open,
+  ).toBe(false);
+  expect(
+    (
+      screen
+        .getByText("Market details")
+        .closest("details") as HTMLDetailsElement
+    ).open,
+  ).toBe(false);
   expect(
     screen.getByText("Customer concentration is not in this filing"),
   ).toBeTruthy();
   expect(screen.getAllByText("Supported").length).toBeGreaterThan(0);
   expect(screen.getAllByText("Challenged").length).toBeGreaterThan(0);
   expect(screen.queryByText("Needs attention")).toBeNull();
-  const sourceSummary = screen.getByText("1 filing checked");
-  const sourceDetails = sourceSummary.closest("details") as HTMLDetailsElement;
-  expect(sourceDetails.open).toBe(false);
-  fireEvent.click(sourceSummary.closest("summary")!);
-  expect(sourceDetails.open).toBe(true);
+  expect(screen.queryByText("1 filing checked")).toBeNull();
+  expect(screen.getByRole("heading", { name: "Your conditions" })).toBeTruthy();
+  fireEvent.click(
+    screen.getAllByRole("button", { name: "Quarterly company release" })[0],
+  );
+  expect(openDetails).toHaveBeenCalledWith(source);
+  fireEvent.click(
+    screen
+      .getByText("Reported GAAP gross margin stays at or above 75%.")
+      .closest("summary")!,
+  );
   expect(
-    screen.getByRole("heading", { name: "The report we checked" }),
+    screen.getByText("Reported GAAP gross margin: 74.6%. Floor: 75%."),
   ).toBeTruthy();
-  expect(screen.getByRole("link", { name: "View filing" })).toBeTruthy();
   expect(
-    screen.getByRole("button", { name: "Record my decision →" }),
+    screen.getByRole("button", { name: "Record your decision" }),
   ).toBeTruthy();
-  expect(
-    container.querySelectorAll(".dashboard-aside > .workspace-aside-card")
-      .length,
-  ).toBe(1);
+  expect(container.querySelector(".dashboard-aside")).toBeNull();
   fireEvent.click(
     screen.getByRole("button", { name: "Ask about this filing" }),
   );
@@ -1320,13 +1395,23 @@ test("evidence shows the result, findings and selected source before advanced co
     screen.getByRole("heading", { name: "Ask about this filing" }),
   ).toBeTruthy();
   expect(screen.getByText("Advanced checks")).toBeTruthy();
-  fireEvent.click(screen.getByRole("button", { name: "Source details" }));
-  expect(openDetails).toHaveBeenCalledWith(source);
 });
 
-test("recording a decision keeps the Qwen explanation visible", () => {
+test("recording a decision keeps the result explanation visible", () => {
   const latest = makeAssessment({
     evidence: [makeEvidence({ title: "Quarterly company release" })],
+    narrative_review: {
+      summary: "The filing still matches the confirmed conditions.",
+      next_question: "What will the next disclosure report?",
+      items: [
+        {
+          assumption_id: "margin",
+          stance: "SUPPORTS",
+          explanation: "The cited passage reports the relevant metric.",
+          evidence_ids: ["source-1"],
+        },
+      ],
+    },
   });
   const client = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
@@ -1381,12 +1466,12 @@ test("recording a decision keeps the Qwen explanation visible", () => {
   expect(
     document.querySelector(".dashboard-aside")?.firstElementChild?.textContent,
   ).toContain("Decision form");
-  fireEvent.click(screen.getByText("Reading of this filing"));
   expect(
-    screen.getByRole("heading", { name: "No AI explanation on this app" }),
+    screen.getByText("The filing still matches the confirmed conditions."),
   ).toBeTruthy();
+  expect(screen.queryByText("Reading of this filing")).toBeNull();
   expect(
-    screen.queryByRole("button", { name: "Record my decision →" }),
+    screen.queryByRole("button", { name: "Record your decision" }),
   ).toBeNull();
 });
 
@@ -1427,7 +1512,7 @@ test("saved research can be downloaded as a versioned PDF", async () => {
   expect(
     await screen.findByRole("navigation", { name: "Research path" }),
   ).toBeTruthy();
-  fireEvent.click(screen.getByRole("button", { name: "Record my decision →" }));
+  fireEvent.click(screen.getByRole("button", { name: "Record your decision" }));
   fireEvent.click(screen.getByText("Download this version"));
   expect(
     screen.getByRole("link", { name: "Download PDF" }).getAttribute("href"),
@@ -1459,7 +1544,7 @@ test("the numerical result stays visible while Qwen explains", () => {
   expect(
     screen.getByRole("heading", { name: "This filing supports your idea" }),
   ).toBeTruthy();
-  expect(screen.getByText("Qwen is writing a short explanation…")).toBeTruthy();
+  expect(screen.getByText("Writing a short explanation…")).toBeTruthy();
 });
 
 test("a failed explanation leaves the evidence result and offers retry", () => {
@@ -1478,7 +1563,7 @@ test("a failed explanation leaves the evidence result and offers retry", () => {
       instrument={makeInstrument()}
     />,
   );
-  expect(screen.getByText("Explanation unavailable")).toBeTruthy();
+  expect(screen.getByText(/Explanation unavailable/)).toBeTruthy();
   fireEvent.click(screen.getByRole("button", { name: "Retry explanation" }));
   expect(retry).toHaveBeenCalledOnce();
 });
@@ -1566,7 +1651,11 @@ test("checking evidence shows the result first and requests an explanation witho
   fireEvent.click(
     screen.getByRole("button", { name: "Check latest NVIDIA filing" }),
   );
-  expect(await screen.findByText("What this evidence means")).toBeTruthy();
+  expect(
+    await screen.findByText(
+      "The filing still matches the confirmed conditions.",
+    ),
+  ).toBeTruthy();
   expect(calls.some((item) => item.includes("/refresh"))).toBe(true);
   expect(calls.some((item) => item.includes("/ai-review"))).toBe(true);
   expect(

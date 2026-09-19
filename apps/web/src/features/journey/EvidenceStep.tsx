@@ -5,8 +5,6 @@ import ReplayPanel from "../../ReplayPanel";
 import ScenarioExplorer from "../../ScenarioExplorer";
 import EvidenceChatDock from "./EvidenceChatDock";
 import PrintHistory from "./PrintHistory";
-import QwenExplanation from "./QwenExplanation";
-import SelectedSource from "./SelectedSource";
 import XStocksContextPanel from "./XStocksContextPanel";
 import { useXStocksContext } from "../../queries/workspace";
 import type {
@@ -99,17 +97,18 @@ export default function EvidenceStep({
     });
   }, [currentIds, priorIds, latest, lastEvidenceAssessment]);
 
-  const current =
-    !!selected && !!latest?.evidence.some((item) => item.id === selected.id);
-  const unanswered =
-    latest?.narrative_review?.next_question ?? latest?.next_question;
   const xstocksLive =
     xstocks.data?.availability === "AVAILABLE" &&
     xstocks.data.indicative_price != null;
 
+  function openSource(evidence: Evidence) {
+    setSelected(evidence);
+    onOpenSourceDetails(evidence);
+  }
+
   return (
     <div
-      className={`research-dashboard${showDecision ? " decision-focus" : ""}`}
+      className={`research-dashboard${showDecision ? " decision-focus" : " evidence-first"}`}
     >
       <div className="dashboard-main">
         <ReplayPanel
@@ -123,66 +122,83 @@ export default function EvidenceStep({
           reviewFailed={reviewFailed}
           llmStatus={llmStatus}
           instrument={instrument}
-          showExplanation={false}
           compact={showDecision}
           priorAssessment={
             latest && latest.evidence.length === 0
               ? (lastEvidenceAssessment ?? null)
               : null
           }
-          onOpenSource={setSelected}
+          onOpenSource={openSource}
         />
         <AssumptionLedger
           latest={latest}
           history={history}
-          setSource={setSelected}
+          thesis={record.thesis}
+          setSource={openSource}
           selectedId={selected?.id}
         />
         {!showDecision && (
-          <PrintHistory history={history} onSource={setSelected} />
-        )}
-        <div className="evidence-details-stack">
-          <SelectedSource
-            evidence={selected}
-            current={current}
-            onOpenDetails={onOpenSourceDetails}
-          />
-          <details className="panel market-context-details">
-            <summary className="detail-summary">
-              <span>
-                <span className="eyebrow">MARKET CONTEXT</span>
-                <strong>Bitget and xStocks</strong>
-              </span>
-              <small>
-                {latest?.market?.last_price
-                  ? `Saved Bitget ${money(latest.market.last_price)} USDT`
-                  : "No saved Bitget quote"}
-                {xstocksLive
-                  ? ` · Live ${xstocks.data?.xstock_symbol} ${money(xstocks.data?.indicative_price)} USD (separate product)`
-                  : ""}
-              </small>
-            </summary>
-            <div className="detail-body market-context-body">
-              <p>
-                Bitget is the selected instrument. xStocks is a different
-                product for the same company and cannot change this finding.
-              </p>
-              {latest?.market ? (
-                <MarketPanel market={latest.market} instrument={instrument} />
-              ) : (
-                <p className="muted">
-                  No saved Bitget observation yet. The record header shows a
-                  live check when available.
-                </p>
+          <section className="panel next-action">
+            <span className="eyebrow">NEXT</span>
+            <h2>Record your decision</h2>
+            <p>
+              Keep, change, or set aside this idea after reading the result.
+            </p>
+            <div className="actions journey-actions">
+              {active && (
+                <button type="button" onClick={onChangeConditions}>
+                  Change conditions
+                </button>
               )}
-              <XStocksContextPanel
-                context={xstocks.data ?? null}
-                loading={xstocks.isLoading}
-                embedded
-              />
+              <button
+                type="button"
+                className="primary"
+                disabled={!latest}
+                onClick={onRecordDecision}
+              >
+                Record your decision
+              </button>
             </div>
-          </details>
-        </div>
+          </section>
+        )}
+        <details className="panel market-context-details">
+          <summary className="detail-summary">
+            <span>
+              <span className="eyebrow">MARKET</span>
+              <strong>Market details</strong>
+            </span>
+            <small>
+              {latest?.market?.last_price
+                ? `Saved Bitget ${money(latest.market.last_price)} USDT`
+                : "No saved Bitget quote"}
+              {xstocksLive
+                ? ` · Live ${xstocks.data?.xstock_symbol} ${money(xstocks.data?.indicative_price)} USD (separate product)`
+                : ""}
+            </small>
+          </summary>
+          <div className="detail-body market-context-body">
+            <p>
+              Bitget is the selected instrument. xStocks is a different product
+              for the same company and cannot change this finding.
+            </p>
+            {latest?.market ? (
+              <MarketPanel market={latest.market} instrument={instrument} />
+            ) : (
+              <p className="muted">
+                No saved Bitget observation yet. The latest quote appears beside
+                the entry price when you write the idea.
+              </p>
+            )}
+            <XStocksContextPanel
+              context={xstocks.data ?? null}
+              loading={xstocks.isLoading}
+              embedded
+            />
+          </div>
+        </details>
+        {!showDecision && (
+          <PrintHistory history={history} onSource={openSource} />
+        )}
         <details className="advanced-panel">
           <summary>Advanced checks</summary>
           <ScenarioExplorer
@@ -195,85 +211,16 @@ export default function EvidenceStep({
           />
         </details>
       </div>
-      <aside className="dashboard-aside">
-        {showDecision ? decision : null}
-        <section className="panel workspace-aside-card evidence-guidance">
-          {showDecision ? (
-            <details className="qwen-peek">
-              <summary>
-                <span className="eyebrow">QWEN</span>
-                <strong>Reading of this filing</strong>
-              </summary>
-              <QwenExplanation
-                latest={latest}
-                pendingReview={pending.review}
-                reviewFailed={reviewFailed}
-                llmStatus={llmStatus}
-                statusUnavailable={llmStatusUnavailable}
-                active={active}
-                writing={writing}
-                onRetry={reviewWithAI}
-                embedded
-              />
-              {unanswered && !latest?.narrative_review && (
-                <div className="open-question">
-                  <span className="eyebrow">STILL OPEN</span>
-                  <p>{unanswered}</p>
-                </div>
-              )}
-            </details>
-          ) : (
-            <>
-              <QwenExplanation
-                latest={latest}
-                pendingReview={pending.review}
-                reviewFailed={reviewFailed}
-                llmStatus={llmStatus}
-                statusUnavailable={llmStatusUnavailable}
-                active={active}
-                writing={writing}
-                onRetry={reviewWithAI}
-                embedded
-              />
-              {unanswered && !latest?.narrative_review && (
-                <div className="open-question">
-                  <span className="eyebrow">STILL OPEN</span>
-                  <p>{unanswered}</p>
-                </div>
-              )}
-              <div className="decision-prompt">
-                <span className="eyebrow">YOUR NEXT STEP</span>
-                <h2>Make the decision yours</h2>
-                <p>
-                  Keep, change or set aside this idea after reading the result.
-                </p>
-                <div className="actions journey-actions">
-                  {active && (
-                    <button type="button" onClick={onChangeConditions}>
-                      Change conditions
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    className="primary"
-                    disabled={!latest}
-                    onClick={onRecordDecision}
-                  >
-                    Record my decision →
-                  </button>
-                </div>
-              </div>
-            </>
-          )}
-        </section>
-      </aside>
+      {showDecision ? (
+        <aside className="dashboard-aside">{decision}</aside>
+      ) : null}
       {latest?.evidence.length ? (
         <EvidenceChatDock
           latest={latest}
           record={record}
           llmStatus={llmStatus}
           statusUnavailable={llmStatusUnavailable}
-          onSource={setSelected}
+          onSource={openSource}
         />
       ) : null}
     </div>

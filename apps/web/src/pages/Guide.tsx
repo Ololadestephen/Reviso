@@ -81,16 +81,16 @@ export default function Guide() {
 
         <h2>What Qwen does</h2>
         <p>
-          Qwen can turn a rough idea into editable conditions, explain how a
-          saved filing relates to those conditions, and answer follow-up
-          questions using citations from that filing. The explanation appears
-          beside the result and does not change it.
+          Sponsored Bitget Qwen 3.8 Max extracts and reviews a saved filing.
+          Groq gpt-oss-20b can help draft editable conditions. Groq Qwen 3.8
+          27B answers follow-up questions from that filing’s citations. The
+          short explanation sits with the result and does not change it.
         </p>
         <p>
-          Qwen cannot confirm conditions, fetch an arbitrary website, compute
-          the financial result, record keep/change/set aside, or place a trade.
-          Repair attempts count toward the daily allowance. This public page
-          does not call Qwen.
+          These models cannot confirm conditions, fetch an arbitrary website,
+          compute the financial result, record keep/change/set aside, or place
+          a trade. Repair attempts count toward the daily allowance. This
+          public page does not call them.
         </p>
 
         <h2>What is saved</h2>

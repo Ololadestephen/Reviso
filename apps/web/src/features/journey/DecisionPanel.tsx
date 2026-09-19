@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { exportThesisUrl } from "../../api/endpoints";
-import { findingLabel } from "../../lib/format";
 import {
   conditionsNamed,
   defaultConditionCall,
@@ -71,15 +70,6 @@ export default function DecisionPanel({
     >
       <span className="eyebrow">YOUR DECISION</span>
       <h2 id="decision-title">Keep, set aside, or change it</h2>
-      <p className="nav-label">
-        {latest
-          ? `Evidence result is ${findingLabel(latest.state)}`
-          : "No saved assessment"}
-      </p>
-      <p className="decision-lead">
-        The filing result stays on the left. Name which conditions still hold
-        before you record what you are doing with the idea.
-      </p>
       {active ? (
         <>
           {rows.length > 0 && (

@@ -16,7 +16,7 @@ const steps = [
   {
     number: "02",
     title: "Write your idea",
-    copy: "Explain why you are interested and what could make you reconsider. You can write the conditions yourself or ask Qwen for help.",
+    copy: "Explain why you are interested and what could make you reconsider. Get help writing your idea.",
     visual: (
       <img
         className="step-screen-image"

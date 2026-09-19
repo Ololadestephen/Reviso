@@ -29,10 +29,6 @@ export default function Landing() {
             An idea often lasts because nobody wrote what would make them
             reconsider. Write the conditions, check the filing, then decide.
           </p>
-          <p className="hero-trust">
-            Missing numbers stay missing. Qwen does not compute the comparison.
-            Tokenized Bitget products are not registered shares.
-          </p>
           <div className="hero-actions">
             <a className="button-link hero-primary" href="/app">
               Start my research
@@ -82,11 +78,6 @@ export default function Landing() {
             </article>
           ))}
         </div>
-        <p className="coverage-note">
-          These products provide tokenized exposure. They are not registered
-          shares in your name and can have different rules, access and
-          liquidity.
-        </p>
       </section>
 
       <section className="final-cta">
@@ -98,7 +89,6 @@ export default function Landing() {
         <a className="button-link final-cta-button" href="/app">
           Open the research app
         </a>
-        <small>You confirm. Reviso does not trade.</small>
       </section>
     </>
   );

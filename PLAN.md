@@ -27,11 +27,11 @@ Keep the locked hero line: “Have a stock idea? See if the evidence supports it
 
 0. **Land the working tree.** Uncommitted locally: Decision-tab / movable chat, Google login race fix, README, Groq follow-up and gpt-oss-20b drafts. Decision/chat/auth is already on `revisoagent.xyz` from a working-tree copy; Git `main` is still `f7a838c`. Commit/push only when asked. Copy `GROQ_API_KEY` onto the host without pasting it in chat.
 
-1. **Honest homepage (judge-first).** Replace the landing preview’s “Customer demand remains broad” with the NVIDIA numeric mixed quarter (GM ≥ 75%, YoY ≥ 80%; Q2 both hold, Q3 margin breaks). Keep `/example` as the written case. Make that case the proof object on the landing, not a quiet afterthought. Put the trust line on the public surface: missing stays missing; Qwen does not compute the comparison; token ≠ share.
+1. **Honest homepage (judge-first).** Replace the landing preview’s “Customer demand remains broad” with the NVIDIA numeric mixed quarter (GM ≥ 75%, YoY ≥ 80%; Q2 both hold, Q3 margin breaks). Keep `/example` as the written case. Make that case the proof object on the landing, not a quiet afterthought. One short research disclaimer lives in the marketing footer (research tool; cannot trade or decide; token ≠ share). Provider names stay in `/guide`. Missing-stays-missing remains on Guide and in exports (Decision 34).
 
 2. **Condition honesty before confirm.** Classify each condition as checkable now (allowlisted metric this issuer actually supports) or manual only. Block confirm on qualitative text unless the user explicitly marks it manual. Show a short per-issuer “what Reviso can test” list on the Review step from existing `supported_metrics`. Do not invent new metrics or a “checkable later” source network.
 
-3. **Decision + case-file export.** Keep / change / set aside must name which conditions still hold, which broke, and one sentence why the idea continues or dies. Require a reason on **change**, not only keep/set aside. On “change,” vOld stays frozen. Export PDF/Markdown as the Demo Day object: idea + rToken disclaimer, confirmed conditions, each saved print and result, decisions and reasons, “Qwen did not compute these comparisons.” Repeat the trust sentence on the evidence result in the app, not only `/guide`.
+3. **Decision + case-file export.** Keep / change / set aside must name which conditions still hold, which broke, and one sentence why the idea continues or dies. Require a reason on **change**, not only keep/set aside. On “change,” vOld stays frozen. Export PDF/Markdown as the Demo Day object: idea + rToken disclaimer, confirmed conditions, each saved print and result, decisions and reasons, “Qwen did not compute these comparisons.” The in-app evidence first screen is tally, sourced explanation, expandable conditions, and record-decision (Decision 34); the long trust sentence stays on `/guide` and in the export.
 
 4. **Print history, thin.** Do not rebuild a new timeline product. Use saved assessments as dated prints (filing date → each condition → supported / invalidated / missing → human decision). NVIDIA two-step replay remains the authored mixed-quarter story; other issuers show whatever prints were actually saved. Live check stays “latest allowlisted filing,” never an older report promoted as current.
 
@@ -82,7 +82,11 @@ Delayed live path before Google; watch the next allowlisted filing (no price ale
 
 No release-complete claim until the connected lifecycle, real AI integration, evaluation and deployment gates pass.
 
-## Latest verification — September 17, 2026
+## Latest verification — September 19, 2026
+
+Commit `1e34353` is on `revisoagent.xyz`. Backup `reviso-before-1e34353-20260919T181800Z.sqlite3` passed `pragma integrity_check`. Named volumes and host Groq/Bitget/Google env were preserved. Public `/`, `/example`, `/guide`, `/app` and `/api/health` returned HTTP 200; landing still shows the mixed-quarter preview and trust line; `/app` still shows Google sign-in (not clicked). Migrations 1–6 and six saved theses remain. Snapshots stay off.
+
+## Earlier verification — September 17, 2026
 
 134 Python tests and 61 frontend tests, Ruff, Prettier, TypeScript and the production build pass. Condition drafts now use Groq `openai/gpt-oss-20b` with `reasoning_effort: "low"`; filing chat stays Groq Qwen 3.8 27B; extract/review stay Bitget-first. One approved unsaved NVIDIA suggest completed in 1.003s (4 editable conditions). Desloppify mechanical scans: backend objective 92.1 / strict 21.9 (25 files); `apps/web` objective 83.9 / strict 19.4 (52 files, `node_modules`/`dist` excluded). Both `next` queues are the 20 unassessed subjective dimensions; those were not reviewed and no scores were fabricated. The two backend security findings remain the existing Bitget SDK subprocess allowlist (B404/B603). Production: integrity-checked backup `reviso-before-groq-draft-20260917T165945Z.sqlite3`; host `GROQ_API_KEY` set (length 56) without pasting it in chat; working-tree copy rebuilt on Lightsail without touching named volumes. Public `/`, `/example`, `/guide`, `/app` and `/api/health` returned HTTP 200; `/app` still shows Google sign-in (not clicked). Migrations 1–6 and four saved theses remain. Snapshots stay off. Git `main` is still uncommitted; commit/push only when asked.
 

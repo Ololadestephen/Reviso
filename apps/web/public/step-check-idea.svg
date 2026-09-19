@@ -1,43 +1,32 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" role="img" aria-labelledby="title desc">
   <title id="title">Reviso evidence review screen</title>
-  <desc id="desc">A Reviso screen showing cited evidence, condition status, and a recorded human decision.</desc>
+  <desc id="desc">A Reviso screen showing the evidence tally, a short sourced explanation, expandable conditions, and the next action.</desc>
   <rect width="640" height="420" rx="24" fill="#F8F9FC"/>
   <rect x="24" y="22" width="592" height="52" rx="14" fill="#fff" stroke="#E1E4EC"/>
   <rect x="42" y="33" width="30" height="30" rx="9" fill="#ECF5DD"/>
   <path d="M48 48c7-8 17-8 20 0-3 8-13 8-20 0Zm5 0c4 4 8 4 11 0-3-4-7-4-11 0Z" fill="#76B900"/>
-  <text x="84" y="45" fill="#171923" font-family="Arial, sans-serif" font-size="14" font-weight="700">NVIDIA evidence review</text>
-  <text x="84" y="62" fill="#7B8190" font-family="Arial, sans-serif" font-size="10">Saved research · version 2</text>
-  <rect x="497" y="34" width="98" height="26" rx="13" fill="#E2F5EE"/>
-  <circle cx="513" cy="47" r="4" fill="#23966C"/>
-  <text x="524" y="51" fill="#237B5C" font-family="Arial, sans-serif" font-size="10" font-weight="700">CHECKED</text>
-  <rect x="24" y="91" width="376" height="301" rx="16" fill="#fff" stroke="#E1E4EC"/>
-  <text x="47" y="121" fill="#707685" font-family="Arial, sans-serif" font-size="10" font-weight="700" letter-spacing="1">YOUR CONDITIONS</text>
-  <text x="47" y="151" fill="#171923" font-family="Arial, sans-serif" font-size="20" font-weight="700">What the evidence shows</text>
-  <rect x="46" y="170" width="332" height="54" rx="10" fill="#F5FBF8" stroke="#D7EDE4"/>
-  <circle cx="67" cy="197" r="8" fill="#25A277"/>
-  <path d="m63 197 3 3 5-6" stroke="#fff" stroke-width="2" fill="none"/>
-  <text x="84" y="192" fill="#242936" font-family="Arial, sans-serif" font-size="11" font-weight="700">Revenue growth remains positive</text>
-  <text x="84" y="209" fill="#677080" font-family="Arial, sans-serif" font-size="10">Supported by the latest company release</text>
-  <rect x="46" y="235" width="332" height="54" rx="10" fill="#FFF9EE" stroke="#EDDFC2"/>
-  <circle cx="67" cy="262" r="8" fill="#D08A18"/>
-  <path d="M67 257v7m0 4v1" stroke="#fff" stroke-width="2"/>
-  <text x="84" y="257" fill="#242936" font-family="Arial, sans-serif" font-size="11" font-weight="700">Gross margin needs attention</text>
-  <text x="84" y="274" fill="#677080" font-family="Arial, sans-serif" font-size="10">Compare the reported value with your floor</text>
-  <rect x="46" y="305" width="332" height="62" rx="10" fill="#F6F7FB"/>
-  <text x="62" y="326" fill="#777D8A" font-family="Arial, sans-serif" font-size="9" font-weight="700">OFFICIAL SOURCE</text>
-  <text x="62" y="347" fill="#242936" font-family="Arial, sans-serif" font-size="11" font-weight="700">Quarterly company release ↗</text>
-  <text x="62" y="360" fill="#8A909E" font-family="Arial, sans-serif" font-size="9">Date and excerpt shown in Reviso</text>
-  <rect x="417" y="91" width="199" height="183" rx="16" fill="#F6F7FB" stroke="#E1E4EC"/>
-  <text x="439" y="120" fill="#777D8A" font-family="Arial, sans-serif" font-size="9" font-weight="700">STILL OPEN</text>
-  <text x="439" y="152" fill="#171923" font-family="Arial, sans-serif" font-size="13" font-weight="700">Customer demand</text>
-  <text x="439" y="172" fill="#171923" font-family="Arial, sans-serif" font-size="13" font-weight="700">remains broad</text>
-  <rect x="439" y="192" width="155" height="28" rx="8" fill="#EEF0F5"/>
-  <text x="451" y="211" fill="#606980" font-family="Arial, sans-serif" font-size="10" font-weight="700">Not enough evidence</text>
-  <text x="439" y="248" fill="#677080" font-family="Arial, sans-serif" font-size="10">Needs a manual research pass.</text>
-  <rect x="417" y="290" width="199" height="102" rx="16" fill="#E9F7F2" stroke="#CFE9E0"/>
-  <circle cx="444" cy="319" r="15" fill="#CFEDE2"/>
-  <path d="m437 319 5 5 9-12" fill="none" stroke="#25815F" stroke-width="3"/>
-  <text x="467" y="315" fill="#1C4E3D" font-family="Arial, sans-serif" font-size="11" font-weight="700">Decision recorded</text>
-  <text x="467" y="333" fill="#527465" font-family="Arial, sans-serif" font-size="9">You chose to keep the idea.</text>
-  <text x="439" y="370" fill="#3C6656" font-family="Arial, sans-serif" font-size="9">The final choice always stays yours.</text>
+  <text x="84" y="45" fill="#171923" font-family="Arial, sans-serif" font-size="14" font-weight="700">NVIDIA research</text>
+  <text x="84" y="62" fill="#7B8190" font-family="Arial, sans-serif" font-size="10">Version 2 · Decision history</text>
+  <rect x="24" y="91" width="592" height="118" rx="16" fill="#fff" stroke="#E1E4EC"/>
+  <text x="47" y="118" fill="#707685" font-family="Arial, sans-serif" font-size="10" font-weight="700" letter-spacing="1">RESULT</text>
+  <text x="47" y="148" fill="#171923" font-family="Arial, sans-serif" font-size="20" font-weight="700">1 condition supported · 1 needs more evidence</text>
+  <text x="47" y="172" fill="#4F52CF" font-family="Arial, sans-serif" font-size="11" font-weight="700">Quarterly company release</text>
+  <text x="232" y="172" fill="#8A909E" font-family="Arial, sans-serif" font-size="11"> · 21 Nov 2024</text>
+  <text x="47" y="193" fill="#4A5160" font-family="Arial, sans-serif" font-size="11">Growth still clears 80%. Margin 74.6% is below 75%.</text>
+  <rect x="24" y="221" width="376" height="171" rx="16" fill="#fff" stroke="#E1E4EC"/>
+  <text x="47" y="248" fill="#707685" font-family="Arial, sans-serif" font-size="10" font-weight="700" letter-spacing="1">YOUR CONDITIONS</text>
+  <rect x="46" y="262" width="332" height="50" rx="10" fill="#F5FBF8" stroke="#D7EDE4"/>
+  <text x="62" y="282" fill="#242936" font-family="Arial, sans-serif" font-size="12" font-weight="700">Revenue growth stays at or above 80%</text>
+  <text x="62" y="300" fill="#23966C" font-family="Arial, sans-serif" font-size="10" font-weight="700">Supported</text>
+  <rect x="46" y="322" width="332" height="50" rx="10" fill="#FFF9EE" stroke="#EDDFC2"/>
+  <text x="62" y="342" fill="#242936" font-family="Arial, sans-serif" font-size="12" font-weight="700">GAAP gross margin stays at or above 75%</text>
+  <text x="62" y="360" fill="#B07512" font-family="Arial, sans-serif" font-size="10" font-weight="700">Challenged</text>
+  <rect x="417" y="221" width="199" height="171" rx="16" fill="#fff" stroke="#E1E4EC"/>
+  <text x="439" y="248" fill="#707685" font-family="Arial, sans-serif" font-size="10" font-weight="700" letter-spacing="1">NEXT</text>
+  <text x="439" y="278" fill="#171923" font-family="Arial, sans-serif" font-size="16" font-weight="700">Record your</text>
+  <text x="439" y="298" fill="#171923" font-family="Arial, sans-serif" font-size="16" font-weight="700">decision</text>
+  <rect x="439" y="318" width="155" height="32" rx="16" fill="#5B5CF6"/>
+  <text x="458" y="338" fill="#fff" font-family="Arial, sans-serif" font-size="11" font-weight="700">Record your decision</text>
+  <circle cx="572" cy="372" r="18" fill="#5B5CF6"/>
+  <path d="M566 372h12M572 366v12" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
 </svg>

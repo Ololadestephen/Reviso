@@ -10,14 +10,12 @@ export default function IdeaComposer({
   locked,
   market = null,
   marketLoading = false,
-  onRefreshMarket,
 }: {
   value: EditableThesis;
   onChange: (value: EditableThesis) => void;
   locked: boolean;
   market?: MarketObservation | null;
   marketLoading?: boolean;
-  onRefreshMarket?: () => void;
 }) {
   const area = useRef<HTMLTextAreaElement>(null);
   const examples = examplesFor(value.instrument_id);
@@ -119,34 +117,19 @@ export default function IdeaComposer({
           <label htmlFor="entry-price">
             Price you are considering · USDT per token
           </label>
-          <input
-            id="entry-price"
-            type="number"
-            min="0.0000000001"
-            step="any"
-            value={value.entry_price}
-            onChange={(event) => set("entry_price", event.target.value)}
-            placeholder="Enter the price you want to study"
-          />
-          <span className="field-help">
-            Your research input. Reviso will not replace it automatically.
-          </span>
-          <div className="observed-price" aria-live="polite">
-            <div>
-              <span>Latest Bitget observation</span>
-              <strong>
-                {marketLoading
-                  ? "Loading…"
-                  : market?.availability === "AVAILABLE" && market.last_price
-                    ? `${money(market.last_price)} USDT`
-                    : "Unavailable"}
-              </strong>
-              {market?.observed_at && (
-                <small>{new Date(market.observed_at).toLocaleString()}</small>
-              )}
-            </div>
-            <div className="observed-price-actions">
-              {market?.availability === "AVAILABLE" && market.last_price && (
+          <div className="entry-price-row">
+            <input
+              id="entry-price"
+              type="number"
+              min="0.0000000001"
+              step="any"
+              value={value.entry_price}
+              onChange={(event) => set("entry_price", event.target.value)}
+              placeholder="Enter the price you want to study"
+            />
+            {market?.availability === "AVAILABLE" && market.last_price ? (
+              <div className="entry-price-quote" aria-live="polite">
+                <span>Bitget {money(market.last_price)} USDT</span>
                 <button
                   type="button"
                   onClick={() =>
@@ -155,18 +138,16 @@ export default function IdeaComposer({
                 >
                   Use this price
                 </button>
-              )}
-              {onRefreshMarket && (
-                <button
-                  type="button"
-                  onClick={onRefreshMarket}
-                  disabled={marketLoading}
-                >
-                  Refresh
-                </button>
-              )}
-            </div>
+              </div>
+            ) : marketLoading ? (
+              <span className="entry-price-quote muted" aria-live="polite">
+                Checking Bitget…
+              </span>
+            ) : null}
           </div>
+          <span className="field-help">
+            Your research input. Reviso will not replace it automatically.
+          </span>
         </div>
         <label>
           Most you are prepared to lose · USDT
