@@ -28,6 +28,8 @@ BITGET_QWEN_MODEL = "qwen3.8-max"
 BITGET_QWEN_MAX_OUTPUT_TOKENS = 5000
 BITGET_QWEN_TIMEOUT_SECONDS = 90
 GROQ_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions"
+GROQ_CHAT_MODEL = "qwen/qwen3.8-27b"
+GROQ_DRAFT_MODEL = "openai/gpt-oss-20b"
 EXTRACTION_PROMPT_VERSION = "thesis-extraction-v2"
 SUGGESTION_PROMPT_VERSION = "assumption-suggestion-v2"
 REVIEW_PROMPT_VERSION = "evidence-review-v3"
@@ -519,14 +521,16 @@ class GroqLanguageModel(SchemaLanguageModel):
     def __init__(
         self,
         api_key: str,
-        model: str = "qwen/qwen3.8-27b",
+        model: str = GROQ_CHAT_MODEL,
         client: httpx.Client | None = None,
+        reasoning_effort: str | None = None,
     ):
         super().__init__(
             api_key,
             LLMDescriptor(provider="groq", model=model, configured=True),
             client,
         )
+        self._reasoning_effort = reasoning_effort
 
     def _completion(self, prompt_version: str, schema: dict, user_payload: dict) -> object:
         messages = [
@@ -537,19 +541,19 @@ class GroqLanguageModel(SchemaLanguageModel):
             "model": self.descriptor.model,
             "messages": messages,
             "temperature": 0.1,
-            "max_completion_tokens": 2500,
+            "max_completion_tokens": 4096 if self._reasoning_effort else 2500,
             "response_format": {
                 "type": "json_schema",
                 "json_schema": {
                     "name": prompt_version.replace("-", "_"),
-                    # Qwen supports JSON Schema mode on Groq, but not Groq's
-                    # guaranteed constrained-decoding tier. Local validation
-                    # below remains the authoritative boundary.
+                    # Local validation below remains the authoritative boundary.
                     "strict": False,
                     "schema": schema,
                 },
             },
         }
+        if self._reasoning_effort:
+            body["reasoning_effort"] = self._reasoning_effort
         payload = self._post(GROQ_ENDPOINT, body)
         try:
             content = payload["choices"][0]["message"]["content"]
@@ -557,6 +561,8 @@ class GroqLanguageModel(SchemaLanguageModel):
             raise LLMUnavailableError(
                 f"groq response unavailable ({type(error).__name__})"
             ) from error
+        if not content:
+            raise LLMUnavailableError("groq response unavailable (empty content)")
         return self._decode_json(content)
 
 
@@ -630,15 +636,43 @@ class BitgetQwenLanguageModel(SchemaLanguageModel):
         raise LLMUnavailableError("bitget-qwen response unavailable (missing output_text)")
 
 
+def groq_chat_model_id() -> str:
+    return os.getenv("REVISO_LLM_MODEL", GROQ_CHAT_MODEL)
+
+
+def groq_draft_model_id() -> str:
+    return os.getenv("REVISO_DRAFT_MODEL", GROQ_DRAFT_MODEL)
+
+
+def groq_model_id() -> str:
+    return groq_chat_model_id()
+
+
 def language_model_from_environment() -> LanguageModel:
     bitget_api_key = os.getenv("BITGET_QWEN_API_KEY", "").strip()
     if bitget_api_key:
         return BitgetQwenLanguageModel(bitget_api_key)
-    model = os.getenv("REVISO_LLM_MODEL", "qwen/qwen3.8-27b")
     groq_api_key = os.getenv("GROQ_API_KEY", "").strip()
     if groq_api_key:
-        return GroqLanguageModel(groq_api_key, model)
+        return GroqLanguageModel(groq_api_key, groq_chat_model_id())
     return UnavailableLanguageModel()
+
+
+def chat_language_model_from_environment() -> LanguageModel:
+    """Follow-up answers use Groq Qwen only. Extraction and review stay on Bitget."""
+    groq_api_key = os.getenv("GROQ_API_KEY", "").strip()
+    if groq_api_key:
+        return GroqLanguageModel(groq_api_key, groq_chat_model_id())
+    return UnavailableLanguageModel(provider="groq", model=groq_chat_model_id())
+
+
+def draft_language_model_from_environment() -> LanguageModel:
+    """Condition drafts use Groq gpt-oss-20b with low reasoning. Chat stays on Qwen."""
+    groq_api_key = os.getenv("GROQ_API_KEY", "").strip()
+    model = groq_draft_model_id()
+    if groq_api_key:
+        return GroqLanguageModel(groq_api_key, model, reasoning_effort="low")
+    return UnavailableLanguageModel(provider="groq", model=model)
 
 
 def provenance(

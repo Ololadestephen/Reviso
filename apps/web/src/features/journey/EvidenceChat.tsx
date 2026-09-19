@@ -9,6 +9,7 @@ import {
   useContinueConversation,
   useConversation,
 } from "../../queries/workspace";
+import { followUpReady } from "../../lib/format";
 
 const suggestions = [
   "Why this result?",
@@ -22,12 +23,14 @@ export default function EvidenceChat({
   llmStatus,
   statusUnavailable = false,
   onSource,
+  compact = false,
 }: {
   latest: Assessment;
   record: ThesisRecord;
   llmStatus: LLMStatus;
   statusUnavailable?: boolean;
   onSource: (source: Evidence) => void;
+  compact?: boolean;
 }) {
   const [question, setQuestion] = useState("");
   const [newResult, setNewResult] = useState(false);
@@ -41,6 +44,7 @@ export default function EvidenceChat({
     latest.evidence.length > 0,
   );
   const ask = useContinueConversation(record);
+  const chatReady = followUpReady(llmStatus);
   const messages = (conversation.data?.messages ?? []).filter(
     (item) => item.kind !== "explanation",
   );
@@ -70,12 +74,7 @@ export default function EvidenceChat({
 
   function send(text: string, detail = false) {
     const trimmed = text.trim();
-    if (
-      sending.current ||
-      ask.isPending ||
-      !llmStatus.configured ||
-      trimmed.length < 5
-    ) {
+    if (sending.current || ask.isPending || !chatReady || trimmed.length < 5) {
       return;
     }
     sending.current = true;
@@ -96,7 +95,7 @@ export default function EvidenceChat({
 
   return (
     <section
-      className="panel evidence-chat"
+      className={`panel evidence-chat${compact ? " compact" : ""}`}
       aria-labelledby="evidence-chat-title"
     >
       <div className="drawer-head">
@@ -163,7 +162,7 @@ export default function EvidenceChat({
         <button
           type="button"
           className="text-action"
-          disabled={ask.isPending || !llmStatus.configured}
+          disabled={ask.isPending || !chatReady}
           onClick={() => send("Tell me more about that.", true)}
         >
           Tell me more
@@ -174,7 +173,7 @@ export default function EvidenceChat({
           <button
             type="button"
             key={item}
-            disabled={ask.isPending || !llmStatus.configured}
+            disabled={ask.isPending || !chatReady}
             onClick={() => send(item)}
           >
             {item}
@@ -186,7 +185,7 @@ export default function EvidenceChat({
           Your question
           <textarea
             ref={field}
-            rows={3}
+            rows={compact ? 2 : 3}
             maxLength={500}
             value={question}
             onChange={(event) => setQuestion(event.target.value)}
@@ -196,19 +195,17 @@ export default function EvidenceChat({
         <button
           type="button"
           className="ai-action"
-          disabled={
-            ask.isPending || !llmStatus.configured || question.trim().length < 5
-          }
+          disabled={ask.isPending || !chatReady || question.trim().length < 5}
           onClick={() => send(question)}
         >
           {ask.isPending ? "Sending…" : "Send"}
         </button>
       </div>
-      {!llmStatus.configured && (
+      {!chatReady && (
         <p className="caption">
           {statusUnavailable
             ? "Chat is paused because Reviso could not check the Qwen connection."
-            : "Chat is off because Qwen is not connected. You can still read the filing."}
+            : "Follow-up chat is off because Groq Qwen is not connected. You can still read the filing."}
         </p>
       )}
       {conversation.isError && (

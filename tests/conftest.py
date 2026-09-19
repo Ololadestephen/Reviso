@@ -26,3 +26,19 @@ def thesis():
             ],
         }
     )
+
+
+def named_from_assessment(assessment: dict) -> dict[str, list[str]]:
+    held, broke, missing = [], [], []
+    for item in assessment.get("assumptions", []):
+        if item["state"] == "SUPPORTED":
+            held.append(item["assumption_id"])
+        elif item["state"] == "INVALIDATED":
+            broke.append(item["assumption_id"])
+        else:
+            missing.append(item["assumption_id"])
+    return {
+        "held_assumption_ids": held,
+        "broke_assumption_ids": broke,
+        "missing_assumption_ids": missing,
+    }

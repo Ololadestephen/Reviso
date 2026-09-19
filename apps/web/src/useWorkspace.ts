@@ -15,6 +15,10 @@ import {
   type EditableThesis,
 } from "./domain/defaults";
 import {
+  groupConditionCalls,
+  type ConditionCall,
+} from "./lib/conditionHonesty";
+import {
   useConfirmThesis,
   useExtractProposal,
   useHistory,
@@ -45,6 +49,12 @@ const unconfiguredLlm: LLMStatus = {
   extraction_prompt: "thesis-extraction-v2",
   review_prompt: "evidence-review-v3",
   streaming: "untested",
+  chat_provider: "groq",
+  chat_model: "qwen/qwen3.8-27b",
+  chat_configured: false,
+  draft_provider: "groq",
+  draft_model: "openai/gpt-oss-20b",
+  draft_configured: false,
 };
 
 /**
@@ -261,10 +271,21 @@ export function useWorkspace(
         },
       );
     },
-    decide: (action: "retain" | "retire") => {
+    decide: (
+      action: "retain" | "retire",
+      calls: Record<string, ConditionCall>,
+      reason: string,
+    ) => {
       clearErrors();
+      const grouped = groupConditionCalls(calls);
       decideMutation.mutate(
-        { action, explanation },
+        {
+          action,
+          explanation: reason,
+          heldAssumptionIds: grouped.held,
+          brokeAssumptionIds: grouped.broke,
+          missingAssumptionIds: grouped.missing,
+        },
         { onSuccess: () => setExplanation("") },
       );
     },

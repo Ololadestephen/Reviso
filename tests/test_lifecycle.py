@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 
 from backend.api import create_app
+from tests.conftest import named_from_assessment
 
 
 def test_confirm_replay_revise_and_retire(tmp_path, thesis):
@@ -46,6 +47,7 @@ def test_confirm_replay_revise_and_retire(tmp_path, thesis):
                     "expected_version": 3,
                     "action": "retire",
                     "explanation": "The essential margin condition broke.",
+                    **named_from_assessment(history["selected_assessment"]),
                 },
             ).status_code
             == 200
@@ -236,3 +238,80 @@ def test_first_stress_is_saved_and_preserved_when_replay_starts(tmp_path, thesis
             },
         ).json()
         assert replay["scenario"]["price_move_pct"] == "-20"
+
+
+def test_confirm_rejects_a_metric_the_issuer_cannot_test(tmp_path, thesis):
+    payload = thesis.model_copy(update={"instrument_id": "RGOOGLUSDT"}).model_dump(mode="json")
+    with TestClient(create_app(str(tmp_path / "uncheckable.sqlite3"))) as client:
+        draft = client.post("/theses/draft", json=payload).json()
+        response = client.post(
+            f"/theses/{draft['id']}/confirm",
+            json={**draft["thesis"], "expected_version": 1},
+        )
+        assert response.status_code == 422
+        assert "cannot numerically test" in response.json()["detail"]
+
+
+def test_decision_requires_every_condition_to_be_named(tmp_path, thesis):
+    with TestClient(create_app(str(tmp_path / "unnamed-decision.sqlite3"))) as client:
+        draft = client.post("/theses/draft", json=thesis.model_dump(mode="json")).json()
+        base = f"/theses/{draft['id']}"
+        client.post(base + "/confirm", json={**draft["thesis"], "expected_version": 1})
+        client.post(
+            "/replays/nvidia-margin/step",
+            json={"thesis_id": draft["id"], "expected_version": 2, "step": 1},
+        )
+        response = client.post(
+            base + "/decisions",
+            json={
+                "expected_version": 2,
+                "action": "retain",
+                "explanation": "I still like the growth print.",
+            },
+        )
+        assert response.status_code == 422
+        assert "Name every confirmed condition" in response.json()["detail"]
+
+
+def test_named_decision_records_which_conditions_still_hold(tmp_path, thesis):
+    with TestClient(create_app(str(tmp_path / "named-decision.sqlite3"))) as client:
+        draft = client.post("/theses/draft", json=thesis.model_dump(mode="json")).json()
+        base = f"/theses/{draft['id']}"
+        client.post(base + "/confirm", json={**draft["thesis"], "expected_version": 1})
+        assessed = client.post(
+            "/replays/nvidia-margin/step",
+            json={"thesis_id": draft["id"], "expected_version": 2, "step": 1},
+        ).json()
+        response = client.post(
+            base + "/decisions",
+            json={
+                "expected_version": 2,
+                "action": "retain",
+                "explanation": "Growth still clears the floor I wrote.",
+                **named_from_assessment(assessed),
+            },
+        )
+        assert response.status_code == 200
+        history = client.get(base + "/assessments").json()
+        explanation = history["events"][-1]["explanation"]
+        assert explanation.startswith("Still hold:")
+        assert "Did not hold:" in explanation
+        assert "Growth still clears the floor I wrote." in explanation
+
+
+def test_revision_rejects_a_metric_the_issuer_cannot_test(tmp_path, thesis):
+    with TestClient(create_app(str(tmp_path / "uncheckable-revision.sqlite3"))) as client:
+        draft = client.post("/theses/draft", json=thesis.model_dump(mode="json")).json()
+        base = f"/theses/{draft['id']}"
+        client.post(base + "/confirm", json={**draft["thesis"], "expected_version": 1})
+        response = client.post(
+            base + "/revisions",
+            json={
+                **draft["thesis"],
+                "instrument_id": "RGOOGLUSDT",
+                "expected_version": 2,
+                "explanation": "Move the same GAAP floor onto Alphabet.",
+            },
+        )
+        assert response.status_code == 422
+        assert "cannot numerically test" in response.json()["detail"]

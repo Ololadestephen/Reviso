@@ -15,6 +15,8 @@ import ThesisEditor from "../src/ThesisEditor";
 import IdeaComposer from "../src/features/journey/IdeaComposer";
 import EvidenceStep from "../src/features/journey/EvidenceStep";
 import EvidenceChat from "../src/features/journey/EvidenceChat";
+import EvidenceChatDock from "../src/features/journey/EvidenceChatDock";
+import DecisionPanel from "../src/features/journey/DecisionPanel";
 import JourneyProgress from "../src/features/journey/JourneyProgress";
 import XStocksContextPanel from "../src/features/journey/XStocksContextPanel";
 import StockPicker from "../src/features/journey/StockPicker";
@@ -28,12 +30,20 @@ import { confirmDraft, fetchLlmStatus } from "../src/api/endpoints";
 import {
   defaultThesis,
   emptyThesis,
+  fromThesisInput,
   manualStarter,
 } from "../src/domain/defaults";
+import {
+  CHAT_BUBBLE_STORAGE_KEY,
+  clampBubblePosition,
+  defaultBubblePosition,
+} from "../src/features/journey/chatBubblePosition";
 import { accountFace } from "../src/lib/accountFace";
 import {
   findingLabel,
   conditionStatusLabel,
+  draftReady,
+  followUpReady,
   humanGaps,
   ideaTitle,
   money,
@@ -55,6 +65,7 @@ import {
 afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();
+  delete window.google;
 });
 
 const numerical = makeNumerical();
@@ -141,6 +152,20 @@ test("confirmed thesis fields are locked", async () => {
       "Attempt to overwrite",
     );
   expect(changed).not.toHaveBeenCalled();
+});
+
+test("a company that cannot test GAAP margin names that before confirm", () => {
+  render(
+    <ThesisEditor
+      value={fromThesisInput(defaultThesis)}
+      onChange={vi.fn()}
+      locked={false}
+      supportedMetrics={["revenue_growth_yoy_pct", "manual"]}
+      companyName="Alphabet"
+    />,
+  );
+  expect(screen.getByText("What Reviso can test for Alphabet")).toBeTruthy();
+  expect(screen.getByRole("alert").textContent).toMatch(/GAAP gross margin/);
 });
 
 test("a newcomer can choose from the verified stock selection", () => {
@@ -477,6 +502,7 @@ test("Qwen annotation is visibly separate from deterministic ledger state", () =
   expect(
     screen.getByText("The cited passage reports a lower margin."),
   ).toBeTruthy();
+  expect(screen.getByText(/does not invent a metric/)).toBeTruthy();
 });
 
 test("public landing and example explain the product without calling an API", () => {
@@ -536,8 +562,26 @@ test("public landing and example explain the product without calling an API", ()
   expect(
     screen.getByText("Write the condition before the print."),
   ).toBeTruthy();
+  expect(
+    screen
+      .getByRole("link", { name: "Read the NVIDIA example" })
+      .getAttribute("href"),
+  ).toBe("/example");
+  expect(
+    screen.getByText(
+      /Missing numbers stay missing. Qwen does not compute the comparison/,
+    ),
+  ).toBeTruthy();
+  expect(screen.getByText(/The result is mixed/)).toBeTruthy();
+  expect(screen.getByText(/Margin 74.6% is below 75%/)).toBeTruthy();
+  expect(
+    screen.getByRole("img", {
+      name: /Q3 margin below 75% did not hold/,
+    }),
+  ).toBeTruthy();
+  expect(screen.queryByText("Customer demand remains broad")).toBeNull();
+  expect(screen.queryByText("Data-centre demand can remain strong")).toBeNull();
   expect(screen.queryByText("Invalidated")).toBeNull();
-  expect(screen.queryByText("74.6% in the third-quarter release")).toBeNull();
   expect(
     screen.getAllByRole("link", { name: "NVIDIA example" }).length,
   ).toBeGreaterThan(0);
@@ -725,7 +769,79 @@ test("unsigned visitors see Google sign-in instead of another person's library",
   expect(
     await screen.findByRole("heading", { name: "Continue with Google" }),
   ).toBeTruthy();
+  expect(screen.queryByText("View the NVIDIA example")).toBeNull();
   expect(screen.queryByText("Data-centre demand can remain strong")).toBeNull();
+});
+
+test("Google sign-in opens the research library without a page reload", async () => {
+  const user = {
+    user_id: "google-user-1",
+    kind: "person",
+    auth: "google",
+    email: "ada@example.test",
+    display_name: "Ada",
+  };
+  let googleCallback: ((response: { credential: string }) => void) | undefined;
+  window.google = {
+    accounts: {
+      id: {
+        initialize: (config) => {
+          googleCallback = config.callback;
+        },
+        renderButton: (parent) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.textContent = "Google test sign-in";
+          button.addEventListener("click", () => {
+            googleCallback?.({
+              credential: `credential-good-${"x".repeat(20)}`,
+            });
+          });
+          parent.appendChild(button);
+        },
+      },
+    },
+  };
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = requestUrl(input);
+      const method = init?.method ?? "GET";
+      if (url.includes("/auth/config")) {
+        return jsonResponse({
+          mode: "google",
+          google_client_id: "test-google-client.apps.googleusercontent.com",
+        });
+      }
+      if (url.includes("/auth/google") && method === "POST") {
+        return jsonResponse(user);
+      }
+      if (url.includes("/auth/me")) {
+        return jsonResponse({ detail: "Sign in to open your research" }, 401);
+      }
+      if (url.includes("/theses")) {
+        return jsonResponse([]);
+      }
+      if (url.includes("/instruments")) {
+        return jsonResponse([makeInstrument()]);
+      }
+      if (url.includes("/llm/status")) {
+        return jsonResponse(makeLlmStatus());
+      }
+      return jsonResponse({ detail: "missing" }, 404);
+    }),
+  );
+  renderApp("/app");
+  fireEvent.click(
+    await screen.findByRole("button", { name: "Google test sign-in" }),
+  );
+  expect(
+    await screen.findByRole("heading", { name: "Your research" }),
+  ).toBeTruthy();
+  expect(await screen.findByText(/No saved research yet/)).toBeTruthy();
+  expect(
+    screen.queryByRole("heading", { name: "Continue with Google" }),
+  ).toBeNull();
 });
 
 test("signing out clears the previous account from the app", async () => {
@@ -962,6 +1078,64 @@ test("a failed follow-up question stays visible", async () => {
   );
 });
 
+test("follow-up chat uses Groq readiness, not Bitget extraction status", () => {
+  expect(followUpReady({ configured: true })).toBe(true);
+  expect(followUpReady({ configured: true, chat_configured: false })).toBe(
+    false,
+  );
+  expect(followUpReady({ configured: false, chat_configured: true })).toBe(
+    true,
+  );
+});
+
+test("condition drafts use Groq readiness, not Bitget extraction status", () => {
+  expect(draftReady({ configured: true })).toBe(true);
+  expect(draftReady({ configured: true, draft_configured: false })).toBe(false);
+  expect(draftReady({ configured: false, draft_configured: true })).toBe(true);
+});
+
+test("follow-up chat stays off when Groq is not connected", async () => {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (input: RequestInfo | URL) => {
+      const url = requestUrl(input);
+      if (url.includes("/conversation")) {
+        return jsonResponse(makeConversation({ messages: [] }));
+      }
+      return jsonResponse({ detail: "missing" }, 404);
+    }),
+  );
+  const client = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+  render(
+    <QueryClientProvider client={client}>
+      <EvidenceChat
+        latest={makeAssessment({ evidence: [makeEvidence()] })}
+        record={makeRecord()}
+        llmStatus={makeLlmStatus({ configured: true, chat_configured: false })}
+        onSource={vi.fn()}
+      />
+    </QueryClientProvider>,
+  );
+  expect(
+    await screen.findByText(
+      /Follow-up chat is off because Groq Qwen is not connected/,
+    ),
+  ).toBeTruthy();
+  expect(
+    (screen.getByRole("button", { name: "Send" }) as HTMLButtonElement)
+      .disabled,
+  ).toBe(true);
+  expect(
+    (
+      screen.getByRole("button", {
+        name: "Why this result?",
+      }) as HTMLButtonElement
+    ).disabled,
+  ).toBe(true);
+});
+
 test("the same account keeps the same illustrated face card", () => {
   expect(accountFace("user-a")).toBe(accountFace("user-a"));
   expect(accountFace("user-a")).not.toBe(accountFace("user-b"));
@@ -1113,10 +1287,15 @@ test("evidence shows the result, findings and selected source before advanced co
     screen.getByRole("heading", { name: "This filing needs a closer look" }),
   ).toBeTruthy();
   expect(
+    screen.getByRole("heading", {
+      name: "Saved checks across versions",
+    }),
+  ).toBeTruthy();
+  expect(
     screen.getByText("Customer concentration is not in this filing"),
   ).toBeTruthy();
-  expect(screen.getByText("Supported")).toBeTruthy();
-  expect(screen.getByText("Challenged")).toBeTruthy();
+  expect(screen.getAllByText("Supported").length).toBeGreaterThan(0);
+  expect(screen.getAllByText("Challenged").length).toBeGreaterThan(0);
   expect(screen.queryByText("Needs attention")).toBeNull();
   const sourceSummary = screen.getByText("1 filing checked");
   const sourceDetails = sourceSummary.closest("details") as HTMLDetailsElement;
@@ -1196,6 +1375,13 @@ test("recording a decision keeps the Qwen explanation visible", () => {
     </QueryClientProvider>,
   );
   expect(screen.getByText("Decision form")).toBeTruthy();
+  expect(document.querySelector(".research-dashboard")?.className).toContain(
+    "decision-focus",
+  );
+  expect(
+    document.querySelector(".dashboard-aside")?.firstElementChild?.textContent,
+  ).toContain("Decision form");
+  fireEvent.click(screen.getByText("Reading of this filing"));
   expect(
     screen.getByRole("heading", { name: "No AI explanation on this app" }),
   ).toBeTruthy();
@@ -1242,6 +1428,7 @@ test("saved research can be downloaded as a versioned PDF", async () => {
     await screen.findByRole("navigation", { name: "Research path" }),
   ).toBeTruthy();
   fireEvent.click(screen.getByRole("button", { name: "Record my decision →" }));
+  fireEvent.click(screen.getByText("Download this version"));
   expect(
     screen.getByRole("link", { name: "Download PDF" }).getAttribute("href"),
   ).toBe(`/api/theses/${record.id}/export?format=pdf&version=3`);
@@ -1385,4 +1572,141 @@ test("checking evidence shows the result first and requests an explanation witho
   expect(
     screen.queryByRole("button", { name: "Ask Qwen to explain the evidence" }),
   ).toBeNull();
+});
+
+test("the decision card does not repeat the evidence result", () => {
+  const latest = makeAssessment({
+    assumptions: [
+      {
+        assumption_id: "margin",
+        state: "INVALIDATED",
+        explanation: "Reported margin is below 75%.",
+        evidence_ids: ["source-1"],
+        essential: true,
+      },
+    ],
+  });
+  const view = render(
+    <DecisionPanel
+      record={makeRecord()}
+      latest={latest}
+      active
+      writing={false}
+      pending={false}
+      explanation=""
+      onExplanation={vi.fn()}
+      onKeep={vi.fn()}
+      onSetAside={vi.fn()}
+      onChangeConditions={vi.fn()}
+    />,
+  );
+  expect(
+    screen.getByRole("heading", { name: "Keep, set aside, or change it" }),
+  ).toBeTruthy();
+  expect(screen.queryByText("Current evidence result")).toBeNull();
+  expect(screen.getByText("Download this version")).toBeTruthy();
+  expect(screen.getByText("Did not hold")).toBeTruthy();
+  expect(
+    (screen.getByRole("button", { name: "Keep idea" }) as HTMLButtonElement)
+      .disabled,
+  ).toBe(true);
+  expect(
+    (
+      screen.getByRole("button", {
+        name: "Change it instead",
+      }) as HTMLButtonElement
+    ).disabled,
+  ).toBe(true);
+  view.rerender(
+    <DecisionPanel
+      record={makeRecord()}
+      latest={latest}
+      active
+      writing={false}
+      pending={false}
+      explanation="Growth still clears the floor I wrote."
+      onExplanation={vi.fn()}
+      onKeep={vi.fn()}
+      onSetAside={vi.fn()}
+      onChangeConditions={vi.fn()}
+    />,
+  );
+  expect(
+    (screen.getByRole("button", { name: "Keep idea" }) as HTMLButtonElement)
+      .disabled,
+  ).toBe(false);
+  expect(
+    (
+      screen.getByRole("button", {
+        name: "Change it instead",
+      }) as HTMLButtonElement
+    ).disabled,
+  ).toBe(false);
+});
+
+test("the filing chat bubble can be dragged without opening", () => {
+  const memory: Record<string, string> = {};
+  vi.stubGlobal("localStorage", {
+    getItem: (key: string) => memory[key] ?? null,
+    setItem: (key: string, value: string) => {
+      memory[key] = value;
+    },
+    removeItem: (key: string) => {
+      delete memory[key];
+    },
+  });
+  Object.defineProperty(window, "innerWidth", { value: 1024, writable: true });
+  Object.defineProperty(window, "innerHeight", { value: 768, writable: true });
+  const latest = makeAssessment({
+    evidence: [makeEvidence({ title: "Quarterly company release" })],
+  });
+  const client = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (input: RequestInfo | URL) => {
+      if (requestUrl(input).includes("/conversation")) {
+        return jsonResponse(makeConversation({ messages: [] }));
+      }
+      return jsonResponse({ detail: "missing" }, 404);
+    }),
+  );
+  render(
+    <QueryClientProvider client={client}>
+      <EvidenceChatDock
+        latest={latest}
+        record={makeRecord()}
+        llmStatus={makeLlmStatus()}
+        onSource={vi.fn()}
+      />
+    </QueryClientProvider>,
+  );
+  const bubble = screen.getByRole("button", { name: "Ask about this filing" });
+  expect(defaultBubblePosition(1024, 768)).toEqual({ x: 952, y: 696 });
+  fireEvent.pointerDown(bubble, {
+    pointerId: 1,
+    button: 0,
+    clientX: 980,
+    clientY: 720,
+  });
+  fireEvent.pointerMove(window, { pointerId: 1, clientX: 400, clientY: 400 });
+  fireEvent.pointerUp(window, { pointerId: 1, clientX: 400, clientY: 400 });
+  fireEvent.click(bubble);
+  expect(bubble.style.left).toBe("372px");
+  expect(bubble.style.top).toBe("376px");
+  expect(screen.queryByRole("heading", { name: "Ask about this filing" })).toBe(
+    null,
+  );
+  expect(JSON.parse(memory[CHAT_BUBBLE_STORAGE_KEY] ?? "{}")).toEqual({
+    x: 372,
+    y: 376,
+  });
+});
+
+test("bubble positions stay inside the window", () => {
+  expect(clampBubblePosition({ x: -40, y: 900 }, 800, 600)).toEqual({
+    x: 16,
+    y: 528,
+  });
 });

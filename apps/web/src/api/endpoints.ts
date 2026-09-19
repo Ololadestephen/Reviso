@@ -164,11 +164,17 @@ export const recordDecision = (
   record: ThesisRecord,
   action: "retain" | "retire",
   explanation: string,
+  heldAssumptionIds: string[],
+  brokeAssumptionIds: string[],
+  missingAssumptionIds: string[],
 ) =>
   post(`/theses/${record.id}/decisions`, thesisRecordSchema, {
     expected_version: record.version,
     action,
     explanation,
+    held_assumption_ids: heldAssumptionIds,
+    broke_assumption_ids: brokeAssumptionIds,
+    missing_assumption_ids: missingAssumptionIds,
   });
 
 export const saveRevision = (

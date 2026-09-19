@@ -262,6 +262,9 @@ class DecisionInput(Contract):
     expected_version: int = Field(ge=1)
     action: Literal["retain", "retire"]
     explanation: str = Field(min_length=5, max_length=2000)
+    held_assumption_ids: list[str] = Field(default_factory=list, max_length=12)
+    broke_assumption_ids: list[str] = Field(default_factory=list, max_length=12)
+    missing_assumption_ids: list[str] = Field(default_factory=list, max_length=12)
 
 
 class ReplayInput(Contract):

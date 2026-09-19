@@ -1,5 +1,9 @@
 import type { Metric, NarrativeStance, State } from "../api/schemas";
 
+/** Shown on the public site and on the evidence result. */
+export const TRUST_LINE =
+  "Reviso does not invent a metric, treat an older report as a successful current check, or let an explanation overwrite the comparison. Market price is not used in this result.";
+
 /** Absent observations must never render as zero. */
 export function money(value: string | null | undefined) {
   return value === null || value === undefined
@@ -119,6 +123,20 @@ export function llmProviderLabel(provider: string) {
   if (provider === "bitget-qwen") return "Bitget Qwen";
   if (provider === "groq") return "Groq";
   return provider;
+}
+
+export function followUpReady(status: {
+  configured: boolean;
+  chat_configured?: boolean;
+}) {
+  return status.chat_configured ?? status.configured;
+}
+
+export function draftReady(status: {
+  configured: boolean;
+  draft_configured?: boolean;
+}) {
+  return status.draft_configured ?? status.configured;
 }
 
 /**

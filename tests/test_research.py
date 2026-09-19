@@ -6,7 +6,7 @@ from pydantic import ValidationError
 
 from backend.contracts import Assumption, State, StressInput, canonical_invalidation
 from backend.replay import CUTOFFS, DOCUMENTS, available_evidence
-from backend.services import aggregate, assessment, evaluate, revision_changes
+from backend.services import aggregate, assessment, evaluate, revision_changes, uncheckable_metrics
 
 
 def test_future_evidence_excluded(thesis):
@@ -67,3 +67,8 @@ def test_canonical_invalidation_matches_the_frontend_sentence():
         canonical_invalidation("revenue_growth_yoy_pct", Decimal(20))
         == "Invalidate when reported year-over-year revenue growth is below 20%."
     )
+
+
+def test_alphabet_cannot_confirm_a_gaap_margin_floor(thesis):
+    thesis.instrument_id = "RGOOGLUSDT"
+    assert uncheckable_metrics(thesis) == ["gaap_margin_pct"]

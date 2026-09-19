@@ -49,15 +49,17 @@ export default function SignIn() {
   const button = useRef<HTMLDivElement>(null);
   const [googleError, setGoogleError] = useState<string | null>(null);
 
+  const googleClientId = config?.google_client_id;
+  const googleMode = config?.mode === "google";
+
   useEffect(() => {
-    const clientId = config?.google_client_id;
-    if (config?.mode !== "google" || !clientId || !button.current) return;
+    if (!googleMode || !googleClientId || !button.current) return;
     let cancelled = false;
     loadGoogleScript()
       .then(() => {
         if (cancelled || !button.current || !window.google) return;
         window.google.accounts.id.initialize({
-          client_id: clientId,
+          client_id: googleClientId,
           ux_mode: "popup",
           callback: (response) => {
             void signInGoogle(response.credential).catch((caught: unknown) => {
@@ -86,7 +88,7 @@ export default function SignIn() {
     return () => {
       cancelled = true;
     };
-  }, [config, signInGoogle]);
+  }, [googleClientId, googleMode, signInGoogle]);
 
   return (
     <div className="sign-in-shell">
@@ -111,7 +113,6 @@ export default function SignIn() {
           Public filings stay shared. Your notebook stays private. Reviso cannot
           place trades.
         </p>
-        <Link to="/example">View the NVIDIA example</Link>
       </div>
     </div>
   );

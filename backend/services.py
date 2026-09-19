@@ -173,3 +173,35 @@ def revision_changes(previous: ThesisInput, proposed: ThesisInput) -> list[str]:
                 f"Revised assumption {key}: {old[key].claim} → {new[key].claim}; minimum {old[key].minimum}% → {new[key].minimum}%."
             )
     return sorted(changes)
+
+
+def uncheckable_metrics(thesis: ThesisInput) -> list[str]:
+    from backend.instruments import instrument_by_id
+
+    allowed = set(instrument_by_id(thesis.instrument_id).supported_metrics)
+    return [item.metric for item in thesis.assumptions if item.metric not in allowed]
+
+
+def named_condition_ids(
+    held: list[str], broke: list[str], missing: list[str]
+) -> tuple[set[str], str | None]:
+    held_set, broke_set, missing_set = set(held), set(broke), set(missing)
+    if held_set & broke_set or held_set & missing_set or broke_set & missing_set:
+        return set(), "A condition cannot be both still holding and broken"
+    return held_set | broke_set | missing_set, None
+
+
+def decision_explanation(
+    claims: dict[str, str],
+    held: list[str],
+    broke: list[str],
+    missing: list[str],
+    reason: str,
+) -> str:
+    def labels(ids: list[str]) -> str:
+        return "; ".join(claims[item].rstrip(".") for item in ids if item in claims) or "none"
+
+    return (
+        f"Still hold: {labels(held)}. Did not hold: {labels(broke)}. "
+        f"Missing: {labels(missing)}. {reason.strip()}"
+    )

@@ -17,6 +17,8 @@ from backend.llm import (
     LanguageModel,
     LLMInvalidOutputError,
     LLMUnavailableError,
+    chat_language_model_from_environment,
+    draft_language_model_from_environment,
     language_model_from_environment,
 )
 from backend.llm_budget import DuplicateLlmRequest, LlmAllowanceExceeded
@@ -58,7 +60,7 @@ async def llm_invalid(_request: Request, _error: LLMInvalidOutputError):
     return JSONResponse(
         status_code=502,
         content={
-            "detail": "Qwen's draft didn't match the required format, so nothing was changed. Continue manually or try again."
+            "detail": "The draft didn't match the required format, so nothing was changed. Continue manually or try again."
         },
     )
 
@@ -68,9 +70,7 @@ async def llm_budget(_request: Request, error: LlmAllowanceExceeded):
 
 
 async def llm_duplicate(_request: Request, _error: DuplicateLlmRequest):
-    return JSONResponse(
-        status_code=409, content={"detail": "This Qwen request is already in progress"}
-    )
+    return JSONResponse(status_code=409, content={"detail": "This request is already in progress"})
 
 
 def budget_message(scope: str) -> str:
@@ -87,10 +87,18 @@ def budget_message(scope: str) -> str:
     return "Qwen is busy. Wait a moment and try again, or continue manually."
 
 
+def _close_language_model(model: LanguageModel | None) -> None:
+    close = getattr(model, "close", None)
+    if close is not None:
+        close()
+
+
 def create_app(
     db_path: str | None = None,
     llm: LanguageModel | None = None,
     google_verifier: GoogleTokenVerifier | None = None,
+    chat_llm: LanguageModel | None = None,
+    draft_llm: LanguageModel | None = None,
 ) -> FastAPI:
     deployment = DeploymentSettings.from_environment()
 
@@ -103,14 +111,31 @@ def create_app(
         app.state.xstocks = XStocksProvider()
         app.state.disclosures = CompanyDisclosureProvider()
         app.state.llm = llm or language_model_from_environment()
+        if chat_llm is not None:
+            app.state.chat_llm = chat_llm
+        elif llm is not None:
+            app.state.chat_llm = llm
+        else:
+            app.state.chat_llm = chat_language_model_from_environment()
+        if draft_llm is not None:
+            app.state.draft_llm = draft_llm
+        elif llm is not None:
+            app.state.draft_llm = llm
+        else:
+            app.state.draft_llm = draft_language_model_from_environment()
         try:
             yield
         finally:
             app.state.disclosures.close()
             app.state.xstocks.close()
-            close = getattr(app.state.llm, "close", None)
-            if close is not None:
-                close()
+            primary = app.state.llm
+            chat = app.state.chat_llm
+            draft = app.state.draft_llm
+            _close_language_model(primary)
+            if chat is not primary:
+                _close_language_model(chat)
+            if draft is not primary and draft is not chat:
+                _close_language_model(draft)
 
     docs_enabled = not deployment.public_demo
     app = FastAPI(

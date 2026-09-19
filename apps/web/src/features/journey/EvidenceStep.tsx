@@ -4,6 +4,7 @@ import MarketPanel from "../../MarketPanel";
 import ReplayPanel from "../../ReplayPanel";
 import ScenarioExplorer from "../../ScenarioExplorer";
 import EvidenceChatDock from "./EvidenceChatDock";
+import PrintHistory from "./PrintHistory";
 import QwenExplanation from "./QwenExplanation";
 import SelectedSource from "./SelectedSource";
 import XStocksContextPanel from "./XStocksContextPanel";
@@ -107,7 +108,9 @@ export default function EvidenceStep({
     xstocks.data.indicative_price != null;
 
   return (
-    <div className="research-dashboard">
+    <div
+      className={`research-dashboard${showDecision ? " decision-focus" : ""}`}
+    >
       <div className="dashboard-main">
         <ReplayPanel
           writing={writing}
@@ -121,6 +124,7 @@ export default function EvidenceStep({
           llmStatus={llmStatus}
           instrument={instrument}
           showExplanation={false}
+          compact={showDecision}
           priorAssessment={
             latest && latest.evidence.length === 0
               ? (lastEvidenceAssessment ?? null)
@@ -134,6 +138,9 @@ export default function EvidenceStep({
           setSource={setSelected}
           selectedId={selected?.id}
         />
+        {!showDecision && (
+          <PrintHistory history={history} onSource={setSelected} />
+        )}
         <div className="evidence-details-stack">
           <SelectedSource
             evidence={selected}
@@ -189,50 +196,76 @@ export default function EvidenceStep({
         </details>
       </div>
       <aside className="dashboard-aside">
+        {showDecision ? decision : null}
         <section className="panel workspace-aside-card evidence-guidance">
-          <QwenExplanation
-            latest={latest}
-            pendingReview={pending.review}
-            reviewFailed={reviewFailed}
-            llmStatus={llmStatus}
-            statusUnavailable={llmStatusUnavailable}
-            active={active}
-            writing={writing}
-            onRetry={reviewWithAI}
-            embedded
-          />
-          {unanswered && !latest?.narrative_review && (
-            <div className="open-question">
-              <span className="eyebrow">STILL OPEN</span>
-              <p>{unanswered}</p>
-            </div>
-          )}
-          {!showDecision && (
-            <div className="decision-prompt">
-              <span className="eyebrow">YOUR NEXT STEP</span>
-              <h2>Make the decision yours</h2>
-              <p>
-                Keep, change or set aside this idea after reading the result.
-              </p>
-              <div className="actions journey-actions">
-                {active && (
-                  <button type="button" onClick={onChangeConditions}>
-                    Change conditions
+          {showDecision ? (
+            <details className="qwen-peek">
+              <summary>
+                <span className="eyebrow">QWEN</span>
+                <strong>Reading of this filing</strong>
+              </summary>
+              <QwenExplanation
+                latest={latest}
+                pendingReview={pending.review}
+                reviewFailed={reviewFailed}
+                llmStatus={llmStatus}
+                statusUnavailable={llmStatusUnavailable}
+                active={active}
+                writing={writing}
+                onRetry={reviewWithAI}
+                embedded
+              />
+              {unanswered && !latest?.narrative_review && (
+                <div className="open-question">
+                  <span className="eyebrow">STILL OPEN</span>
+                  <p>{unanswered}</p>
+                </div>
+              )}
+            </details>
+          ) : (
+            <>
+              <QwenExplanation
+                latest={latest}
+                pendingReview={pending.review}
+                reviewFailed={reviewFailed}
+                llmStatus={llmStatus}
+                statusUnavailable={llmStatusUnavailable}
+                active={active}
+                writing={writing}
+                onRetry={reviewWithAI}
+                embedded
+              />
+              {unanswered && !latest?.narrative_review && (
+                <div className="open-question">
+                  <span className="eyebrow">STILL OPEN</span>
+                  <p>{unanswered}</p>
+                </div>
+              )}
+              <div className="decision-prompt">
+                <span className="eyebrow">YOUR NEXT STEP</span>
+                <h2>Make the decision yours</h2>
+                <p>
+                  Keep, change or set aside this idea after reading the result.
+                </p>
+                <div className="actions journey-actions">
+                  {active && (
+                    <button type="button" onClick={onChangeConditions}>
+                      Change conditions
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className="primary"
+                    disabled={!latest}
+                    onClick={onRecordDecision}
+                  >
+                    Record my decision →
                   </button>
-                )}
-                <button
-                  type="button"
-                  className="primary"
-                  disabled={!latest}
-                  onClick={onRecordDecision}
-                >
-                  Record my decision →
-                </button>
+                </div>
               </div>
-            </div>
+            </>
           )}
         </section>
-        {showDecision ? decision : null}
       </aside>
       {latest?.evidence.length ? (
         <EvidenceChatDock

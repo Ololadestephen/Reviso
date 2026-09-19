@@ -437,6 +437,14 @@
             "title": "Action",
             "type": "string"
           },
+          "broke_assumption_ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 12,
+            "title": "Broke Assumption Ids",
+            "type": "array"
+          },
           "expected_version": {
             "minimum": 1.0,
             "title": "Expected Version",
@@ -447,6 +455,22 @@
             "minLength": 5,
             "title": "Explanation",
             "type": "string"
+          },
+          "held_assumption_ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 12,
+            "title": "Held Assumption Ids",
+            "type": "array"
+          },
+          "missing_assumption_ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 12,
+            "title": "Missing Assumption Ids",
+            "type": "array"
           }
         },
         "required": [

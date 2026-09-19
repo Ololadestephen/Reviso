@@ -1,12 +1,11 @@
 import { conditionText } from "./lib/format";
-import type { Assumption } from "./api/schemas";
+import {
+  checkableMetrics,
+  metricLabel,
+  unsupportedMetrics,
+} from "./lib/conditionHonesty";
+import type { Assumption, Metric } from "./api/schemas";
 import type { EditableThesis } from "./domain/defaults";
-
-interface Props {
-  value: EditableThesis;
-  onChange: (value: EditableThesis) => void;
-  locked: boolean;
-}
 
 function manualAssumption(existing: Assumption[]): Assumption {
   let index = existing.length + 1;
@@ -23,7 +22,19 @@ function manualAssumption(existing: Assumption[]): Assumption {
   };
 }
 
-export default function ThesisEditor({ value, onChange, locked }: Props) {
+export default function ThesisEditor({
+  value,
+  onChange,
+  locked,
+  supportedMetrics,
+  companyName,
+}: {
+  value: EditableThesis;
+  onChange: (value: EditableThesis) => void;
+  locked: boolean;
+  supportedMetrics?: Metric[];
+  companyName?: string;
+}) {
   const update = (index: number, next: Assumption) =>
     onChange({
       ...value,
@@ -31,6 +42,8 @@ export default function ThesisEditor({ value, onChange, locked }: Props) {
         itemIndex === index ? next : item,
       ),
     });
+  const checkable = checkableMetrics(supportedMetrics);
+  const blocked = unsupportedMetrics(value.assumptions, supportedMetrics);
 
   return (
     <fieldset disabled={locked} className="editor">
@@ -39,6 +52,31 @@ export default function ThesisEditor({ value, onChange, locked }: Props) {
           ? "These are the confirmed conditions for this version. Changing them creates a new version."
           : "Read and edit every condition. Any number shown here is a boundary you choose, not a forecast from Reviso."}
       </p>
+      {companyName && (
+        <div className="metric-dictionary">
+          <p>
+            <strong>What Reviso can test for {companyName}</strong>
+          </p>
+          <ul>
+            {checkable.length > 0 ? (
+              checkable.map((metric) => (
+                <li key={metric}>{metricLabel(metric)}</li>
+              ))
+            ) : (
+              <li>No numerical filing comparison for this issuer yet.</li>
+            )}
+            <li>{metricLabel("manual")} — confirm only if you mark it so</li>
+          </ul>
+        </div>
+      )}
+      {blocked.length > 0 && (
+        <p className="caption" role="alert">
+          {companyName ?? "This company"} cannot numerically test{" "}
+          {blocked.map((metric) => metricLabel(metric)).join(", ")}. Switch
+          those conditions to a supported measure or mark them as manual
+          research before you confirm.
+        </p>
+      )}
       {value.assumptions.length === 0 && (
         <div className="empty assumption-empty">
           No conditions yet. Ask Qwen for editable suggestions or add one
@@ -76,18 +114,29 @@ export default function ThesisEditor({ value, onChange, locked }: Props) {
                     });
                   }}
                 >
-                  <option value="gaap_margin_pct">GAAP gross margin</option>
-                  <option value="revenue_growth_yoy_pct">
-                    Revenue growth compared with last year
-                  </option>
+                  {checkable.map((metric) => (
+                    <option key={metric} value={metric}>
+                      {metric === "gaap_margin_pct"
+                        ? "GAAP gross margin"
+                        : "Revenue growth compared with last year"}
+                    </option>
+                  ))}
+                  {!checkable.includes(assumption.metric) &&
+                    assumption.metric !== "manual" && (
+                      <option value={assumption.metric}>
+                        {metricLabel(assumption.metric)} · not available here
+                      </option>
+                    )}
                   <option value="manual">Qualitative · manual research</option>
                 </select>
                 <span className="field-help">
-                  {assumption.metric === "gaap_margin_pct"
-                    ? "The share of reported revenue left after cost of revenue."
-                    : assumption.metric === "revenue_growth_yoy_pct"
-                      ? "Reported quarterly revenue compared with the same period one year earlier."
-                      : "Reviso records this claim but will not invent a numerical test."}
+                  {assumption.metric === "manual"
+                    ? "Reviso records this claim but will not invent a numerical test. Confirming it means you accept manual-only."
+                    : checkable.includes(assumption.metric)
+                      ? assumption.metric === "gaap_margin_pct"
+                        ? "The share of reported revenue left after cost of revenue."
+                        : "Reported quarterly revenue compared with the same period one year earlier."
+                      : `${companyName ?? "This company"} cannot test this measure. Switch it or mark it manual.`}
                 </span>
               </label>
               {assumption.metric !== "manual" && (
