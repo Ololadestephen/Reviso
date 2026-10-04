@@ -98,6 +98,8 @@ No release-complete claim until the connected lifecycle, real AI integration, ev
 
 ## Latest local verification — October 4, 2026
 
+The subsequent result-page polish passed 148 Python and 91 frontend tests, Ruff, source-code Prettier, TypeScript/build and desktop/mobile browser checks using a disposable database and blank AI keys. Comparisons and citations now stay visible; optional market/history/scenario/technical sections share a closed Advanced view. Missing data and retrieval failures remain visible. This follow-up is uncommitted and not deployed. See [the UI verification report](docs/evaluations/2026-10-04-result-polish.md) for all Desloppify scores and remaining limitations.
+
 148 Python tests and 76 frontend tests pass, together with Ruff, source-code Prettier, TypeScript and the production build. The isolated browser run used a temporary SQLite database and blank AI keys: six-company picker, manual NVIDIA conditions, confirmation, mixed historical result, source dialog, chat context, deep-link reload and 390px evidence/chat layout passed. The subsequently authorized live AI check passed all three actions with 3/6 provider requests; cached repeats and restart persistence passed. The local SQLite backup passed integrity checking. Production backup is blocked by an SSH timeout and an expired AWS profile targeting a root login session; restore non-root access before deployment. No production change was made. Desloppify objective/strict: backend 92.4/22.0; web 84.9/19.1. Subjective dimensions remain unassessed and Python security coverage is reduced without Bandit; these are not hackathon grades or accuracy measures.
 
 ## Latest verification — September 19, 2026

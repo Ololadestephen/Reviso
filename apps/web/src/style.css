@@ -2708,54 +2708,304 @@ body {
 
 .condition-list {
   display: grid;
-  gap: 10px;
+  gap: 0;
 }
 
-.condition-item {
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: #fff;
+.result-workbench {
+  padding: clamp(22px, 3vw, 36px);
+  border-radius: 22px;
 }
 
-.condition-item summary {
+.result-topline,
+.result-source-line {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 14px 16px;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+}
+
+.result-mode {
+  color: var(--accent);
+  font-size: 0.76rem;
+  font-weight: 650;
+}
+
+.result-mode.historical {
+  color: #735226;
+}
+
+.evidence-result h2 {
+  margin: 16px 0 8px;
+  font-size: clamp(1.45rem, 2.2vw, 2rem);
+  line-height: 1.2;
+}
+
+.evidence-result .result-counts {
+  margin: 0 0 18px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.result-source-line {
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.result-source-line > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+button.text-link {
+  min-height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.6;
+  text-align: left;
+}
+
+button.text-link:hover:not(:disabled) {
+  background: transparent;
+  color: var(--accent-dark);
+  text-decoration: underline;
+}
+
+.result-reading {
+  padding: 18px 0 6px;
+  max-width: 48rem;
+}
+
+.result-reading .reading-label {
+  margin: 0 0 7px;
+  font-size: 0.76rem;
+  color: var(--muted);
+  font-weight: 650;
+}
+
+.reading-text,
+.reading-detail p,
+.result-lead {
+  margin: 0 0 10px;
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+.result-lead {
+  padding-top: 12px;
+}
+
+.result-workbench .findings-panel {
+  padding-top: 24px;
+}
+
+.result-workbench .findings-panel h2 {
+  margin: 0 0 20px;
+  font-size: 1rem;
+}
+
+.comparison-grid,
+.comparison-labels {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.6fr) minmax(85px, 0.8fr) minmax(95px, 0.8fr)
+    minmax(125px, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.comparison-labels {
+  padding: 0 14px 10px;
+  color: var(--muted);
+  font-size: 0.74rem;
+}
+
+.comparison-row {
+  padding: 18px 14px;
+  border-top: 1px solid var(--line);
+  border-left: 2px solid transparent;
+}
+
+.comparison-row.selected {
+  border-left-color: var(--accent);
+  background: #faf9ff;
+}
+
+.comparison-condition > strong {
+  font-size: 0.94rem;
+}
+
+.condition-caption {
+  display: block;
+  margin-top: 5px;
+  font-size: 0.76rem;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.condition-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.comparison-value strong {
+  overflow-wrap: anywhere;
+  font-size: 1.08rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.mobile-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.comparison-row .badge {
+  justify-self: start;
+  font-size: 0.66rem;
+  white-space: normal;
+}
+
+.comparison-row .condition-explanation {
+  margin-top: 12px;
+  font-size: 0.8rem;
+}
+
+.comparison-row .condition-explanation summary {
+  min-height: 24px;
+}
+
+.comparison-row .condition-explanation p {
+  margin: 10px 0 0;
+  max-width: 48rem;
+  line-height: 1.65;
+}
+
+.result-workbench .next-action {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-top: 14px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+}
+
+.result-workbench .next-action h2 {
+  font-size: 0.94rem;
+  margin: 0 0 5px;
+}
+
+.result-workbench .next-action p {
+  margin: 0;
+  font-size: 0.8rem;
+}
+
+.result-workbench .next-action .actions {
+  margin: 0;
+}
+
+.research-options {
+  padding: 0;
+  border-radius: 16px;
+  box-shadow: none;
+}
+
+.research-options > .detail-summary {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.research-options > .detail-summary::after {
+  grid-column: 2;
+}
+
+.research-options > .detail-summary small {
+  display: block;
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+
+.options-body > details {
+  margin: 0;
+  padding: 14px 0;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.options-body > details:last-child {
+  border-bottom: 0;
+}
+
+.option-section > summary {
   cursor: pointer;
-  list-style: none;
-}
-
-.condition-item summary::-webkit-details-marker {
-  display: none;
-}
-
-.condition-claim {
+  font-size: 0.88rem;
   font-weight: 600;
 }
 
-.condition-item > p,
-.condition-item .evidence-links {
-  padding: 0 16px 14px;
+.options-body .previous-checks > summary {
+  padding: 0;
 }
 
-.condition-item.selected {
-  border-color: #c9d2f5;
-  box-shadow: 0 0 0 3px #eef1ff;
+.options-body .previous-checks .eyebrow {
+  display: none;
 }
 
-.condition-item.supported {
-  background: #f7fbf7;
+.option-section .panel {
+  border: 0;
+  padding: 20px 0 0;
+  box-shadow: none;
 }
 
-.condition-item.invalidated {
-  background: #fff7f6;
-}
+@media (max-width: 800px) {
+  .comparison-labels {
+    display: none;
+  }
 
-.condition-item.attention,
-.condition-item.unknown {
-  background: #fffaf0;
+  .comparison-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 14px 20px;
+  }
+
+  .comparison-condition,
+  .comparison-row .badge {
+    grid-column: 1 / -1;
+  }
+
+  .mobile-label {
+    position: static;
+    display: block;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+    margin-bottom: 4px;
+    color: var(--muted);
+    font-size: 0.74rem;
+  }
+
+  .result-workbench .next-action {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .result-workbench .next-action .actions {
+    justify-content: flex-start;
+  }
 }
 
 .next-action h2 {
@@ -4050,15 +4300,6 @@ details[open] > .detail-summary::after {
 
 .decision-focus .evidence-result h2 {
   font-size: 1.38rem;
-}
-
-.decision-focus .findings-panel,
-.decision-focus .evidence-result {
-  padding: 20px 22px;
-}
-
-.decision-focus .condition-item summary {
-  padding: 10px 12px;
 }
 
 .qwen-peek > summary {

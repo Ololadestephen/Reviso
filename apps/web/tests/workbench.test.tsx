@@ -459,7 +459,6 @@ test("Qwen evidence review starts from evidence without a second click", async (
       writing={false}
       pending={idlePending}
       active
-      replay={vi.fn()}
       refresh={vi.fn()}
       latest={makeAssessment()}
       reviewWithAI={review}
@@ -478,7 +477,6 @@ test("Qwen evidence review starts from evidence without a second click", async (
       writing={false}
       pending={idlePending}
       active
-      replay={vi.fn()}
       refresh={vi.fn()}
       latest={makeAssessment({ evidence: [makeEvidence()] })}
       reviewWithAI={review}
@@ -489,7 +487,7 @@ test("Qwen evidence review starts from evidence without a second click", async (
   expect(
     screen.queryByRole("button", { name: "Explain this result" }),
   ).toBeNull();
-  expect(screen.getByText(/Writing a short explanation/)).toBeTruthy();
+  expect(screen.queryByText(/Writing a short explanation/)).toBeNull();
   await waitFor(() => expect(review).toHaveBeenCalledOnce());
 });
 
@@ -522,7 +520,6 @@ test("Qwen annotation is visibly separate from deterministic ledger state", () =
       writing={false}
       pending={idlePending}
       active
-      replay={vi.fn()}
       refresh={vi.fn()}
       latest={result}
       reviewWithAI={vi.fn()}
@@ -535,11 +532,11 @@ test("Qwen annotation is visibly separate from deterministic ledger state", () =
       "The passage is relevant but the deterministic floor still controls invalidation.",
     ),
   ).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: "Read more" }));
   expect(
-    screen.getByText("Still missing: What will the next disclosure report?"),
+    screen.getByText("What will the next disclosure report?"),
   ).toBeTruthy();
-  expect(screen.getByText("Technical details")).toBeTruthy();
-  expect(screen.getByText(/qwen\/qwen3.8-27b/)).toBeTruthy();
+  expect(screen.queryByText(/qwen\/qwen3.8-27b/)).toBeNull();
   expect(screen.queryByText("What this evidence means")).toBeNull();
   expect(screen.queryByText(/does not invent a metric/)).toBeNull();
 });
@@ -957,7 +954,6 @@ test("public disclosure failures remain visible while refresh stays available", 
       writing={false}
       pending={idlePending}
       active
-      replay={vi.fn()}
       refresh={refresh}
       reviewWithAI={vi.fn()}
       llmStatus={makeLlmStatus()}
@@ -979,7 +975,7 @@ test("public disclosure failures remain visible while refresh stays available", 
     />,
   );
   expect(screen.getByRole("status").textContent).toContain("unavailable");
-  expect(screen.getByText(/no older report substituted/)).toBeTruthy();
+  expect(screen.getByText(/An older report was not used instead/)).toBeTruthy();
   fireEvent.click(screen.getByRole("button", { name: "Retry filing" }));
   expect(refresh).toHaveBeenCalledOnce();
 });
@@ -990,7 +986,6 @@ test("the evidence result hides engine placeholders and explains when Qwen is of
       writing={false}
       pending={idlePending}
       active
-      replay={vi.fn()}
       refresh={vi.fn()}
       reviewWithAI={vi.fn()}
       llmStatus={makeLlmStatus()}
@@ -1005,8 +1000,8 @@ test("the evidence result hides engine placeholders and explains when Qwen is of
       instrument={makeInstrument()}
     />,
   );
-  expect(screen.getByText(/Qwen is not connected on this app/)).toBeTruthy();
-  expect(screen.getByText(/cannot compare this token price/)).toBeTruthy();
+  expect(screen.getByText(/AI explanation is off/)).toBeTruthy();
+  expect(screen.queryByText(/cannot compare this token price/)).toBeNull();
 });
 
 test("follow-up answers show only the current evidence context with clickable citations", async () => {
@@ -1345,7 +1340,7 @@ test("evidence shows the result, findings and selected source before advanced co
   );
   expect(
     screen.getByRole("heading", {
-      name: "1 condition supported · 1 needs more evidence",
+      name: "A condition needs a closer look",
     }),
   ).toBeTruthy();
   expect(screen.getByText("Previous checks")).toBeTruthy();
@@ -1368,21 +1363,19 @@ test("evidence shows the result, findings and selected source before advanced co
     screen.getByText("Customer concentration is not in this filing"),
   ).toBeTruthy();
   expect(screen.getAllByText("Supported").length).toBeGreaterThan(0);
-  expect(screen.getAllByText("Challenged").length).toBeGreaterThan(0);
+  expect(screen.getByText("1 supported · 1 needs a closer look")).toBeTruthy();
   expect(screen.queryByText("Needs attention")).toBeNull();
   expect(screen.queryByText("1 filing checked")).toBeNull();
   expect(screen.getByRole("heading", { name: "Your conditions" })).toBeTruthy();
   fireEvent.click(
-    screen.getAllByRole("button", { name: "Quarterly company release" })[0],
+    screen.getByRole("button", { name: "View source for Gross margin" }),
   );
   expect(openDetails).toHaveBeenCalledWith(source);
-  fireEvent.click(
-    screen
-      .getByText("Reported GAAP gross margin stays at or above 75%.")
-      .closest("summary")!,
-  );
+  fireEvent.click(screen.getAllByText("Condition details")[1]);
+  expect(screen.getByText("74.6%")).toBeTruthy();
+  expect(screen.getByText("75%")).toBeTruthy();
   expect(
-    screen.getByText("Reported GAAP gross margin: 74.6%. Floor: 75%."),
+    screen.getByText("Reported margin is below the chosen floor."),
   ).toBeTruthy();
   expect(
     screen.getByRole("button", { name: "Record your decision" }),
@@ -1394,7 +1387,7 @@ test("evidence shows the result, findings and selected source before advanced co
   expect(
     screen.getByRole("heading", { name: "Ask about this filing" }),
   ).toBeTruthy();
-  expect(screen.getByText("Advanced checks")).toBeTruthy();
+  expect(screen.getByText("Advanced view")).toBeTruthy();
 });
 
 test("recording a decision keeps the result explanation visible", () => {
@@ -1533,7 +1526,6 @@ test("the numerical result stays visible while Qwen explains", () => {
       writing
       pending={{ ...idlePending, review: true }}
       active
-      replay={vi.fn()}
       refresh={vi.fn()}
       latest={makeAssessment({ evidence: [makeEvidence()] })}
       reviewWithAI={vi.fn()}
@@ -1542,7 +1534,7 @@ test("the numerical result stays visible while Qwen explains", () => {
     />,
   );
   expect(
-    screen.getByRole("heading", { name: "This filing supports your idea" }),
+    screen.getByRole("heading", { name: "Your conditions are supported" }),
   ).toBeTruthy();
   expect(screen.getByText("Writing a short explanation…")).toBeTruthy();
 });
@@ -1554,7 +1546,6 @@ test("a failed explanation leaves the evidence result and offers retry", () => {
       writing={false}
       pending={idlePending}
       active
-      replay={vi.fn()}
       refresh={vi.fn()}
       latest={makeAssessment({ evidence: [makeEvidence()] })}
       reviewWithAI={retry}

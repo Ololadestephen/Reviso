@@ -228,7 +228,6 @@ test.each([false, true])(
         writing={false}
         pending={idlePending}
         active={false}
-        replay={() => {}}
         refresh={() => {}}
         reviewWithAI={() => {}}
         reviewFailed={configured}
@@ -255,7 +254,7 @@ test.each([false, true])(
       ),
     ).toBeTruthy();
     expect(
-      screen.getByRole("heading", { name: "1 did not hold" }),
+      screen.getByRole("heading", { name: "One condition did not hold" }),
     ).toBeTruthy();
   },
 );
