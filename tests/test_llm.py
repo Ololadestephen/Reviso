@@ -81,6 +81,7 @@ class FakeLanguageModel:
         self.answer_calls = 0
         self.closed = False
         self.last_history = None
+        self.last_finding = None
         self.last_timing = {"total_ms": 1, "ttft_ms": None, "repair_attempts": 0}
 
     def extract(self, current):
@@ -90,11 +91,12 @@ class FakeLanguageModel:
         self.extract_calls += 1
         return current.model_copy(update={"rationale": current.rationale + " Structured by Qwen."})
 
-    def review(self, thesis, evidence):
+    def review(self, thesis, evidence, finding=None):
         from backend.llm_budget import note_provider_request
 
         note_provider_request()
         self.review_calls += 1
+        self.last_finding = finding
         return NarrativeReview.model_validate(valid_review(thesis, evidence[-1].id))
 
     def suggest(self, idea):
@@ -119,12 +121,13 @@ class FakeLanguageModel:
             }
         )
 
-    def answer(self, thesis, evidence, question, history=None, detail=False):
+    def answer(self, thesis, evidence, question, history=None, detail=False, finding=None):
         from backend.llm_budget import note_provider_request
 
         note_provider_request()
         self.answer_calls += 1
         self.last_history = history
+        self.last_finding = finding
         extra = " More detail from the saved filing." if detail else ""
         return ResearchAnswer(
             summary=f"The saved evidence provides bounded context for: {question}{extra}",

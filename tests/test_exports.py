@@ -4,7 +4,7 @@ from fastapi.testclient import TestClient
 from pypdf import PdfReader
 
 from backend.api import create_app
-from backend.exports import markdown_snapshot
+from backend.exports import _MARK, markdown_snapshot
 from tests.conftest import named_from_assessment
 from tests.test_llm import FakeLanguageModel
 
@@ -78,12 +78,23 @@ def test_export_is_saved_state_only_version_bounded_and_keeps_prior_assessment(t
         assert "reviso-nvda-v3.pdf" in pdf.headers["content-disposition"]
         assert pdf.content.startswith(b"%PDF")
         text = pdf_text(pdf.content)
+        lowered = text.lower()
+        assert _MARK.is_file()
         assert "Reviso research · NVIDIA" in text
-        assert "Cited follow-up answers" in text
+        assert "Research memorandum" in text
+        assert "Older example filing" in text
+        assert "revisoagent.xyz" in text
+        assert "cited follow-up answers" in lowered
         assert "Which saved fact bears on this thesis?" in text
-        assert "no trade was placed" in text.lower()
+        assert "no trade was placed" in lowered
         assert "BITGET_QWEN_API_KEY" not in text
         assert b"BITGET_QWEN_API_KEY" not in pdf.content
+        pages = PdfReader(BytesIO(pdf.content)).pages
+        assert len(pages) >= 1
+        for page in pages:
+            page_text = page.extract_text() or ""
+            assert "Reviso" in page_text
+            assert "Research memorandum" in page_text
 
         original_pdf = client.get(base + "/export?format=pdf&version=1")
         original_text = pdf_text(original_pdf.content)

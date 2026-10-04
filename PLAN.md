@@ -4,9 +4,23 @@
 
 Close Reviso for Season 2 as a **versioned, human-owned falsification notebook**, with Qwen as a clerk. Do not add copilot, scanner, portfolio, or extra-ticker work.
 
-Internal target: submission materials by **20 September Lagos**. Official window ends **21 September UTC+8**; exact hour is still unconfirmed. Do not assume 23:59.
+Working deadline: **8 October**, from the organizer's X link supplied by the user. The exact cutoff hour/time zone has not been independently confirmed. Internal target: materials and approved release ready by **7 October Lagos**. The earlier September dates below describe historical milestones, not the current deadline.
 
 The research slice is already built: NVIDIA thesis → confirmed conditions → cited assessment and controlled stresses → stored version → timestamp-gated evidence → keep / change / set aside. Public demo, six issuers, Google isolation, and exports exist. This close-out makes that object honest on the homepage, at confirm, at decision, and in the export a judge can open.
+
+## Active close-out — 4 October 2026
+
+The user owns the small user study. Do not conduct it or invent its findings. Focus local work on research quality, source/tool integration and natural-language interaction; keep the six-company boundary.
+
+- [x] Give AI review/chat the saved numerical finding, confirmed conditions, dated evidence, publisher and reported metrics, rather than expecting the model to reconstruct the comparison.
+- [x] Reject numerical review stances that reverse the saved result, claims with missing citations, and drafts using issuer-unsupported metrics. A repair retains the original research context and remains bounded to one attempt.
+- [x] Invalidate explanation reuse when the finding, provider, model or review prompt changes. A timestamp-only refresh can reuse the same finding.
+- [x] Show saved chat facts and dated citation links, clear stale-context drafts, protect in-flight results, add keyboard sending and identify the newest included filing.
+- [x] Keep a plain-language deterministic explanation when AI is absent/fails; simplify source details without removing provenance.
+- [x] Pass offline tests, formatting/static checks, build, separate Desloppify scans and a disposable browser check. See [the dated evidence report](docs/evaluations/2026-10-04-research-closeout.md).
+- [x] Run the separately authorized bounded live check: draft, mixed review and cited follow-up passed with 3/6 provider requests and no repairs. See [the live report](docs/evaluations/final-ai-2026-10-04b/REPORT.md).
+- [ ] After release approval: commit/push, integrity-check a SQLite backup, deploy while preserving accounts/secrets, and verify the signed-in live journey.
+- [ ] Final recording, X post and form submission: user approval required. User study: user-owned.
 
 ## Close-out plan — 17 September 2026
 
@@ -53,7 +67,7 @@ Delayed live path before Google; watch the next allowlisted filing (no price ale
 - [x] Run numerical/calibration checks and separate backend/frontend mechanical quality scans.
 - [ ] Complete independent Desloppify review/triage (runner usage-limit failure; no fabricated scores).
 - [x] Implement owner-scoped research, Google sign-in, CSRF sessions and Qwen spend limits locally, keeping backend contracts, providers, engines, services and SQLite separate.
-- [ ] Confirm the organizer's exact September 21 UTC+8 cutoff time.
+- [ ] Confirm the organizer's exact extended cutoff hour/time zone (working date: October 8).
 - [x] Wire provider-neutral LLM contracts to sponsored Bitget Qwen 3.8 Max first and Qwen 3.8 27B on Groq as fallback, with schema-constrained local validation, citation bounds, provenance, idempotence and manual fallback.
 - [x] Route filing follow-up answers through Groq Qwen only; route condition drafts through Groq gpt-oss-20b; keep extraction and review on Bitget-first.
 - [x] Configure the received Bitget Qwen key locally and verify one approved live extraction call.
@@ -81,6 +95,10 @@ Delayed live path before Google; watch the next allowlisted filing (no price ale
 - [ ] Publish only after user approval; record walkthrough and prepare final submission.
 
 No release-complete claim until the connected lifecycle, real AI integration, evaluation and deployment gates pass.
+
+## Latest local verification — October 4, 2026
+
+148 Python tests and 76 frontend tests pass, together with Ruff, source-code Prettier, TypeScript and the production build. The isolated browser run used a temporary SQLite database and blank AI keys: six-company picker, manual NVIDIA conditions, confirmation, mixed historical result, source dialog, chat context, deep-link reload and 390px evidence/chat layout passed. The subsequently authorized live AI check passed all three actions with 3/6 provider requests; cached repeats and restart persistence passed. The local SQLite backup passed integrity checking. Production backup is blocked by an SSH timeout and an expired AWS profile targeting a root login session; restore non-root access before deployment. No production change was made. Desloppify objective/strict: backend 92.4/22.0; web 84.9/19.1. Subjective dimensions remain unassessed and Python security coverage is reduced without Bandit; these are not hackathon grades or accuracy measures.
 
 ## Latest verification — September 19, 2026
 

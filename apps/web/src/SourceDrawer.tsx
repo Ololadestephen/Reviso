@@ -6,7 +6,7 @@ import type { Evidence } from "./api/schemas";
  * is correct; calling it locally curated would assert something never recorded.
  */
 function retrievalLabel(origin: Evidence["origin"]) {
-  if (origin === "PUBLIC_RETRIEVAL") return "Retrieved from NVIDIA";
+  if (origin === "PUBLIC_RETRIEVAL") return "Retrieved from primary source";
   if (origin === "CURATED_REPLAY") return "Locally curated";
   return "Retrieved · origin not recorded";
 }
@@ -41,17 +41,21 @@ export default function SourceDrawer({
           </a>
           <dl>
             {[
-              ["Published · date precision", evidence.published_at],
-              ["Evidence available from", evidence.available_at],
-              ["Period ended", evidence.observed_at],
+              [
+                "Published",
+                new Date(evidence.published_at).toLocaleDateString(undefined, {
+                  timeZone: "UTC",
+                }),
+              ],
+              [
+                "Period ended",
+                new Date(evidence.observed_at).toLocaleDateString(undefined, {
+                  timeZone: "UTC",
+                }),
+              ],
               [retrievalLabel(evidence.origin), evidence.retrieved_at],
               ["Scope", evidence.scope],
               ["Limitations", evidence.limitations],
-              ["Duplicate family", evidence.duplicate_family],
-              ["Excerpt SHA-256", evidence.content_hash],
-              ...(evidence.document_hash
-                ? [["Document SHA-256", evidence.document_hash]]
-                : []),
             ].map(([label, value]) => (
               <div key={label}>
                 <dt>{label}</dt>
@@ -59,6 +63,28 @@ export default function SourceDrawer({
               </div>
             ))}
           </dl>
+          <details className="source-technical">
+            <summary>Retrieval and verification details</summary>
+            <dl>
+              {[
+                ["Evidence available from", evidence.available_at],
+                ["Published · recorded date", evidence.published_at],
+                ["Duplicate family", evidence.duplicate_family],
+                ["Excerpt SHA-256", evidence.content_hash],
+                ...(evidence.document_hash
+                  ? [["Document SHA-256", evidence.document_hash]]
+                  : []),
+                ...(evidence.parser_version
+                  ? [["Parser", evidence.parser_version]]
+                  : []),
+              ].map(([label, value]) => (
+                <div key={label}>
+                  <dt>{label}</dt>
+                  <dd>{value}</dd>
+                </div>
+              ))}
+            </dl>
+          </details>
         </>
       )}
     </dialog>

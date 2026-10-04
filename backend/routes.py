@@ -55,6 +55,7 @@ from backend.market import market_execution
 from backend.providers import BitgetProvider
 from backend.replay import CASES, CUTOFFS, available_evidence, evidence_by_id
 from backend.research_chat import append_exchange, conversation_for
+from backend.research_context import ResearchContext
 from backend.services import (
     assessment,
     decision_explanation,
@@ -389,7 +390,15 @@ def ai_review(thesis_id: str, repo: Repo, llm: LLM, owner: Owner, limits: Limits
         raise HTTPException(409, "Load a disclosure replay or refresh public evidence first")
     thesis = ThesisInput.model_validate(record["thesis"])
     evidence = [Evidence.model_validate(item) for item in previous["evidence"]]
-    context_hash = narrative_context_hash(thesis, evidence)
+    finding = ResearchContext.from_assessment(previous)
+    context_hash = digest(
+        {
+            "research": narrative_context_hash(thesis, evidence, finding),
+            "provider": llm.descriptor.provider,
+            "model": llm.descriptor.model,
+            "prompt_version": REVIEW_PROMPT_VERSION,
+        }
+    )
     if previous.get("narrative_review") and previous.get("narrative_context_hash") == context_hash:
         conversation_for(repo, owner.user_id, thesis_id, previous, record)
         return previous
@@ -420,7 +429,13 @@ def ai_review(thesis_id: str, repo: Repo, llm: LLM, owner: Owner, limits: Limits
         saved = repo.assess(owner.user_id, thesis_id, record["version"], result)
         conversation_for(repo, owner.user_id, thesis_id, saved, record)
         return saved
-    review = paid(repo, owner.user_id, input_hash, limits, lambda: llm.review(thesis, evidence))
+    review = paid(
+        repo,
+        owner.user_id,
+        input_hash,
+        limits,
+        lambda: llm.review(thesis, evidence, finding=finding),
+    )
     metadata = provenance(llm.descriptor, REVIEW_PROMPT_VERSION, getattr(llm, "last_timing", None))
     result = attach_review(
         previous, review.model_dump(mode="json"), metadata, context_hash, input_hash
@@ -504,7 +519,10 @@ def answer_research_question(
         input_hash,
         limits,
         lambda: chat_llm.answer(
-            ThesisInput.model_validate(selected_record["thesis"]), evidence, question
+            ThesisInput.model_validate(selected_record["thesis"]),
+            evidence,
+            question,
+            finding=ResearchContext.from_assessment(selected),
         ),
     )
     saved = SavedResearchAnswer(

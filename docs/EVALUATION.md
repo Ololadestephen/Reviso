@@ -1,5 +1,11 @@
 # Evaluation
 
+## Latest local verification — 2026-10-04
+
+The [research close-out report](evaluations/2026-10-04-research-closeout.md) records source/AI contract improvements, the isolated browser check and all quality scores. Final verification passed 148 backend and 76 frontend tests. The subsequently approved [three-action live check](evaluations/final-ai-2026-10-04b/REPORT.md) passed draft v3, review v4 and follow-up v3 with 3/6 provider requests and no repairs, including cached repeats and SQLite restart persistence. This is a constructed historical NVIDIA smoke test, not an independent benchmark. The small user study is reserved for the user; no completion rate, satisfaction figure or general research-accuracy score is claimed.
+
+## Evaluation boundaries
+
 Separate numerical software correctness from research quality. Numerical tests must cover independent expected proceeds and P&L, exact breach boundaries, monotonicity, missing data, partial fills, timestamp mismatches, instrument/currency mismatches and deterministic results.
 
 Initial corpus is developer-inspected calibration material, not an untouched holdout. NVIDIA FY25 Q2 GAAP gross margin (75.1%) and FY25 Q3 (74.6%) can illustrate a confirmed 75% floor being breached. Revenue growth can remain supported despite the margin decline: this is the negative control. Scenarios for position price and book liquidity are synthetic and labeled separately.

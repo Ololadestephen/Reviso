@@ -165,7 +165,7 @@ export default function ReplayPanel({
           )}
         </div>
       )}
-      {latest && !review && !hasEvidence && <p>{resultLead(latest)}</p>}
+      {latest && !review && <p>{resultLead(latest)}</p>}
       {hasEvidence && !review && pending.review && (
         <p role="status">Writing a short explanation…</p>
       )}

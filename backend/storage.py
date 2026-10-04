@@ -80,7 +80,7 @@ class Repository:
         return record
 
     def summaries(self, owner_id: str) -> list[dict]:
-        """One row per thesis owned by this user: newest version plus selected assessment."""
+        """Newest-created research first, with each thesis's latest version and assessment."""
 
         with self.connect() as connection:
             rows = connection.execute(
@@ -99,7 +99,7 @@ class Repository:
                 "LEFT JOIN assessments AS selected "
                 "  ON selected.owner_id=selection.owner_id "
                 " AND selected.input_hash = selection.input_hash "
-                "ORDER BY latest.rowid DESC",
+                "ORDER BY julianday(first.created_at) DESC, latest.rowid DESC",
                 (owner_id, owner_id, owner_id, owner_id),
             ).fetchall()
         return [self._summary(row) for row in rows]

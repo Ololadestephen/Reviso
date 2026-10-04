@@ -12,7 +12,7 @@ from tests.test_llm import FakeLanguageModel, valid_review
 
 
 class RepairingLanguageModel(FakeLanguageModel):
-    def review(self, thesis, evidence):
+    def review(self, thesis, evidence, finding=None):
         note_provider_request()
         note_provider_request()
         return NarrativeReview.model_validate(valid_review(thesis, evidence[-1].id))

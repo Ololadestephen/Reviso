@@ -1,3 +1,5 @@
+from datetime import UTC, datetime
+
 import pytest
 
 from backend.identity import LOCAL_USER_ID, OPERATOR_USER_ID
@@ -45,3 +47,26 @@ def test_summaries_report_the_newest_version_and_original_creation(tmp_path, the
 
 def test_summaries_are_empty_before_any_thesis_exists(tmp_path):
     assert Repository(str(tmp_path / "empty.sqlite3")).summaries(LOCAL_USER_ID) == []
+
+
+@pytest.mark.parametrize("creation_days, newest_index", [((1, 2), 1), ((2, 1), 0)])
+def test_newest_created_research_stays_first_after_an_older_study_is_updated(
+    tmp_path, thesis, monkeypatch, creation_days, newest_index
+):
+    timestamps = iter(datetime(2026, 10, day, tzinfo=UTC) for day in (*creation_days, 3))
+    monkeypatch.setattr("backend.storage.utc_now", lambda: next(timestamps))
+    repo = Repository(str(tmp_path / "newest-first.sqlite3"))
+    records = [
+        repo.create(LOCAL_USER_ID, thesis.model_dump(mode="json")),
+        repo.create(LOCAL_USER_ID, thesis.model_dump(mode="json")),
+    ]
+    older = records[1 - newest_index]
+    repo.evolve(LOCAL_USER_ID, older["id"], 1, {"confirmed": True}, {"action": "confirm"})
+
+    expected = [records[newest_index]["id"], older["id"]]
+    summaries = repo.summaries(LOCAL_USER_ID)
+    assert [item["id"] for item in summaries] == expected
+    assert summaries[1]["version"] == 2
+    assert summaries[1]["created_at"] == older["created_at"]
+    reopened = Repository(repo.path)
+    assert [item["id"] for item in reopened.summaries(LOCAL_USER_ID)] == expected

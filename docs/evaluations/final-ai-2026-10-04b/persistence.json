@@ -1,0 +1,546 @@
+{
+  "history": {
+    "versions": [
+      {
+        "id": "6bde8c69-7033-4fc6-bfc3-6a52d931401b",
+        "version": 1,
+        "confirmed": false,
+        "retired": false,
+        "parent_version": null,
+        "created_at": "2026-10-04T09:31:23.493709+00:00",
+        "thesis": {
+          "instrument_id": "RNVDAUSDT",
+          "direction": "long",
+          "proposed_amount": "10000",
+          "entry_price": "100",
+          "max_loss": "1000",
+          "max_slippage_bps": "100",
+          "holding_days": 90,
+          "rationale": "NVIDIA can maintain margins and revenue growth.",
+          "assumptions": [
+            {
+              "id": "margin",
+              "claim": "GAAP margin remains at least 75%",
+              "category": "fundamental",
+              "essential": true,
+              "metric": "gaap_margin_pct",
+              "minimum": "75",
+              "invalidation_condition": "Invalidate when reported GAAP gross margin is below 75%."
+            },
+            {
+              "id": "growth",
+              "claim": "Revenue growth remains at least 80%",
+              "category": "fundamental",
+              "essential": true,
+              "metric": "revenue_growth_yoy_pct",
+              "minimum": "80",
+              "invalidation_condition": "Invalidate when reported year-over-year revenue growth is below 80%."
+            }
+          ]
+        }
+      },
+      {
+        "id": "6bde8c69-7033-4fc6-bfc3-6a52d931401b",
+        "version": 2,
+        "confirmed": true,
+        "retired": false,
+        "parent_version": 1,
+        "created_at": "2026-10-04T09:31:23.496913+00:00",
+        "thesis": {
+          "instrument_id": "RNVDAUSDT",
+          "direction": "long",
+          "proposed_amount": "10000",
+          "entry_price": "100",
+          "max_loss": "1000",
+          "max_slippage_bps": "100",
+          "holding_days": 90,
+          "rationale": "NVIDIA can maintain margins and revenue growth.",
+          "assumptions": [
+            {
+              "id": "margin",
+              "claim": "GAAP margin remains at least 75%",
+              "category": "fundamental",
+              "essential": true,
+              "metric": "gaap_margin_pct",
+              "minimum": "75",
+              "invalidation_condition": "Invalidate when reported GAAP gross margin is below 75%."
+            },
+            {
+              "id": "growth",
+              "claim": "Revenue growth remains at least 80%",
+              "category": "fundamental",
+              "essential": true,
+              "metric": "revenue_growth_yoy_pct",
+              "minimum": "80",
+              "invalidation_condition": "Invalidate when reported year-over-year revenue growth is below 80%."
+            }
+          ]
+        }
+      }
+    ],
+    "assessments": [
+      {
+        "state": "INVALIDATED",
+        "assumptions": [
+          {
+            "assumption_id": "margin",
+            "state": "INVALIDATED",
+            "explanation": "Reported 74.6%; confirmed minimum 75%. This satisfies the declared invalidation condition.",
+            "evidence_ids": [
+              "nvda-fy25-Third"
+            ],
+            "essential": true
+          },
+          {
+            "assumption_id": "growth",
+            "state": "SUPPORTED",
+            "explanation": "Reported 94%; confirmed minimum 80%. The reported metric meets the condition for this period; future performance is unknown.",
+            "evidence_ids": [
+              "nvda-fy25-Third"
+            ],
+            "essential": true
+          }
+        ],
+        "numerical": {
+          "mode": "CONTROLLED_SCENARIO",
+          "quantity": "100",
+          "price_pnl": "-1000.0",
+          "loss_breach": false,
+          "execution": null,
+          "premium": null,
+          "premium_reason": "No synchronized USD/USDT-adjusted share reference and verified unit ratio.",
+          "breaking_move_pct": "-10.1",
+          "search": "Smallest found within the tested scenario set: price decline 0\u2013100%, 0.1 percentage-point steps; strict loss > limit. Spread/depth fixed; no mixed-shock optimum claimed.",
+          "costs": "Exit fee included at declared bps; entry fees, taxes and FX omitted. Spread is an additional symmetric shock around midpoint. Depth is not a fill guarantee."
+        },
+        "missing": [
+          "Compatible current share reference and unit ratio",
+          "Narrative AI review has not been added to this assessment",
+          "Token terms and current redemption availability"
+        ],
+        "next_question": "Does the latest primary disclosure still meet your essential metric floor?",
+        "thesis_id": "6bde8c69-7033-4fc6-bfc3-6a52d931401b",
+        "thesis_version": 2,
+        "mode": "HISTORICAL_REPLAY",
+        "evidence_cutoff": "2024-11-21T00:00:00+00:00",
+        "evaluated_at": "2026-10-04T09:31:23.499825+00:00",
+        "evidence": [
+          {
+            "id": "nvda-fy25-Second",
+            "instrument_id": "RNVDAUSDT",
+            "source_url": "https://investor.nvidia.com/news/press-release-details/2024/NVIDIA-Announces-Financial-Results-for-Second-Quarter-Fiscal-2025/default.aspx",
+            "publisher": "NVIDIA investor relations",
+            "title": "NVIDIA FY2025 Second quarter results",
+            "excerpt": "Gross margin 75.1%; revenue up 122% from a year ago.",
+            "published_at": "2024-08-28T00:00:00Z",
+            "available_at": "2024-08-29T00:00:00Z",
+            "observed_at": "2024-07-28T00:00:00Z",
+            "retrieved_at": "2026-09-10T12:00:00Z",
+            "content_hash": "8fc78c9bde0c584c0c92de01c4a2daef6b1dbeadf3e02f67e3a8eb266404b3eb",
+            "duplicate_family": "NVIDIA-FY25-Second",
+            "scope": "NVIDIA company; reported quarter only",
+            "limitations": "Short excerpt, not full document. Day-level publication precision. Token price and liquidity not represented. Retrieval time records local curation date, not original availability.",
+            "metrics": {
+              "gaap_margin_pct": "75.1",
+              "revenue_growth_yoy_pct": "122"
+            },
+            "origin": "CURATED_REPLAY",
+            "document_hash": null,
+            "parser_version": null
+          },
+          {
+            "id": "nvda-fy25-Third",
+            "instrument_id": "RNVDAUSDT",
+            "source_url": "https://investor.nvidia.com/news/press-release-details/2024/NVIDIA-Announces-Financial-Results-for-Third-Quarter-Fiscal-2025/default.aspx",
+            "publisher": "NVIDIA investor relations",
+            "title": "NVIDIA FY2025 Third quarter results",
+            "excerpt": "Gross margin 74.6%; revenue up 94% from a year ago.",
+            "published_at": "2024-11-20T00:00:00Z",
+            "available_at": "2024-11-21T00:00:00Z",
+            "observed_at": "2024-10-27T00:00:00Z",
+            "retrieved_at": "2026-09-10T12:00:00Z",
+            "content_hash": "0a9a4518c2a11dd5f27b42cf955aa45b1bf632bf7e48dd46937d69215ced64d1",
+            "duplicate_family": "NVIDIA-FY25-Third",
+            "scope": "NVIDIA company; reported quarter only",
+            "limitations": "Short excerpt, not full document. Day-level publication precision. Token price and liquidity not represented. Retrieval time records local curation date, not original availability.",
+            "metrics": {
+              "gaap_margin_pct": "74.6",
+              "revenue_growth_yoy_pct": "94"
+            },
+            "origin": "CURATED_REPLAY",
+            "document_hash": null,
+            "parser_version": null
+          }
+        ],
+        "versions": {
+          "model": "none-manual-confirmation",
+          "prompt": "none",
+          "engine": "decimal-v1",
+          "policy": "confirmed-metric-floor-v1"
+        },
+        "scenario": {
+          "price_move_pct": "-10",
+          "spread_bps": "20",
+          "depth_multiplier": "1",
+          "fee_bps": "0",
+          "bids": null
+        },
+        "input_hash": "5a8c872e0eb8a11792f158fc8fbe38945a8d620e53958c7afa32e66dfeb7b7cd",
+        "result_hash": "8180e615929e7915310b718e326f5d569ee246fc8cf0c38315319da1797eff78"
+      },
+      {
+        "state": "INVALIDATED",
+        "assumptions": [
+          {
+            "assumption_id": "margin",
+            "state": "INVALIDATED",
+            "explanation": "Reported 74.6%; confirmed minimum 75%. This satisfies the declared invalidation condition.",
+            "evidence_ids": [
+              "nvda-fy25-Third"
+            ],
+            "essential": true
+          },
+          {
+            "assumption_id": "growth",
+            "state": "SUPPORTED",
+            "explanation": "Reported 94%; confirmed minimum 80%. The reported metric meets the condition for this period; future performance is unknown.",
+            "evidence_ids": [
+              "nvda-fy25-Third"
+            ],
+            "essential": true
+          }
+        ],
+        "numerical": {
+          "mode": "CONTROLLED_SCENARIO",
+          "quantity": "100",
+          "price_pnl": "-1000.0",
+          "loss_breach": false,
+          "execution": null,
+          "premium": null,
+          "premium_reason": "No synchronized USD/USDT-adjusted share reference and verified unit ratio.",
+          "breaking_move_pct": "-10.1",
+          "search": "Smallest found within the tested scenario set: price decline 0\u2013100%, 0.1 percentage-point steps; strict loss > limit. Spread/depth fixed; no mixed-shock optimum claimed.",
+          "costs": "Exit fee included at declared bps; entry fees, taxes and FX omitted. Spread is an additional symmetric shock around midpoint. Depth is not a fill guarantee."
+        },
+        "missing": [
+          "Compatible current share reference and unit ratio",
+          "Token terms and current redemption availability"
+        ],
+        "next_question": "What did later NVIDIA reports show for margin and growth?",
+        "thesis_id": "6bde8c69-7033-4fc6-bfc3-6a52d931401b",
+        "thesis_version": 2,
+        "mode": "HISTORICAL_REPLAY",
+        "evidence_cutoff": "2024-11-21T00:00:00+00:00",
+        "evaluated_at": "2026-10-04T09:31:59.906778+00:00",
+        "evidence": [
+          {
+            "id": "nvda-fy25-Second",
+            "instrument_id": "RNVDAUSDT",
+            "source_url": "https://investor.nvidia.com/news/press-release-details/2024/NVIDIA-Announces-Financial-Results-for-Second-Quarter-Fiscal-2025/default.aspx",
+            "publisher": "NVIDIA investor relations",
+            "title": "NVIDIA FY2025 Second quarter results",
+            "excerpt": "Gross margin 75.1%; revenue up 122% from a year ago.",
+            "published_at": "2024-08-28T00:00:00Z",
+            "available_at": "2024-08-29T00:00:00Z",
+            "observed_at": "2024-07-28T00:00:00Z",
+            "retrieved_at": "2026-09-10T12:00:00Z",
+            "content_hash": "8fc78c9bde0c584c0c92de01c4a2daef6b1dbeadf3e02f67e3a8eb266404b3eb",
+            "duplicate_family": "NVIDIA-FY25-Second",
+            "scope": "NVIDIA company; reported quarter only",
+            "limitations": "Short excerpt, not full document. Day-level publication precision. Token price and liquidity not represented. Retrieval time records local curation date, not original availability.",
+            "metrics": {
+              "gaap_margin_pct": "75.1",
+              "revenue_growth_yoy_pct": "122"
+            },
+            "origin": "CURATED_REPLAY",
+            "document_hash": null,
+            "parser_version": null
+          },
+          {
+            "id": "nvda-fy25-Third",
+            "instrument_id": "RNVDAUSDT",
+            "source_url": "https://investor.nvidia.com/news/press-release-details/2024/NVIDIA-Announces-Financial-Results-for-Third-Quarter-Fiscal-2025/default.aspx",
+            "publisher": "NVIDIA investor relations",
+            "title": "NVIDIA FY2025 Third quarter results",
+            "excerpt": "Gross margin 74.6%; revenue up 94% from a year ago.",
+            "published_at": "2024-11-20T00:00:00Z",
+            "available_at": "2024-11-21T00:00:00Z",
+            "observed_at": "2024-10-27T00:00:00Z",
+            "retrieved_at": "2026-09-10T12:00:00Z",
+            "content_hash": "0a9a4518c2a11dd5f27b42cf955aa45b1bf632bf7e48dd46937d69215ced64d1",
+            "duplicate_family": "NVIDIA-FY25-Third",
+            "scope": "NVIDIA company; reported quarter only",
+            "limitations": "Short excerpt, not full document. Day-level publication precision. Token price and liquidity not represented. Retrieval time records local curation date, not original availability.",
+            "metrics": {
+              "gaap_margin_pct": "74.6",
+              "revenue_growth_yoy_pct": "94"
+            },
+            "origin": "CURATED_REPLAY",
+            "document_hash": null,
+            "parser_version": null
+          }
+        ],
+        "versions": {
+          "model": "none-manual-confirmation",
+          "prompt": "none",
+          "engine": "decimal-v1",
+          "policy": "confirmed-metric-floor-v1"
+        },
+        "scenario": {
+          "price_move_pct": "-10",
+          "spread_bps": "20",
+          "depth_multiplier": "1",
+          "fee_bps": "0",
+          "bids": null
+        },
+        "input_hash": "6306e4c4bd17013446fcaf112f37ac96510ab834ebdc8a7ada5ac3fe14e1f3cf",
+        "result_hash": "0ffd44a9a3b794e4737a65cfce50d35c868fe78e66036b6be704e814cddf0bb9",
+        "narrative_review": {
+          "summary": "Saved finding invalidates overall: FY2025 Q3 margin 74.6% is below 75%, needing attention; growth 94% meets 80%. Historical report; future/current status unknown.",
+          "next_question": "What did later NVIDIA reports show for margin and growth?",
+          "items": [
+            {
+              "assumption_id": "margin",
+              "stance": "CONTRADICTS",
+              "explanation": "Q3 GAAP margin 74.6% missed 75%; saved finding invalidates margin.",
+              "evidence_ids": [
+                "nvda-fy25-Third"
+              ]
+            },
+            {
+              "assumption_id": "growth",
+              "stance": "SUPPORTS",
+              "explanation": "Q3 revenue growth 94% met 80%; saved finding supports growth.",
+              "evidence_ids": [
+                "nvda-fy25-Third"
+              ]
+            }
+          ]
+        },
+        "narrative_context_hash": "e95f0896ea41f82d011075508c7d40ca5d151c9fd28fb9eff4fe94623c614d0b",
+        "narrative_source_input_hash": "5a8c872e0eb8a11792f158fc8fbe38945a8d620e53958c7afa32e66dfeb7b7cd",
+        "llm_provenance": {
+          "provider": "bitget-qwen",
+          "model": "qwen3.8-max",
+          "prompt_version": "evidence-review-v4",
+          "generated_at": "2026-10-04T09:31:59.906511+00:00",
+          "total_ms": 36396,
+          "ttft_ms": null,
+          "repair_attempts": 0
+        }
+      }
+    ],
+    "events": [
+      {
+        "action": "confirm",
+        "explanation": "User confirmed claims and invalidation conditions.",
+        "version": 2,
+        "at": "2026-10-04T09:31:23.496913+00:00"
+      }
+    ],
+    "selected_assessment": {
+      "state": "INVALIDATED",
+      "assumptions": [
+        {
+          "assumption_id": "margin",
+          "state": "INVALIDATED",
+          "explanation": "Reported 74.6%; confirmed minimum 75%. This satisfies the declared invalidation condition.",
+          "evidence_ids": [
+            "nvda-fy25-Third"
+          ],
+          "essential": true
+        },
+        {
+          "assumption_id": "growth",
+          "state": "SUPPORTED",
+          "explanation": "Reported 94%; confirmed minimum 80%. The reported metric meets the condition for this period; future performance is unknown.",
+          "evidence_ids": [
+            "nvda-fy25-Third"
+          ],
+          "essential": true
+        }
+      ],
+      "numerical": {
+        "mode": "CONTROLLED_SCENARIO",
+        "quantity": "100",
+        "price_pnl": "-1000.0",
+        "loss_breach": false,
+        "execution": null,
+        "premium": null,
+        "premium_reason": "No synchronized USD/USDT-adjusted share reference and verified unit ratio.",
+        "breaking_move_pct": "-10.1",
+        "search": "Smallest found within the tested scenario set: price decline 0\u2013100%, 0.1 percentage-point steps; strict loss > limit. Spread/depth fixed; no mixed-shock optimum claimed.",
+        "costs": "Exit fee included at declared bps; entry fees, taxes and FX omitted. Spread is an additional symmetric shock around midpoint. Depth is not a fill guarantee."
+      },
+      "missing": [
+        "Compatible current share reference and unit ratio",
+        "Token terms and current redemption availability"
+      ],
+      "next_question": "What did later NVIDIA reports show for margin and growth?",
+      "thesis_id": "6bde8c69-7033-4fc6-bfc3-6a52d931401b",
+      "thesis_version": 2,
+      "mode": "HISTORICAL_REPLAY",
+      "evidence_cutoff": "2024-11-21T00:00:00+00:00",
+      "evaluated_at": "2026-10-04T09:31:59.906778+00:00",
+      "evidence": [
+        {
+          "id": "nvda-fy25-Second",
+          "instrument_id": "RNVDAUSDT",
+          "source_url": "https://investor.nvidia.com/news/press-release-details/2024/NVIDIA-Announces-Financial-Results-for-Second-Quarter-Fiscal-2025/default.aspx",
+          "publisher": "NVIDIA investor relations",
+          "title": "NVIDIA FY2025 Second quarter results",
+          "excerpt": "Gross margin 75.1%; revenue up 122% from a year ago.",
+          "published_at": "2024-08-28T00:00:00Z",
+          "available_at": "2024-08-29T00:00:00Z",
+          "observed_at": "2024-07-28T00:00:00Z",
+          "retrieved_at": "2026-09-10T12:00:00Z",
+          "content_hash": "8fc78c9bde0c584c0c92de01c4a2daef6b1dbeadf3e02f67e3a8eb266404b3eb",
+          "duplicate_family": "NVIDIA-FY25-Second",
+          "scope": "NVIDIA company; reported quarter only",
+          "limitations": "Short excerpt, not full document. Day-level publication precision. Token price and liquidity not represented. Retrieval time records local curation date, not original availability.",
+          "metrics": {
+            "gaap_margin_pct": "75.1",
+            "revenue_growth_yoy_pct": "122"
+          },
+          "origin": "CURATED_REPLAY",
+          "document_hash": null,
+          "parser_version": null
+        },
+        {
+          "id": "nvda-fy25-Third",
+          "instrument_id": "RNVDAUSDT",
+          "source_url": "https://investor.nvidia.com/news/press-release-details/2024/NVIDIA-Announces-Financial-Results-for-Third-Quarter-Fiscal-2025/default.aspx",
+          "publisher": "NVIDIA investor relations",
+          "title": "NVIDIA FY2025 Third quarter results",
+          "excerpt": "Gross margin 74.6%; revenue up 94% from a year ago.",
+          "published_at": "2024-11-20T00:00:00Z",
+          "available_at": "2024-11-21T00:00:00Z",
+          "observed_at": "2024-10-27T00:00:00Z",
+          "retrieved_at": "2026-09-10T12:00:00Z",
+          "content_hash": "0a9a4518c2a11dd5f27b42cf955aa45b1bf632bf7e48dd46937d69215ced64d1",
+          "duplicate_family": "NVIDIA-FY25-Third",
+          "scope": "NVIDIA company; reported quarter only",
+          "limitations": "Short excerpt, not full document. Day-level publication precision. Token price and liquidity not represented. Retrieval time records local curation date, not original availability.",
+          "metrics": {
+            "gaap_margin_pct": "74.6",
+            "revenue_growth_yoy_pct": "94"
+          },
+          "origin": "CURATED_REPLAY",
+          "document_hash": null,
+          "parser_version": null
+        }
+      ],
+      "versions": {
+        "model": "none-manual-confirmation",
+        "prompt": "none",
+        "engine": "decimal-v1",
+        "policy": "confirmed-metric-floor-v1"
+      },
+      "scenario": {
+        "price_move_pct": "-10",
+        "spread_bps": "20",
+        "depth_multiplier": "1",
+        "fee_bps": "0",
+        "bids": null
+      },
+      "input_hash": "6306e4c4bd17013446fcaf112f37ac96510ab834ebdc8a7ada5ac3fe14e1f3cf",
+      "result_hash": "0ffd44a9a3b794e4737a65cfce50d35c868fe78e66036b6be704e814cddf0bb9",
+      "narrative_review": {
+        "summary": "Saved finding invalidates overall: FY2025 Q3 margin 74.6% is below 75%, needing attention; growth 94% meets 80%. Historical report; future/current status unknown.",
+        "next_question": "What did later NVIDIA reports show for margin and growth?",
+        "items": [
+          {
+            "assumption_id": "margin",
+            "stance": "CONTRADICTS",
+            "explanation": "Q3 GAAP margin 74.6% missed 75%; saved finding invalidates margin.",
+            "evidence_ids": [
+              "nvda-fy25-Third"
+            ]
+          },
+          {
+            "assumption_id": "growth",
+            "stance": "SUPPORTS",
+            "explanation": "Q3 revenue growth 94% met 80%; saved finding supports growth.",
+            "evidence_ids": [
+              "nvda-fy25-Third"
+            ]
+          }
+        ]
+      },
+      "narrative_context_hash": "e95f0896ea41f82d011075508c7d40ca5d151c9fd28fb9eff4fe94623c614d0b",
+      "narrative_source_input_hash": "5a8c872e0eb8a11792f158fc8fbe38945a8d620e53958c7afa32e66dfeb7b7cd",
+      "llm_provenance": {
+        "provider": "bitget-qwen",
+        "model": "qwen3.8-max",
+        "prompt_version": "evidence-review-v4",
+        "generated_at": "2026-10-04T09:31:59.906511+00:00",
+        "total_ms": 36396,
+        "ttft_ms": null,
+        "repair_attempts": 0
+      }
+    }
+  },
+  "conversation": {
+    "thesis_id": "6bde8c69-7033-4fc6-bfc3-6a52d931401b",
+    "thesis_version": 2,
+    "assessment_input_hash": "6306e4c4bd17013446fcaf112f37ac96510ab834ebdc8a7ada5ac3fe14e1f3cf",
+    "context_hash": "e9d6009f3c6906b728ad3455c5aee48310218d943988d9a018af5412845943d8",
+    "messages": [
+      {
+        "id": "707f51c9-0cbc-454c-87fd-d0d2b5ca9797",
+        "role": "assistant",
+        "kind": "explanation",
+        "text": "Saved finding invalidates overall: FY2025 Q3 margin 74.6% is below 75%, needing attention; growth 94% meets 80%. Historical report; future/current status unknown.",
+        "question": null,
+        "answer": {
+          "summary": "Saved finding invalidates overall: FY2025 Q3 margin 74.6% is below 75%, needing attention; growth 94% meets 80%. Historical report; future/current status unknown.",
+          "facts": [
+            "margin: CONTRADICTS",
+            "growth: SUPPORTS"
+          ],
+          "uncertainty": "What did later NVIDIA reports show for margin and growth?",
+          "evidence_ids": [
+            "nvda-fy25-Third"
+          ]
+        },
+        "evidence_ids": [
+          "nvda-fy25-Third"
+        ],
+        "created_at": "2026-10-04T09:31:59.911684Z"
+      },
+      {
+        "id": "7e6ce986-db98-4a65-a356-ea6fb2799831",
+        "role": "user",
+        "kind": "followup",
+        "text": "Why did one condition fail while the other held? What should I check next?",
+        "question": "Why did one condition fail while the other held? What should I check next?",
+        "answer": null,
+        "evidence_ids": [],
+        "created_at": "2026-10-04T09:32:00.668184Z"
+      },
+      {
+        "id": "70a4b224-f3a9-4bd7-a14a-041ecf7c812d",
+        "role": "assistant",
+        "kind": "followup",
+        "text": "The margin condition failed because the reported 74.6% fell below the 75% threshold, while growth met its target. Future performance is unknown. Check the next quarterly report to see if margins recover.",
+        "question": "Why did one condition fail while the other held? What should I check next?",
+        "answer": {
+          "summary": "The margin condition failed because the reported 74.6% fell below the 75% threshold, while growth met its target. Future performance is unknown. Check the next quarterly report to see if margins recover.",
+          "facts": [
+            "GAAP margin was 74.6%, below the 75% minimum.",
+            "Revenue growth was 94%, above the 80% minimum.",
+            "The margin condition failed while the growth condition held."
+          ],
+          "uncertainty": "Future margin and growth trends are unknown.",
+          "evidence_ids": [
+            "nvda-fy25-Third"
+          ]
+        },
+        "evidence_ids": [
+          "nvda-fy25-Third"
+        ],
+        "created_at": "2026-10-04T09:32:00.668184Z"
+      }
+    ]
+  }
+}

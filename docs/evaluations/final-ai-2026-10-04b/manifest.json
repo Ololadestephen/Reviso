@@ -1,0 +1,54 @@
+{
+  "corpus": {
+    "instrument_id": "RNVDAUSDT",
+    "request_cap": 6,
+    "per_action_cap": 2,
+    "actions": [
+      "draft",
+      "mixed_review",
+      "cited_followup"
+    ],
+    "draft_idea": "NVIDIA can maintain GAAP gross margin of at least 75% and year-over-year revenue growth of at least 80%.",
+    "confirmed_thesis": {
+      "rationale": "NVIDIA can maintain margins and revenue growth.",
+      "assumptions": [
+        {
+          "id": "margin",
+          "claim": "GAAP margin remains at least 75%",
+          "metric": "gaap_margin_pct",
+          "minimum": "75",
+          "invalidation_condition": "Invalidate when reported GAAP gross margin is below 75%."
+        },
+        {
+          "id": "growth",
+          "claim": "Revenue growth remains at least 80%",
+          "metric": "revenue_growth_yoy_pct",
+          "minimum": "80",
+          "invalidation_condition": "Invalidate when reported year-over-year revenue growth is below 80%."
+        }
+      ]
+    },
+    "historical_replay_step": 1,
+    "question": "Why did one condition fail while the other held? What should I check next?",
+    "checks": [
+      "issuer_supported_draft",
+      "mixed_saved_stances_and_citations",
+      "cited_facts_and_uncertainty",
+      "cache_without_paid_calls",
+      "restart_persistence"
+    ]
+  },
+  "source_sha256": {
+    "backend/api.py": "d6fa9780db5402208705759ce9bd3aca8520daa922978383b04cbfa1f1a0a38f",
+    "backend/contracts.py": "f86287a4fa127ed69cdc2c96d41fb7ec8706d9afe14b508638511f3caa472a9f",
+    "backend/instruments.py": "05fa6e3b979ad405aa66de6a27cb62880381d991b1e73045bfbd7dce4e12134b",
+    "backend/llm.py": "2fb09f47d5bfa0ee93bd3785049669ddb580d8a7bb4b03c3d18390e37e3ff044",
+    "backend/research_context.py": "c7006de58050b07b2aa9a717af53928a480cc4661e196d9cb79cfa8aefe04ad7",
+    "backend/research_chat.py": "11811b98711b4da36cfb1afd499a31cbe8e58812a68cdf0d2a41f42c01e18db0",
+    "backend/routes.py": "64f3e11fa8fad5616c8c024e96bd3f43fdcc87c057aa3ee24e50073881b5ddb9",
+    "backend/services.py": "77511671bdf0ac704366a6e4771df9dbbd41edc84049ff768a9ed1083ece5b5d",
+    "backend/storage.py": "7340c282ac0bc763be312e4e9db52f86034083dc3031602f85b56719ad06e63d",
+    "backend/replay.py": "d968c3135de6d39d5c21a7392c1a7bdb59c3ecc9b6ef32a8da9657b6d7e56184",
+    "scripts/final_live_validation.py": "13c90404f6e1e38847ebbf684fc7ffe2827599227b846f8009e52d80f4679dd7"
+  }
+}

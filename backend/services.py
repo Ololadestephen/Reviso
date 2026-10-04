@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 
 from backend.contracts import AssumptionResult, Evidence, State, StressInput, ThesisInput, utc_now
 from backend.engines import stress
+from backend.research_context import ResearchContext
 
 VERSIONS = {
     "model": "none-manual-confirmation",
@@ -21,7 +22,9 @@ def digest(value: dict) -> str:
     ).hexdigest()
 
 
-def narrative_context_hash(thesis: ThesisInput, evidence: list[Evidence]) -> str:
+def narrative_context_hash(
+    thesis: ThesisInput, evidence: list[Evidence], finding: ResearchContext | None = None
+) -> str:
     """Stable key for explanations when the filing and conditions have not changed."""
     return digest(
         {
@@ -35,6 +38,7 @@ def narrative_context_hash(thesis: ThesisInput, evidence: list[Evidence]) -> str
                 for item in thesis.assumptions
             ],
             "evidence": [{"id": item.id, "content_hash": item.content_hash} for item in evidence],
+            "saved_finding": finding.cache_payload() if finding else None,
         }
     )
 

@@ -38,6 +38,9 @@ export default function EvidenceChat({
   const log = useRef<HTMLDivElement>(null);
   const field = useRef<HTMLTextAreaElement>(null);
   const sending = useRef(false);
+  const currentContext = `${record.id}:${latest.input_hash}`;
+  const contextRef = useRef(currentContext);
+  contextRef.current = currentContext;
   const conversation = useConversation(
     record.id,
     latest.input_hash,
@@ -45,6 +48,14 @@ export default function EvidenceChat({
   );
   const ask = useContinueConversation(record);
   const chatReady = followUpReady(llmStatus);
+  const newestSource = latest.evidence.reduce<Evidence | undefined>(
+    (newest, source) =>
+      !newest ||
+      Date.parse(source.published_at) > Date.parse(newest.published_at)
+        ? source
+        : newest,
+    undefined,
+  );
   const messages = (conversation.data?.messages ?? []).filter(
     (item) => item.kind !== "explanation",
   );
@@ -62,6 +73,7 @@ export default function EvidenceChat({
       previousHash.current.length > 0
     ) {
       setNewResult(true);
+      setQuestion("");
     }
     previousHash.current = latest.input_hash;
   }, [latest.input_hash]);
@@ -74,10 +86,17 @@ export default function EvidenceChat({
 
   function send(text: string, detail = false) {
     const trimmed = text.trim();
-    if (sending.current || ask.isPending || !chatReady || trimmed.length < 5) {
+    if (
+      sending.current ||
+      ask.isPending ||
+      !chatReady ||
+      conversation.isError ||
+      trimmed.length < 5
+    ) {
       return;
     }
     sending.current = true;
+    const sentContext = currentContext;
     ask.mutate(
       {
         question: trimmed,
@@ -88,7 +107,9 @@ export default function EvidenceChat({
         onSettled: () => {
           sending.current = false;
         },
-        onSuccess: () => setQuestion(""),
+        onSuccess: () => {
+          if (contextRef.current === sentContext) setQuestion("");
+        },
       },
     );
   }
@@ -102,6 +123,12 @@ export default function EvidenceChat({
         <div>
           <span className="eyebrow">FOLLOW-UP</span>
           <h2 id="evidence-chat-title">Ask about this filing</h2>
+          <p className="caption chat-context">
+            {newestSource?.title} ·{" "}
+            {latest.mode === "HISTORICAL_REPLAY"
+              ? "Older example"
+              : "Saved evidence"}
+          </p>
         </div>
       </div>
       {newResult && (
@@ -110,7 +137,7 @@ export default function EvidenceChat({
           stay saved with the previous filing.
         </p>
       )}
-      <div className="chat-log" ref={log}>
+      <div className="chat-log" ref={log} aria-busy={ask.isPending}>
         {messages.length === 0 && (
           <p className="chat-empty">
             Ask about the result, missing evidence, or what to check next.
@@ -131,6 +158,17 @@ export default function EvidenceChat({
               </time>
             </div>
             <p>{item.text}</p>
+            {item.role === "assistant" &&
+              Boolean(item.answer?.facts.length) && (
+                <ul
+                  className="chat-facts"
+                  aria-label="Facts from the saved evidence"
+                >
+                  {item.answer?.facts.map((fact, index) => (
+                    <li key={`${item.id}-fact-${index}`}>{fact}</li>
+                  ))}
+                </ul>
+              )}
             {item.answer?.uncertainty && item.role === "assistant" && (
               <p className="caption">Unknown: {item.answer.uncertainty}</p>
             )}
@@ -147,6 +185,11 @@ export default function EvidenceChat({
                       onClick={() => onSource(source)}
                     >
                       ↗ {source.title}
+                      {" · "}
+                      {new Date(source.published_at).toLocaleDateString(
+                        undefined,
+                        { timeZone: "UTC" },
+                      )}
                     </button>
                   ) : null;
                 })}
@@ -159,19 +202,20 @@ export default function EvidenceChat({
             Qwen is answering from this filing…
           </p>
         )}
-        {ask.isError && (
-          <p className="caption" role="alert">
-            {ask.error instanceof Error
-              ? ask.error.message
-              : "Qwen could not answer from this filing. Try again."}
-          </p>
-        )}
+        {ask.isError &&
+          ask.variables?.assessmentInputHash === latest.input_hash && (
+            <p className="caption" role="alert">
+              {ask.error instanceof Error
+                ? ask.error.message
+                : "Qwen could not answer from this filing. Try again."}
+            </p>
+          )}
       </div>
       {canAskMore && (
         <button
           type="button"
           className="text-action"
-          disabled={ask.isPending || !chatReady}
+          disabled={ask.isPending || !chatReady || conversation.isError}
           onClick={() => send("Tell me more about that.", true)}
         >
           Tell me more
@@ -182,7 +226,7 @@ export default function EvidenceChat({
           <button
             type="button"
             key={item}
-            disabled={ask.isPending || !chatReady}
+            disabled={ask.isPending || !chatReady || conversation.isError}
             onClick={() => send(item)}
           >
             {item}
@@ -196,20 +240,39 @@ export default function EvidenceChat({
             ref={field}
             rows={compact ? 2 : 3}
             maxLength={500}
+            disabled={ask.isPending || !chatReady || conversation.isError}
             value={question}
             onChange={(event) => setQuestion(event.target.value)}
+            onKeyDown={(event) => {
+              if (
+                event.key === "Enter" &&
+                (event.metaKey || event.ctrlKey) &&
+                !event.nativeEvent.isComposing
+              ) {
+                event.preventDefault();
+                send(question);
+              }
+            }}
             placeholder="Ask a follow-up about this result…"
           />
         </label>
         <button
           type="button"
           className="ai-action"
-          disabled={ask.isPending || !chatReady || question.trim().length < 5}
+          disabled={
+            ask.isPending ||
+            !chatReady ||
+            conversation.isError ||
+            question.trim().length < 5
+          }
           onClick={() => send(question)}
         >
           {ask.isPending ? "Sending…" : "Send"}
         </button>
       </div>
+      <p className="caption chat-shortcut">
+        Ctrl / ⌘ + Enter to send. Enter adds a new line.
+      </p>
       {!chatReady && (
         <p className="caption">
           {statusUnavailable

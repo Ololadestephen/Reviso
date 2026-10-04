@@ -10,6 +10,7 @@ from backend.contracts import (
     utc_now,
 )
 from backend.llm import HISTORY_TURNS, QUESTION_PROMPT_VERSION, provenance
+from backend.research_context import ResearchContext
 from backend.services import digest, narrative_context_hash
 from backend.storage import Repository
 
@@ -17,7 +18,11 @@ from backend.storage import Repository
 def context_for(record: dict, assessment: dict) -> tuple[ThesisInput, list[Evidence], str]:
     thesis = ThesisInput.model_validate(record["thesis"])
     evidence = [Evidence.model_validate(item) for item in assessment["evidence"]]
-    return thesis, evidence, narrative_context_hash(thesis, evidence)
+    return (
+        thesis,
+        evidence,
+        narrative_context_hash(thesis, evidence, ResearchContext.from_assessment(assessment)),
+    )
 
 
 def empty_thread(thesis_id: str, version: int, assessment_hash: str, context_hash: str) -> dict:
@@ -127,7 +132,12 @@ def append_exchange(
 
     def generate():
         return llm.answer(
-            thesis, evidence, question, history=history_payload(thread), detail=detail
+            thesis,
+            evidence,
+            question,
+            history=history_payload(thread),
+            detail=detail,
+            finding=ResearchContext.from_assessment(selected),
         )
 
     answer = run_paid(input_hash, generate) if run_paid else generate()

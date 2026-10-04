@@ -1,12 +1,18 @@
 # Reviso
 
-Know what would change your mind.
+### Have a stock idea? See if the evidence supports it.
 
-Reviso is a research notebook for a stock idea you already have. You write the idea, name the conditions that would make you reconsider, check those conditions against a dated company filing, and record the decision yourself. It cannot place a trade.
+Reviso helps you turn a stock idea into clear conditions, check them against company reports, and save your decision with the evidence behind it.
 
-Live demo: [https://revisoagent.xyz](https://revisoagent.xyz)
+[Open Reviso](https://revisoagent.xyz) · [User guide](https://revisoagent.xyz/guide) · [Worked example](https://revisoagent.xyz/example) · [Demo script](docs/DEMO_SCRIPT.md)
 
-This is a working research product for Bitget AI Base Camp Season 2 (AI Trading Desk / Decision Stress Testing). It is not an investment adviser, brokerage, or signal service. Tokenized Bitget products in the demo give economic exposure to a company. They are not registered shares in your name.
+Built for Bitget AI Base Camp Season 2, in the AI Trading Desk / Decision Stress Testing track.
+
+## Why Reviso?
+
+It is easy to have a reason to buy a stock and forget what would make you reconsider. Research ends up spread across notes, articles, and chat messages.
+
+Reviso keeps the idea, its conditions, the sources, and your decisions in one record. When a report changes the picture, you can see which condition still holds and which one needs attention.
 
 ## What you get
 
@@ -21,7 +27,7 @@ Public pages (`/`, `/guide`, `/example`, `/privacy`, `/terms`) are read-only. Th
 ## How a session works
 
 1. **Pick a company.** Choose NVIDIA, Apple, Microsoft, Alphabet, Amazon or Tesla. Each card shows the Bitget tokenized pair Reviso has verified for that issuer.
-2. **Write the idea.** Explain why you are interested and what would make you reconsider. You can write the conditions yourself or ask Qwen for an editable draft. Saving a draft does not freeze anything. Confirming does: that version stays in the history.
+2. **Write the idea.** Explain why you are interested and what would make you reconsider. Write the conditions yourself or ask AI for an editable draft. Review and confirm them to save a version that stays in your history.
 3. **Check the evidence.** Reviso fetches the allowlisted filing and a separately dated Bitget USDT observation, then compares only compatible reported metrics. Missing numbers stay missing. Qwen can explain the saved excerpts. It cannot change 74.6 versus 75.
 4. **Decide.** Keep, change or set aside the idea, in your own words. Later edits create a new version. The earlier conditions, finding and decision remain attached to the version they belonged to.
 
@@ -29,13 +35,26 @@ New research is a short path: Choose → Explain → Review. After confirmation 
 
 A complete written NVIDIA case, with no live fetch and no Qwen call, is at [`/example`](https://revisoagent.xyz/example). The product walkthrough is at [`/guide`](https://revisoagent.xyz/guide).
 
-## What Qwen may do
+## A concrete example
 
-Sponsored Bitget Qwen 3.8 Max is the first language-model route. Qwen 3.8 27B on Groq is a fallback. Qwen can:
+For a historical NVIDIA example, suppose your idea depends on gross margin staying at least **75%** and revenue growing at least **80%** compared with a year earlier.
 
-- turn a rough idea into editable conditions
-- explain how a saved filing relates to those conditions
-- answer follow-up questions using citations from that filing
+| Historical report | Gross margin | Revenue growth | Result against your conditions |
+| --- | --- | --- | --- |
+| Fiscal 2025 Q2 | 75.1% | 122% | Both conditions hold |
+| Fiscal 2025 Q3 | 74.6% | 94% | Margin falls below the limit; growth still holds |
+
+Reviso preserves the original conditions and shows what changed. You decide whether to keep, change, or set aside the idea. This is a prepared historical example, not a current recommendation or a token-price backtest.
+
+## How AI helps
+
+Different tasks use separate model routes:
+
+| Task | Provider and model |
+| --- | --- |
+| Idea extraction and evidence explanation | Bitget Qwen 3.8 Max; Groq Qwen fallback when the Bitget key is unset |
+| Editable condition suggestions | Groq `openai/gpt-oss-20b` |
+| Filing follow-up questions | Groq `qwen/qwen3.8-27b` |
 
 Qwen cannot confirm conditions, fetch an arbitrary website, compute the financial result, record keep / change / set aside, or place a trade. Repair attempts count toward the daily allowance. If Qwen is offline or the allowance is used, you can still finish the path by hand. Saved findings stay readable.
 
@@ -53,7 +72,9 @@ Reviso only fetches allowlisted hosts and paths. External text is data, never in
 
 **Supported** means the available filing supports that specific condition. **Invalidated** requires a confirmed floor and a reported number that misses it. One missed floor does not rewrite the other comparisons. An older report is not promoted as a successful current check. Guidance and non-GAAP figures cannot fill a missing GAAP fact.
 
-Reviso does not claim that a token equals company shares, tracks the listed stock one-for-one, or can be redeemed.
+Reviso is a research tool and cannot place trades. Tokenized Bitget products are not registered company shares in your name. Reviso does not establish redemption rights or exact tracking of the listed share price.
+
+xStocks research is currently an external link. Its articles are not ingested into Reviso's findings or chat.
 
 ## Coverage
 
@@ -98,6 +119,8 @@ Contracts, providers, numerical engines, services and the SQLite repository stay
 Prerequisites: Python 3.12 through [uv](https://docs.astral.sh/uv/), and Node.js 22.13 or newer. From this repository root:
 
 ```sh
+git clone https://github.com/Ololadestephen/Reviso.git
+cd Reviso
 uv sync --frozen
 npm ci
 cp .env.example .env
@@ -116,6 +139,8 @@ npm run dev
 ```
 
 Open [http://127.0.0.1:5173](http://127.0.0.1:5173). Loopback uses an explicit local identity. API docs are at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) in local mode only; they are disabled in public demo.
+
+Manual conditions and the historical example work without model keys. Live company reports and market data require internet access; AI features require the corresponding server-side keys.
 
 The public Bitget SDK bridge needs outbound access to `api.bitget.com`. Failures produce unavailable observations, not invented values. Private thesis text is not sent to Bitget.
 
@@ -146,6 +171,19 @@ For local Google sign-in, Google Cloud must list both `http://127.0.0.1:5173` an
 
 ## Verify
 
+Project structure:
+
+```text
+apps/web/       React frontend and UI tests
+backend/        API, providers, research logic, authentication, storage
+bridge/         Read-only Bitget SDK bridge
+tests/          Backend tests
+deploy/aws/     Lightsail and Caddy configuration
+docs/           Architecture, evidence policy, evaluation, and demo materials
+```
+
+Run these checks from the repository root:
+
 ```sh
 uv run ruff check backend tests
 uv run ruff format --check backend tests
@@ -169,6 +207,7 @@ Tests establish behavior. They do not establish research accuracy. Mechanical qu
 
 ## Further reading
 
+- [Demo script and recording checklist](docs/DEMO_SCRIPT.md)
 - [Guide to using Reviso](https://revisoagent.xyz/guide)
 - [NVIDIA example](https://revisoagent.xyz/example)
 - [Architecture](docs/ARCHITECTURE.md)

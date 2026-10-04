@@ -60,7 +60,7 @@ async def llm_invalid(_request: Request, _error: LLMInvalidOutputError):
     return JSONResponse(
         status_code=502,
         content={
-            "detail": "The draft didn't match the required format, so nothing was changed. Continue manually or try again."
+            "detail": "The AI response did not pass Reviso's checks. Your saved research is unchanged. Read the source or continue manually."
         },
     )
 

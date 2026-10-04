@@ -1,5 +1,7 @@
 # Season 2 submission checklist
 
+Current working target, October 4: finish by October 7 Lagos for the user-supplied October 8 extension. The exact organizer cutoff hour/time zone remains unconfirmed. Keep the dated rules below distinct from that planning assumption. The small user study belongs to the user; the [local close-out report](evaluations/2026-10-04-research-closeout.md) supplies engineering evidence, not study results or an official grade.
+
 Verified 2026-09-10 by following the Developer guide button in the live event page to [the Season 2 handbook](https://bitget-ai.gitbook.io/bitgetai_hackathons2). Direct crawler and the root `.md` URL failed earlier; the actual Markdown page linked by the handbook is `/bitgetai_hackathons2/base-camp-hackathon-s2-en.md`.
 
 ## Verified rules
@@ -7,16 +9,16 @@ Verified 2026-09-10 by following the Developer guide button in the live event pa
 - Track: AI Trading Desk. Sub-theme: Decision Stress Testing. Judges assess research quality, effective source/tool integration, natural-language interaction and a personalized thesis. This track uses judge scoring, not trading-return scoring.
 - Required: accessible demo and a complete research task from question to actionable insight. Screen recording is optional; public code, docs and logs can accompany the demo.
 - Complete the project description in the form itself. External links cannot replace it. Cover thesis/pain point, concrete target user and value, validation/metrics, progress, deliverables, and optionally perspective on AI trading. First three carry the most weight. Distinguish observed, estimated and target figures.
-- Separate required field: actual LLM role and models used. Reviso has contract-tested adapters for sponsored Bitget Qwen 3.8 Max and fallback Qwen 3.8 27B on Groq. A 21-case live calibration used 25 provider requests. Raw judgments matched the small constructed narrative set, but response-shape failures left only one full application pass. After compatibility changes, a frozen five-case v2 validation passed extraction, mixed evidence, injection resistance, abstention and saved-review integration using five first-attempt requests. State the small constructed scope; do not claim general research accuracy.
+- Separate required field: actual LLM role and models used. Current routing is sponsored Bitget Qwen 3.8 Max for extraction/review (Groq fallback), Groq `openai/gpt-oss-20b` for editable condition drafts, and Groq Qwen 3.8 27B for cited filing follow-ups. A 21-case live calibration used 25 provider requests. Raw judgments matched the small constructed narrative set, but response-shape failures left only one full application pass. After compatibility changes, a frozen five-case v2 validation passed extraction, mixed evidence, injection resistance, abstention and saved-review integration using five first-attempt requests. State the small constructed scope; do not claim general research accuracy. October's prompt changes still require a separately authorized live check.
 - Required X promotional post: introduce the product and include `#BitgetHackathon` and `@Bitget_AI`. Handbook also asks for a retweet of the official post, but that link is still marked TBD. No X post means incomplete submission.
 - [Official submission form](https://forms.gle/GyWZCMCPocgJdJon6). No separate registration is required. At most two independent projects/themes per team, each in a separate form entry. Do not submit simple renames/minor ports of Season 1 work.
 - Optional fields include university, Demo Day and K3 subsidy. The Qwen build-credit application was granted on September 11; the credential remains server-side and must not appear in submission materials.
 
 ## Deadline uncertainty
 
-The handbook states September 3–21, 2026, UTC+8, and elsewhere says before September 21. It does not give an hour/minute. Therefore an exact cutoff is NOT verified. Do not assume 23:59. Internal target: finish submission materials by September 20 Lagos time, allowing time to resolve the ambiguity with organizers. This is a planning target, not an official cutoff.
+The user supplied [an organizer X link](https://x.com/Bitget_AI/status/2106225469242958312?s=20) for an October 8 extension. That post's contents and exact cutoff have not been independently verified here. Do not assume 23:59 or a time zone. Internal target: October 7 Lagos, not an official cutoff.
 
-Voting/judging dates conflict within the handbook: some sections say September 22–28; others say September 22–October 7. Winner announcement is listed around October 8. Organizer clarification is needed. No message has been sent to organizers.
+The September 10 handbook inspection recorded September 3–21 UTC+8, conflicting judging windows and an announcement around October 8. Those historical dates must not be substituted for the newer user-supplied extension. Organizer clarification is still needed; no message has been sent.
 
 ## Reviso release gates
 
@@ -27,10 +29,24 @@ Voting/judging dates conflict within the handbook: some sections say September 2
 - [x] Offline v2 response-contract compatibility changes implemented from batch 01 evidence.
 - [x] Newly frozen five-case v2 validation holdout evaluated successfully under a 10-request cap (5 used).
 - [x] Public NVIDIA quarterly earnings retrieval beyond the bundled replay, with saved citations and conservative parsing.
-- [ ] User task-completion evaluation and plain-LLM baseline.
+- [ ] User task-completion evaluation (user-owned small study); no figures invented.
+- [ ] Independent plain-LLM research baseline beyond the existing constructed calibration.
 - [ ] Exact deadline/official promotional post confirmed.
-- [ ] Host, persistence and private-record access controls selected.
-- [ ] Public deployment, X post and submission approved by user.
+- [x] AWS Lightsail, persistent SQLite and Google owner-scoped access implemented; historical deployment reports retained.
+- [x] Local October research/source/chat improvements verified with mocks and disposable replay.
+- [ ] New prompt versions validated live after paid-call approval.
+- [ ] October release approved, backed up, deployed and verified on the signed-in live domain.
+- [ ] Final X post and submission approved by user.
+
+## Project description draft — not submitted
+
+Reviso helps individual researchers write down what would change their mind about a stock idea. Instead of asking a chatbot for a buy-or-sell answer, they choose a company, explain their idea, confirm a few conditions, inspect dated company evidence, and record their own decision.
+
+The current selection covers six familiar companies. Official Bitget tools supply the selected token's market context; NVIDIA releases or issuer-bound SEC facts supply company evidence. These stay separate, as does optional xStocks indicative-price context. Reviso uses Decimal arithmetic to compare reported metrics with the user's confirmed limits. Missing evidence remains missing.
+
+AI helps draft editable conditions, explain the saved result and answer filing-bound questions with source links. The server checks schemas, source IDs and numerical review consistency; it does not treat that as proof every sentence is correct. Google sign-in separates notebooks. Previous versions, findings and human decisions remain saved and can be exported.
+
+Local verification now has 142 backend and 76 frontend passing tests plus a disposable browser walkthrough. Earlier live calibration and validation reports include successes and failures; the current prompt changes await approved live validation. The user study is pending with the project owner. No general accuracy, investment return or guaranteed response-time claim is made.
 
 ## Draft X post — not published
 

@@ -1,4 +1,8 @@
-# Local quality report — 2026-09-17
+# Local quality reports
+
+The latest [October 4 close-out report](evaluations/2026-10-04-research-closeout.md#desloppify-results) contains the initial, intermediate and final scans, every mechanical dimension and all unassessed subjective dimensions. The two new backend findings and the new test finding were corrected and scan-resolved. Existing findings remain open; no independent subjective review or security certification is claimed.
+
+## Earlier local quality report — 2026-09-17
 
 The installed Desloppify workflow was used for separate coherent backend and frontend scans, with `status` and `next` after each milestone. Exclusions cover dependency/build/cache output; no application files were excluded to raise scores. No suppressions, fabricated subjective evidence or wontfix decisions were entered. No branch, commit, push or external issue was created.
 

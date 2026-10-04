@@ -47,7 +47,7 @@ const unconfiguredLlm: LLMStatus = {
   model: "qwen3.8-max",
   configured: false,
   extraction_prompt: "thesis-extraction-v2",
-  review_prompt: "evidence-review-v3",
+  review_prompt: "evidence-review-v4",
   streaming: "untested",
   chat_provider: "groq",
   chat_model: "qwen/qwen3.8-27b",
