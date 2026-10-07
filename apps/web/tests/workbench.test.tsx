@@ -25,7 +25,7 @@ import Timeline from "../src/Timeline";
 import ReplayPanel from "../src/ReplayPanel";
 import SourceDrawer from "../src/SourceDrawer";
 import { ApiError, ContractError } from "../src/api/client";
-import { evidenceSchema } from "../src/api/schemas";
+import { evidenceSchema, xstocksContextSchema } from "../src/api/schemas";
 import { confirmDraft, fetchLlmStatus } from "../src/api/endpoints";
 import {
   defaultThesis,
@@ -279,39 +279,37 @@ test("the idea screen shows a Bitget observation without replacing the user's pr
 });
 
 test("xStocks is labelled as separate indicative context", () => {
-  render(
-    <XStocksContextPanel
-      loading={false}
-      context={{
-        instrument_id: "RNVDAUSDT",
-        xstock_symbol: "NVDAx",
-        name: "NVIDIA xStock",
-        underlying_symbol: "NVDA",
-        currency: "USD",
-        indicative_price: "213.755",
-        availability: "AVAILABLE",
-        retrieved_at: "2026-09-14T07:19:25Z",
-        trading_halted: false,
-        market_open: true,
-        trading_period: "overnight",
-        networks: ["Ethereum", "Solana"],
-        source_url:
-          "https://api.xstocks.fi/api/v2/public/assets/NVDAx/price-data",
-        research_url: "https://xstocks.fi/us/news",
-        cached: false,
-        warnings: [],
-        limitations: ["A different product."],
-      }}
-    />,
-  );
+  const context = xstocksContextSchema.parse({
+    instrument_id: "RNVDAUSDT",
+    xstock_symbol: "NVDAx",
+    name: "NVIDIA xStock",
+    underlying_symbol: "NVDA",
+    currency: "USD",
+    indicative_price: "213.755",
+    availability: "AVAILABLE",
+    retrieved_at: "2026-09-14T07:19:25Z",
+    trading_halted: false,
+    market_open: true,
+    trading_period: "overnight",
+    networks: ["Ethereum", "Solana"],
+    source_url: "https://api.xstocks.fi/api/v2/public/assets/NVDAx/price-data",
+    research_url: "https://xstocks.fi/us/news",
+    cached: false,
+    warnings: [],
+    limitations: ["A different product."],
+  });
+  render(<XStocksContextPanel loading={false} context={context} />);
   expect(screen.getByText("213.76 USD")).toBeTruthy();
   expect(screen.getByText(/not registered share ownership/i)).toBeTruthy();
   expect(screen.getByText(/another tokenized product/i)).toBeTruthy();
   expect(screen.getByText(/not the selected Bitget USDT quote/i)).toBeTruthy();
   expect(screen.getByText("A different product.")).toBeTruthy();
   expect(
-    screen.getByRole("link", { name: /xStocks website/ }).getAttribute("href"),
-  ).toBe("https://xstocks.fi/us/news");
+    screen
+      .getByRole("link", { name: /Official price source/ })
+      .getAttribute("href"),
+  ).toBe(context.source_url);
+  expect(screen.queryByRole("link", { name: /xStocks website/ })).toBeNull();
 });
 
 test("the create path names three steps", () => {
@@ -720,7 +718,7 @@ test("public landing and example explain the product without calling an API", ()
     }),
   ).toBeTruthy();
   expect(screen.getByText("What counts as evidence")).toBeTruthy();
-  expect(screen.getByText("What Qwen does")).toBeTruthy();
+  expect(screen.getByText("What AI does")).toBeTruthy();
   expect(
     screen.getByText(
       /Missing numbers stay missing. Reviso does not invent a metric/,

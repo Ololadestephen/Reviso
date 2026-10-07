@@ -148,8 +148,14 @@ export default function EvidenceChatDock({
         style={{ left: position.x, top: position.y }}
         aria-expanded={open}
         aria-controls={open ? titleId : undefined}
-        aria-label={open ? "Close chat" : "Ask about this filing"}
-        title="Ask about this filing. Drag to move."
+        aria-label={
+          open
+            ? "Close chat"
+            : latest.research_sources?.length
+              ? "Ask about this research"
+              : "Ask about this filing"
+        }
+        title="Ask about this research. Drag to move."
         onPointerDown={startDrag}
         onClick={() => {
           if (skipClick.current) {
@@ -171,7 +177,11 @@ export default function EvidenceChatDock({
           aria-labelledby="evidence-chat-title"
         >
           <div className="chat-dock-head">
-            <p className="caption">Bound to this saved filing</p>
+            <p className="caption">
+              {latest.research_sources?.length
+                ? "Bound to this saved research"
+                : "Bound to this saved filing"}
+            </p>
             <button
               type="button"
               className="quiet"

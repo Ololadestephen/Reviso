@@ -32,6 +32,22 @@ def test_live_budget_rejects_other_endpoints(tmp_path):
     assert not budget.attempts
 
 
+def test_two_request_budget_cannot_be_bypassed_by_changing_actions(tmp_path):
+    budget = RequestBudget(tmp_path, max_requests=2)
+    budget.reserve(GROQ_ENDPOINT)
+    budget.action = "repair"
+    budget.reserve(GROQ_ENDPOINT)
+    budget.action = "unapproved"
+    with pytest.raises(RuntimeError, match="ceiling"):
+        budget.reserve(GROQ_ENDPOINT)
+    assert len(budget.attempts) == 2
+
+
+def test_live_budget_rejects_invalid_ceiling(tmp_path):
+    with pytest.raises(ValueError, match="ceiling"):
+        RequestBudget(tmp_path, max_requests=7)
+
+
 def test_freeze_is_exclusive_and_changed_manifest_cannot_call_provider(tmp_path):
     freeze(tmp_path)
     with pytest.raises(FileExistsError):
@@ -73,10 +89,14 @@ def test_full_live_harness_uses_saved_api_flow_without_network(tmp_path, monkeyp
             return completion(validation.THESIS)
         return completion(
             {
-                "summary": "The margin condition failed and growth held.",
-                "facts": ["Reported margin was 74.6%."],
-                "uncertainty": "The next quarter remains unknown.",
-                "evidence_ids": ["nvda-fy25-Third"],
+                "summary": {
+                    "text": "The margin condition failed and growth held.",
+                    "evidence_ids": ["nvda-fy25-Third"],
+                },
+                "facts": [
+                    {"text": "Reported margin was 74.6%.", "evidence_ids": ["nvda-fy25-Third"]}
+                ],
+                "uncertainty": {"text": "The next quarter remains unknown.", "evidence_ids": []},
             }
         )
 

@@ -1,0 +1,152 @@
+{
+  "status": "PENDING_INDEPENDENT_SELECTION",
+  "case_count": 24,
+  "selector": null,
+  "verifier": null,
+  "cases": [
+    {
+      "id": "nvda-support",
+      "instrument_id": "RNVDAUSDT",
+      "bucket": "numerical_support",
+      "case_file": null
+    },
+    {
+      "id": "nvda-contradiction",
+      "instrument_id": "RNVDAUSDT",
+      "bucket": "numerical_contradiction",
+      "case_file": null
+    },
+    {
+      "id": "nvda-uncheckable",
+      "instrument_id": "RNVDAUSDT",
+      "bucket": "uncheckable",
+      "case_file": null
+    },
+    {
+      "id": "nvda-qualitative",
+      "instrument_id": "RNVDAUSDT",
+      "bucket": "qualitative_uncertainty",
+      "case_file": null
+    },
+    {
+      "id": "aapl-support",
+      "instrument_id": "RAAPLUSDT",
+      "bucket": "numerical_support",
+      "case_file": null
+    },
+    {
+      "id": "aapl-contradiction",
+      "instrument_id": "RAAPLUSDT",
+      "bucket": "numerical_contradiction",
+      "case_file": null
+    },
+    {
+      "id": "aapl-uncheckable",
+      "instrument_id": "RAAPLUSDT",
+      "bucket": "uncheckable",
+      "case_file": null
+    },
+    {
+      "id": "aapl-qualitative",
+      "instrument_id": "RAAPLUSDT",
+      "bucket": "qualitative_uncertainty",
+      "case_file": null
+    },
+    {
+      "id": "msft-support",
+      "instrument_id": "RMSFTUSDT",
+      "bucket": "numerical_support",
+      "case_file": null
+    },
+    {
+      "id": "msft-contradiction",
+      "instrument_id": "RMSFTUSDT",
+      "bucket": "numerical_contradiction",
+      "case_file": null
+    },
+    {
+      "id": "msft-uncheckable",
+      "instrument_id": "RMSFTUSDT",
+      "bucket": "uncheckable",
+      "case_file": null
+    },
+    {
+      "id": "msft-qualitative",
+      "instrument_id": "RMSFTUSDT",
+      "bucket": "qualitative_uncertainty",
+      "case_file": null
+    },
+    {
+      "id": "googl-support",
+      "instrument_id": "RGOOGLUSDT",
+      "bucket": "numerical_support",
+      "case_file": null
+    },
+    {
+      "id": "googl-contradiction",
+      "instrument_id": "RGOOGLUSDT",
+      "bucket": "numerical_contradiction",
+      "case_file": null
+    },
+    {
+      "id": "googl-uncheckable",
+      "instrument_id": "RGOOGLUSDT",
+      "bucket": "uncheckable",
+      "case_file": null
+    },
+    {
+      "id": "googl-qualitative",
+      "instrument_id": "RGOOGLUSDT",
+      "bucket": "qualitative_uncertainty",
+      "case_file": null
+    },
+    {
+      "id": "amzn-support",
+      "instrument_id": "RAMZNUSDT",
+      "bucket": "numerical_support",
+      "case_file": null
+    },
+    {
+      "id": "amzn-contradiction",
+      "instrument_id": "RAMZNUSDT",
+      "bucket": "numerical_contradiction",
+      "case_file": null
+    },
+    {
+      "id": "amzn-uncheckable",
+      "instrument_id": "RAMZNUSDT",
+      "bucket": "uncheckable",
+      "case_file": null
+    },
+    {
+      "id": "amzn-qualitative",
+      "instrument_id": "RAMZNUSDT",
+      "bucket": "qualitative_uncertainty",
+      "case_file": null
+    },
+    {
+      "id": "tsla-support",
+      "instrument_id": "RTSLAUSDT",
+      "bucket": "numerical_support",
+      "case_file": null
+    },
+    {
+      "id": "tsla-contradiction",
+      "instrument_id": "RTSLAUSDT",
+      "bucket": "numerical_contradiction",
+      "case_file": null
+    },
+    {
+      "id": "tsla-uncheckable",
+      "instrument_id": "RTSLAUSDT",
+      "bucket": "uncheckable",
+      "case_file": null
+    },
+    {
+      "id": "tsla-qualitative",
+      "instrument_id": "RTSLAUSDT",
+      "bucket": "qualitative_uncertainty",
+      "case_file": null
+    }
+  ]
+}

@@ -139,6 +139,14 @@ export const evidenceSchema = z.looseObject({
   origin: z.enum(["CURATED_REPLAY", "PUBLIC_RETRIEVAL"]).optional(),
   document_hash: z.string().nullish(),
   parser_version: z.string().nullish(),
+  kind: z
+    .enum([
+      "COMPANY_FACTS",
+      "COMPANY_REPORT",
+      "MONETARY_POLICY",
+      "ECONOMIC_DATA",
+    ])
+    .optional(),
 });
 
 /** Shared output of backend/engines.py `walk_bids`. */
@@ -256,6 +264,9 @@ export const llmStatusSchema = z.looseObject({
   configured: z.boolean(),
   extraction_prompt: z.string(),
   review_prompt: z.string(),
+  review_provider: z.string().optional(),
+  review_model: z.string().optional(),
+  review_configured: z.boolean().optional(),
   suggestion_prompt: z.string().optional(),
   question_prompt: z.string().optional(),
   streaming: z.string().optional(),
@@ -288,6 +299,19 @@ export const assessmentSchema = z.looseObject({
   evidence_cutoff: timestamp,
   evaluated_at: timestamp,
   evidence: z.array(evidenceSchema),
+  research_sources: z.array(evidenceSchema).optional(),
+  research_retrieval: z
+    .array(
+      z.looseObject({
+        provider: z.enum(["SEC", "FED", "BLS"]),
+        availability: z.enum(["AVAILABLE", "PARTIAL", "UNAVAILABLE"]),
+        checked_at: timestamp,
+        cached: z.boolean(),
+        warnings: z.array(z.string()),
+      }),
+    )
+    .optional(),
+  research_base_input_hash: z.string().optional(),
   numerical: numericalSchema,
   scenario: scenarioSchema,
   assumptions: z.array(

@@ -52,6 +52,7 @@ from backend.llm import (
 )
 from backend.llm_budget import track_llm_usage
 from backend.market import market_execution
+from backend.official_research import research_evidence
 from backend.providers import BitgetProvider
 from backend.replay import CASES, CUTOFFS, available_evidence, evidence_by_id
 from backend.research_chat import append_exchange, conversation_for
@@ -91,6 +92,10 @@ def get_chat_llm(request: Request) -> LanguageModel:
     return request.app.state.chat_llm
 
 
+def get_review_llm(request: Request) -> LanguageModel:
+    return request.app.state.review_llm
+
+
 def get_draft_llm(request: Request) -> LanguageModel:
     return request.app.state.draft_llm
 
@@ -122,6 +127,7 @@ Provider = Annotated[BitgetProvider, Depends(get_provider)]
 XStocks = Annotated[XStocksProvider, Depends(get_xstocks)]
 LLM = Annotated[LanguageModel, Depends(get_llm)]
 ChatLLM = Annotated[LanguageModel, Depends(get_chat_llm)]
+ReviewLLM = Annotated[LanguageModel, Depends(get_review_llm)]
 DraftLLM = Annotated[LanguageModel, Depends(get_draft_llm)]
 Disclosures = Annotated[CompanyDisclosureProvider, Depends(get_disclosures)]
 DeploymentMode = Annotated[
@@ -209,9 +215,14 @@ def auth_logout(request: Request, repo: Repo, auth: Auth, response: Response):
 
 
 @router.get("/llm/status")
-def llm_status(llm: LLM, chat_llm: ChatLLM, draft_llm: DraftLLM, owner: Owner):
+def llm_status(
+    llm: LLM, chat_llm: ChatLLM, draft_llm: DraftLLM, review_llm: ReviewLLM, owner: Owner
+):
     return {
         **llm.descriptor.public(),
+        "review_provider": review_llm.descriptor.provider,
+        "review_model": review_llm.descriptor.model,
+        "review_configured": review_llm.descriptor.configured,
         "chat_provider": chat_llm.descriptor.provider,
         "chat_model": chat_llm.descriptor.model,
         "chat_configured": chat_llm.descriptor.configured,
@@ -383,13 +394,13 @@ def refresh(thesis_id: str, repo: Repo, provider: Provider, disclosures: Disclos
 
 
 @router.post("/theses/{thesis_id}/ai-review")
-def ai_review(thesis_id: str, repo: Repo, llm: LLM, owner: Owner, limits: Limits):
+def ai_review(thesis_id: str, repo: Repo, llm: ReviewLLM, owner: Owner, limits: Limits):
     record = confirmed(repo, owner.user_id, thesis_id)
     previous = repo.history(owner.user_id, thesis_id)["selected_assessment"]
-    if not previous or not previous["evidence"]:
+    if not previous or not research_evidence(previous):
         raise HTTPException(409, "Load a disclosure replay or refresh public evidence first")
     thesis = ThesisInput.model_validate(record["thesis"])
-    evidence = [Evidence.model_validate(item) for item in previous["evidence"]]
+    evidence = research_evidence(previous)
     finding = ResearchContext.from_assessment(previous)
     context_hash = digest(
         {
@@ -493,7 +504,7 @@ def answer_research_question(
     selected = repo.history(owner.user_id, thesis_id)["selected_assessment"]
     if not selected or selected["input_hash"] != body.assessment_input_hash:
         raise HTTPException(409, "The evidence context changed; reload before asking")
-    if not selected["evidence"]:
+    if not research_evidence(selected):
         raise HTTPException(409, "No saved evidence is available for a cited answer")
     selected_record = repo.get_version(owner.user_id, thesis_id, selected["thesis_version"])
     metadata = provenance(chat_llm.descriptor, QUESTION_PROMPT_VERSION)
@@ -512,7 +523,7 @@ def answer_research_question(
     cached = repo.research_answer_by_hash(owner.user_id, thesis_id, input_hash)
     if cached:
         return cached
-    evidence = [Evidence.model_validate(item) for item in selected["evidence"]]
+    evidence = research_evidence(selected)
     answer = paid(
         repo,
         owner.user_id,
@@ -548,7 +559,7 @@ def research_conversation(
 ):
     record = confirmed(repo, owner.user_id, thesis_id)
     selected = repo.history(owner.user_id, thesis_id)["selected_assessment"]
-    if not selected or not selected["evidence"]:
+    if not selected or not research_evidence(selected):
         raise HTTPException(409, "No saved evidence is available for a cited answer")
     if selected["input_hash"] != assessment_input_hash:
         raise HTTPException(409, "The evidence context changed; reload before asking")
@@ -568,7 +579,7 @@ def continue_research_conversation(
     selected = repo.history(owner.user_id, thesis_id)["selected_assessment"]
     if not selected or selected["input_hash"] != body.assessment_input_hash:
         raise HTTPException(409, "The evidence context changed; reload before asking")
-    if not selected["evidence"]:
+    if not research_evidence(selected):
         raise HTTPException(409, "No saved evidence is available for a cited answer")
 
     def run_paid(request_key: str, generate):

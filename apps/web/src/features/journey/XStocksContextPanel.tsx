@@ -86,9 +86,6 @@ export default function XStocksContextPanel({
             <a href={context.source_url} target="_blank" rel="noreferrer">
               Official price source ↗
             </a>
-            <a href={context.research_url} target="_blank" rel="noreferrer">
-              xStocks website ↗
-            </a>
           </div>
         </>
       )}

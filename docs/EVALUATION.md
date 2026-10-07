@@ -2,9 +2,36 @@
 
 ## Latest local verification — 2026-10-04
 
+The [SEC live follow-up](evaluations/2026-10-04-sec-live.md) verifies the user's
+corrected `.env`, CIK-bound NVIDIA/Microsoft metadata name variants and real
+report retrieval for all six companies. Management/risk passages loaded in each
+case; 195 backend tests passed. This is connector verification, not an AI accuracy
+result. No paid request or deployment was made.
+
+The [official-research report](evaluations/2026-10-04-official-research.md) records
+the latest optional SEC/Fed/BLS integration: 183 backend and 113 frontend test
+passes, desktop/mobile checks, real public Fed/BLS retrieval and complete quality
+scores. Live SEC passage retrieval needs a genuine identifying contact. New
+review v5 and question v4 prompts have offline coverage only; no new paid AI run,
+independent study or deployment is claimed.
+
+The [xStocks reading and validation-preparation report](evaluations/2026-10-04-xstocks-reading-and-validation-prep.md)
+records the subsequent link-only UI slice, 104 frontend and 148 backend test
+passes, disposable desktop/mobile checks and full quality scores. The independent
+24-slot pilot remains preparation only; no new AI batch or publication occurred.
+
 The [research close-out report](evaluations/2026-10-04-research-closeout.md) records source/AI contract improvements, the isolated browser check and all quality scores. Final verification passed 148 backend and 76 frontend tests. The subsequently approved [three-action live check](evaluations/final-ai-2026-10-04b/REPORT.md) passed draft v3, review v4 and follow-up v3 with 3/6 provider requests and no repairs, including cached repeats and SQLite restart persistence. This is a constructed historical NVIDIA smoke test, not an independent benchmark. The small user study is reserved for the user; no completion rate, satisfaction figure or general research-accuracy score is claimed.
 
 ## Evaluation boundaries
+
+The [independent pilot preparation pack](evaluations/independent-pilot-01/README.md)
+defines 24 pending slots across six issuers, source/expectation templates, the
+rubric and a proposed 60-request ceiling for 24 explanations plus six follow-ups
+including repairs. No cases have been independently selected, no holdout is
+frozen and no paid run is authorised. An independent selector and verifier must
+supply unfamiliar reports and expected answers before a tested runner/frozen
+manifest and separate credit approval. This is not a new accuracy result and
+does not conduct the user-owned study.
 
 Separate numerical software correctness from research quality. Numerical tests must cover independent expected proceeds and P&L, exact breach boundaries, monotonicity, missing data, partial fills, timestamp mismatches, instrument/currency mismatches and deterministic results.
 
@@ -59,3 +86,16 @@ Browser-inspected flow: draft → confirmation → first disclosure → second d
 Two authorized live Bitget Qwen extraction attempts preceded the frozen batch. The first hit Reviso's original 25-second read timeout; the second returned a valid unsaved proposal in 49.58 seconds after the Bitget-only window was raised to 90 seconds. The subsequent frozen calibration completed all 21 cases with 25 requests and 43,145 reported tokens. Only the clear extraction passed the application contract. Post-run inspection found that all 22 raw assumption judgments in the 11 Reviso-prompt narrative cases matched the accepted constructed labels and stayed within the citation boundary, but the model returned incompatible JSON shapes that Reviso correctly rejected. The plain-prompt baseline also failed the contract. Full details and limitations are in [batch 01](evaluations/2026-09-11-batch-01/REPORT.md).
 
 The newly frozen v2 validation used 5 of its 10 authorized requests and 10,196 reported tokens. All five provider responses completed on the first attempt, and all five cases passed the complete application contract: structured extraction and risk preservation, mixed evidence, embedded prompt injection with a phantom-citation request, abstention on missing financial observations, and persisted/cached review integration across SQLite restart. The injection case took 84.494 seconds against the 90-second read timeout, leaving a narrow operational margin. See the [v2 report](evaluations/2026-09-11-v2-validation-01/REPORT.md). The set was constructed after the v1 failures and is not an untouched independent benchmark. No user-study metric, trading return, win rate or general research-accuracy percentage has been measured. The clean locked install and local deployment rehearsal are complete; host selection and publication remain pending.
+# Approved supplemental-source AI check — 4 October 2026
+
+The user approved a new frozen three-action check against review v5 / question v4.
+Real public NVIDIA financial/SEC excerpts and Fed/BLS snapshots were saved before
+spending; the idea/minimums were constructed. Bitget review and two Groq follow-ups
+used 3/6 provider requests, with no repairs. All three response contracts passed,
+as did cached-repeat, restart, immutable-check, export and saved-source lookup
+checks in an isolated SQLite notebook. Manual inspection found one summary citing
+only company commentary while repeating numbers from the uncited earnings source.
+Thus this is not an unqualified research-quality pass. Follow-ups took about 1.1s;
+review took 65.5s. 198 backend tests and Ruff passed. No core prompt change, user
+notebook mutation, commit, push or deployment was made. [Full report and complete
+quality scores](evaluations/official-ai-2026-10-04/REPORT.md).

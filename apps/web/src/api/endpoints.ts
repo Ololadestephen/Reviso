@@ -75,6 +75,14 @@ export const fetchHistory = (id: string, signal?: AbortSignal) =>
 export const fetchEvidence = (id: string, signal?: AbortSignal) =>
   get(`/evidence/${id}`, evidenceSchema, signal);
 
+export const loadOfficialResearch = (
+  record: ThesisRecord,
+  assessmentHash: string,
+) =>
+  post(`/theses/${record.id}/research-context`, assessmentSchema, {
+    assessment_input_hash: assessmentHash,
+  });
+
 export const saveDraft = (thesis: ThesisInput) =>
   post("/theses/draft", thesisRecordSchema, thesis);
 

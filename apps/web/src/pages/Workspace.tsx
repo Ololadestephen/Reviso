@@ -459,6 +459,7 @@ export default function Workspace() {
             active={active}
             replay={replay}
             refresh={refresh}
+            loadResearch={workspace.loadResearch}
             latest={latest}
             reviewWithAI={workspace.reviewWithAI}
             reviewFailed={workspace.reviewFailed}

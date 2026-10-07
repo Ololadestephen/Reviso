@@ -214,7 +214,15 @@ class Repository:
         )
         return json.loads(saved["body"])
 
-    def assess(self, owner_id: str, thesis_id: str, expected: int, assessment: dict) -> dict:
+    def assess(
+        self,
+        owner_id: str,
+        thesis_id: str,
+        expected: int,
+        assessment: dict,
+        *,
+        expected_selection: str | None = None,
+    ) -> dict:
         with self.connect() as connection:
             connection.execute("BEGIN IMMEDIATE")
             row = connection.execute(
@@ -226,6 +234,13 @@ class Repository:
             current = json.loads(row["body"])
             if current["version"] != expected or current["retired"]:
                 raise ConflictError("Thesis changed during assessment")
+            if expected_selection is not None:
+                selected = connection.execute(
+                    "SELECT input_hash FROM assessment_selection WHERE owner_id=? AND thesis_id=?",
+                    (owner_id, thesis_id),
+                ).fetchone()
+                if selected is None or selected["input_hash"] != expected_selection:
+                    raise ConflictError("Research selection changed while sources were loading")
             return self._save_assessment(connection, owner_id, thesis_id, expected, assessment)
 
     def assessment_by_hash(self, owner_id: str, thesis_id: str, input_hash: str) -> dict | None:
@@ -284,6 +299,14 @@ class Repository:
             rows = connection.execute(query, parameters).fetchall()
         return [json.loads(row["body"]) for row in rows]
 
+    def research_answer_by_id(self, owner_id: str, thesis_id: str, answer_id: str) -> dict | None:
+        with self.connect() as connection:
+            row = connection.execute(
+                "SELECT body FROM research_answers WHERE owner_id=? AND thesis_id=? AND id=?",
+                (owner_id, thesis_id, answer_id),
+            ).fetchone()
+        return json.loads(row["body"]) if row else None
+
     def assessment_with_narrative(
         self, owner_id: str, thesis_id: str, context_hash: str
     ) -> dict | None:
@@ -323,8 +346,9 @@ class Repository:
             row = connection.execute(
                 "SELECT e.value FROM assessments a, json_each(a.body, '$.evidence') e "
                 "WHERE a.owner_id=? AND json_extract(e.value, '$.id')=? "
-                "ORDER BY a.rowid LIMIT 1",
-                (owner_id, evidence_id),
+                "UNION ALL SELECT e.value FROM assessments a, json_each(a.body, '$.research_sources') e "
+                "WHERE a.owner_id=? AND json_extract(e.value, '$.id')=? LIMIT 1",
+                (owner_id, evidence_id, owner_id, evidence_id),
             ).fetchone()
         if row is None:
             raise KeyError(evidence_id)

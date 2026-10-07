@@ -19,7 +19,7 @@ Reviso keeps the idea, its conditions, the sources, and your decisions in one re
 - A private library of ideas, versions, evidence checks, conversations and decisions
 - Six checked companies, each bound to one Bitget Reality instrument and one official evidence path
 - A rules-based finding from reported numbers, not from a model vote
-- Qwen as an explainer beside the result, not as the decision
+- AI as an explainer beside the result, not as the decision
 - Exports of a saved version as Markdown, JSON or PDF
 
 Public pages (`/`, `/guide`, `/example`, `/privacy`, `/terms`) are read-only. They do not read your notebook and do not call Qwen. Saved research lives behind Google sign-in at `/app`.
@@ -52,11 +52,30 @@ Different tasks use separate model routes:
 
 | Task | Provider and model |
 | --- | --- |
-| Idea extraction and evidence explanation | Bitget Qwen 3.8 Max; Groq Qwen fallback when the Bitget key is unset |
+| Idea extraction | Bitget Qwen 3.8 Max; Groq Qwen when the Bitget key is unset |
+| Evidence explanation | Same primary route by default; opt-in Gemini `gemini-3.5-flash-lite` |
 | Editable condition suggestions | Groq `openai/gpt-oss-20b` |
 | Filing follow-up questions | Groq `qwen/qwen3.8-27b` |
 
-Qwen cannot confirm conditions, fetch an arbitrary website, compute the financial result, record keep / change / set aside, or place a trade. Repair attempts count toward the daily allowance. If Qwen is offline or the allowance is used, you can still finish the path by hand. Saved findings stay readable.
+These models cannot confirm conditions, fetch an arbitrary website, compute the financial result, record keep / change / set aside, or place a trade. Repair attempts count toward the shared AI daily allowance. If AI is offline or the allowance is used, you can still finish the path by hand. Saved findings stay readable.
+
+Gemini explanations are an optional local integration, not yet live-validated.
+The server accepts `GEMINI_API_KEY` or the existing `Gemini_API` name (the standard
+name takes priority). A key alone does not activate it. After reviewing Google's
+[data-use terms](https://ai.google.dev/gemini-api/terms), set
+`REVISO_REVIEW_PROVIDER=gemini` and restart the backend with `--env-file .env`.
+Google's free-tier content may be used to improve its products; confirm the right
+tier and privacy policy before enabling this for other people. Google OAuth's
+client ID is unrelated to this API key.
+
+Gemini uses a fixed Google endpoint, structured JSON, minimal reasoning and a
+10-second network timeout per request. One validation repair is allowed and
+counts toward the existing allowance; network/rate-limit errors are not retried
+and never fall back to Bitget. This is a latency safeguard, not a measured reply
+time. Set `REVISO_REVIEW_PROVIDER=primary` to restore the previous route.
+`/llm/status` reports separate `review_provider`, `review_model` and
+`review_configured` fields; configured means a key is present, not authenticated
+or live-tested. Old saved explanations retain their original provenance.
 
 ## Evidence rules
 
@@ -65,6 +84,9 @@ Reviso only fetches allowlisted hosts and paths. External text is data, never in
 | Kind of data | Role |
 | --- | --- |
 | Official company filing | The source for company conditions |
+| Selected SEC report passages | Company-prepared management discussion and risks; commentary, not engine metrics or independent proof |
+| Federal Reserve policy statement | Dated economy-wide interest-rate context, not company evidence |
+| BLS inflation and jobs releases | Dated economy-wide context; current pages may be revised, so availability starts at retrieval |
 | Bitget Reality USDT observation | Dated market context for the selected instrument, not a finding |
 | xStocks indicative USD price | Separate comparison context for the same company. Never filing evidence, never a substitute for the Bitget quote |
 | Historical NVIDIA replay | Labeled history for the prepared example. Not current evidence for a live check |
@@ -74,7 +96,25 @@ Reviso only fetches allowlisted hosts and paths. External text is data, never in
 
 Reviso is a research tool and cannot place trades. Tokenized Bitget products are not registered company shares in your name. Reviso does not establish redemption rights or exact tracking of the listed share price.
 
-xStocks research is currently an external link. Its articles are not ingested into Reviso's findings or chat.
+On a live result, **More research → Load official research** retrieves those three
+official source groups. It saves a new check with your existing financial filing,
+rechecks its age and preserves the previous check. It does not refresh the
+financial filing or price and makes no AI call. Request a new explanation or use
+chat separately when ready; both can cite loaded passages. Historical replays and
+controlled scenarios do not fetch today's releases. Source failures stay visible.
+
+For SEC report retrieval, set `REVISO_SEC_USER_AGENT` on the server to an identifying
+application name and a genuine contact email, as required by SEC fair-access
+guidance. A personal contact is sufficient; do not invent an address. No API key
+is required for these sources. BLS access may return HTTP 403 from some networks;
+Reviso reports unavailable rather than bypassing access controls. See
+[official research sources](docs/OFFICIAL_RESEARCH.md) for boundaries and setup.
+
+xStocks research is a small, manually checked reading list on the result page,
+with company/wider-market labels and newer relevant links first. Articles newer
+than the saved check date are hidden. It is not an automatic feed: articles are
+not ingested into findings or chat. Content ingestion requires permission; see
+[the integration boundary](docs/XSTOCKS_RESEARCH.md).
 
 ## Coverage
 
@@ -109,7 +149,7 @@ FastAPI  ── SQLite (immutable versions, owner-scoped rows)
         ├── Bitget public market (official SDK, read-only)
         ├── NVIDIA newsroom / SEC company facts
         ├── xStocks public USD context
-        └── Qwen extract/review (Bitget first, Groq fallback); Groq chat and drafts
+        └── Primary extraction; optional Gemini review; Groq chat and drafts
 ```
 
 Contracts, providers, numerical engines, services and the SQLite repository stay separate. The browser never receives provider keys. Production serves the built web app and `/api` from one origin behind Caddy on AWS Lightsail. SQLite and TLS certificates live on named Docker volumes. One application replica is required while SQLite is the store.
@@ -160,6 +200,8 @@ Copy `.env.example` to a Git-ignored `.env`. Do not put secrets in `VITE_*` vari
 | Variable | Purpose |
 | --- | --- |
 | `BITGET_QWEN_API_KEY` | Sponsored Qwen 3.8 Max. Loaded from `.env` or the process environment. An exported process value wins. The endpoint and model id are fixed in backend code. |
+| `GEMINI_API_KEY` / `Gemini_API` | Server-only Gemini explanation key. Standard name wins; never prefix with `VITE_`. |
+| `REVISO_REVIEW_PROVIDER` | `primary` (default) or `gemini`. Only changes result explanations, not extraction, drafting or chat. Gemini has no automatic provider fallback. |
 | `GROQ_API_KEY` | Filing follow-up chat (Groq Qwen 3.8 27B) and condition drafts (gpt-oss-20b). Also the extraction/review fallback if Bitget is unset. `REVISO_LLM_MODEL` changes the Groq chat id; `REVISO_DRAFT_MODEL` changes the Groq draft id. |
 | `REVISO_DB_PATH` | SQLite file. Default `data/reviso-v1.sqlite3`. Migrations run on startup. |
 | `REVISO_AUTH_MODE` | `local` (default on loopback), `google`, or `simulated`. Public demo cannot use local or simulated. |
@@ -195,6 +237,10 @@ npm run build
 ```
 
 Tests establish behavior. They do not establish research accuracy. Mechanical quality scans are recorded in [quality](docs/QUALITY.md). Live Qwen batches and browser journeys are recorded in [evaluation](docs/EVALUATION.md). No general accuracy score is claimed from those runs.
+
+A [24-slot independent research pilot](docs/evaluations/independent-pilot-01/README.md)
+is prepared, not completed. Source selection and expected answers await an
+independent reviewer. No holdout or paid request budget is authorised yet.
 
 ## Limits
 

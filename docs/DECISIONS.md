@@ -40,6 +40,36 @@
 
 37. October 4 result-page polish: one main result area shows the saved outcome, a short explanation, report date/source, and each condition's reported value beside its confirmed minimum. Those values are displayed from the assessed thesis version and cited evidence without browser-side financial comparison. Absent and uncited/stale values are never shown as zero or current observations. Manual conditions explicitly need human review. Source links stay outside collapsed views; condition details and longer AI reading expand on demand. One closed Advanced view contains separate Bitget/xStocks market context, previous checks, historical examples, what-if tests and technical details. xStocks context is requested only when Market details opens; the existing workspace Bitget quote hook is unchanged. Missing evidence, failed/incomplete retrieval and historical/what-if labels remain visible in the main result. Only an actual pending review displays a writing indicator. Record/edit actions, auto-review guards, backend calculations, AI prompts and immutable data are unchanged. This supersedes Decision 34's expandable-number placement. Local only; no paid call, commit/push or deployment.
 
+38. October 4 validation preparation and xStocks reading: a 24-slot cross-company pilot pack now defines independent selection/verification, source snapshots, frozen expectations, scoring and a proposed 60-provider-request cap for 24 explanations plus six follow-ups. It is not a selected/frozen/run holdout; no independent answers or scores are fabricated. The small study remains user-owned. The result page now shows a compact manually curated xStocks reading list, newest qualifying links first, with issuer-bound mentions and labelled wider-market topics. Date-only publication uses the next-UTC-day gate; articles newer than the saved check are hidden. Links are external and never enter the finding, AI/chat context or exports. The indicative price stays in Advanced view, without its former research button. Article/PDF ingestion needs content permission under the website terms. No website connector, paid AI run, account contact, database change, commit/push or deployment is made by this work.
+
+39. October 4 optional Gemini explanation route: server-only `GEMINI_API_KEY`
+or the user's existing `Gemini_API` alias is accepted; standard name wins.
+`REVISO_REVIEW_PROVIDER=gemini` is required, so adding a key does not silently
+send user research to Google. Extraction retains the existing Bitget-first
+selection; Groq drafting and chat are unchanged. The fixed Google compatible
+endpoint uses `gemini-3.5-flash-lite`, structured JSON and minimal reasoning,
+with a 10-second network timeout per request, one contract repair and no
+automatic network retries or provider fallback. Existing budget accounting,
+numerical/citation validation and provider-keyed narrative caches apply.
+Separate review readiness is reported to the browser; existing saved
+explanations retain their provenance. Free-tier data-use terms must be reviewed
+before activation for public users. Live latency/quality and key validity are
+unverified; local implementation is not authority for a paid call or deployment.
+
+40. October 7 submission-day chat attribution: new follow-ups use
+`research-question-v5` with provider-only cited statements for the summary, each
+fact and uncertainty. Each summary/fact names its own supplied sources; reported
+percentage values must appear in those cited excerpts or reported metrics.
+Confirmed floors are permitted only when labelled as user conditions. The full
+visible reply is limited to 70 words, or 160 for requested detail. Failed output
+receives at most one repair with the same context and validation error; continued
+failure saves no exchange. Public answers retain their existing flat contract and
+actual citation union; no unrelated IDs are appended. Existing records/history
+are not rewritten. Duplicate-question reuse requires the saved provider, model
+and prompt to match, preventing older output from bypassing the new boundary.
+This is bounded attribution, not general semantic proof of every qualitative
+claim. Local only; the new prompt has not been live-tested or deployed.
+
 ## Capability matrix
 
 | Capability | Source/interface | Access | Current scope/limitations |
@@ -68,3 +98,14 @@ The working slice uses human confirmation plus deterministic metric floors. Qwen
 The investor-relations quarterly index returned HTTP 403 to the automated request. NVIDIA's own newsroom serves earnings releases successfully, so discovery uses the fixed `https://nvidianews.nvidia.com/news?q=financial%20results` listing. Only earnings-release paths on that exact HTTPS host may be fetched. The newest fiscal quarter present in this bounded listing is selected, with no fallback to older reports if it fails. Coverage is limited to this listing; this is not an exhaustive filings feed.
 
 Live verification retrieved the August 26, 2026 FY2027 Q2 release for the quarter ended July 26, 2026. The parser obtained 75.0% GAAP gross margin and 106% reported revenue growth. This is a dated source observation. The immutable assessment stores excerpts and extraction provenance; the document hash fingerprints the received HTML, which is not retained in full. Retrieval itself uses no LLM; the separate September 12 browser journey did send the preserved excerpt and confirmed assumptions to Qwen for one bounded narrative review.
+# 2026-10-04 — Official supplemental research
+
+SEC report excerpts are company statements, not independent verification. Fed policy
+and BLS releases are economy-wide context, not proof of a company's condition. These
+sources contain no engine metrics and cannot change a numerical comparison. Explicit
+loading creates a new live check with a fresh cutoff and rechecks the saved financial
+evidence for age; it does not claim to refresh the financial filing or quote. BLS current
+pages may be revised, so their availability is no earlier than retrieval. Sources,
+failures and provenance are saved with the check. AI citations may use these excerpts,
+but macro-only citations cannot establish a company assumption. Live paid validation
+requires separate approval. No additional xStocks ingestion in this slice.

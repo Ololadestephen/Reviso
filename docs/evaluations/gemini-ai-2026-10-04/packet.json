@@ -1,0 +1,80 @@
+{
+  "thesis": {
+    "instrument_id": "RNVDAUSDT",
+    "direction": "long",
+    "proposed_amount": "10000",
+    "entry_price": "100",
+    "max_loss": "1000",
+    "max_slippage_bps": "100",
+    "holding_days": 90,
+    "rationale": "NVIDIA's growth and margins need to meet my stated floors; peer demand needs review.",
+    "assumptions": [
+      {
+        "id": "growth",
+        "claim": "Revenue growth remains at least 120%",
+        "category": "fundamental",
+        "essential": true,
+        "metric": "revenue_growth_yoy_pct",
+        "minimum": "120",
+        "invalidation_condition": "Invalidate when reported year-over-year revenue growth is below 120%."
+      },
+      {
+        "id": "margin",
+        "claim": "GAAP gross margin remains at least 75%",
+        "category": "fundamental",
+        "essential": true,
+        "metric": "gaap_margin_pct",
+        "minimum": "75",
+        "invalidation_condition": "Invalidate when reported GAAP gross margin is below 75%."
+      },
+      {
+        "id": "peers",
+        "claim": "NVIDIA demand is stronger than every competitor's demand.",
+        "category": "fundamental",
+        "essential": true,
+        "metric": "manual",
+        "minimum": "0",
+        "invalidation_condition": "Requires manual evidence review; no numerical invalidation rule."
+      }
+    ]
+  },
+  "financial_evidence": [
+    {
+      "id": "nvda-public-acc61d7488198c00a3767dc764e5c3e6703ca2ebacdae3f57db04608472e285c",
+      "instrument_id": "RNVDAUSDT",
+      "source_url": "https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-second-quarter-fiscal-2027",
+      "publisher": "NVIDIA Newsroom",
+      "title": "NVIDIA Announces Financial Results for Second Quarter Fiscal 2027",
+      "excerpt": "NVIDIA (NASDAQ: NVDA) today reported revenue for the second quarter ended July 26, 2026, of $96.2 billion, up 18% from the previous quarter and up 106% from a year ago. For the quarter, GAAP and non-GAAP gross margins were both 75.0%. GAAP and non-GAAP earnings per diluted share were $2.46 and $2.22, respectively.\n\nGAAP table \u00b7 Q2 FY27 \u00b7 Gross margin: 75.0 %",
+      "published_at": "2026-08-26T00:00:00Z",
+      "available_at": "2026-08-27T00:00:00Z",
+      "observed_at": "2026-07-26T00:00:00Z",
+      "retrieved_at": "2026-10-04T20:02:15.941032Z",
+      "content_hash": "9536ed274360b82fe16193f57732bdc275d2ca36352b52d28ff00d3e43cdd2b2",
+      "duplicate_family": "NVIDIA-FY2027-Second",
+      "scope": "NVIDIA company; quarter ended 2026-07-26 only",
+      "limitations": "Selected introduction and labeled GAAP table row, not the full disclosure. Day-level publication precision. Reported results are not forecasts or token rights. Missing or ambiguous metrics remain unavailable.",
+      "metrics": {
+        "revenue_growth_yoy_pct": "106",
+        "gaap_margin_pct": "75.0"
+      },
+      "origin": "PUBLIC_RETRIEVAL",
+      "document_hash": "3c6ec3d35d1cd950dbdbdd937b778c9a9e091e93fed695b713e84f656c8c14bf",
+      "parser_version": "nvidia-earnings-v1",
+      "kind": "COMPANY_FACTS"
+    }
+  ],
+  "expected_states": {
+    "growth": "INVALIDATED",
+    "margin": "SUPPORTED",
+    "peers": "INSUFFICIENT_EVIDENCE"
+  },
+  "expected_stances": {
+    "growth": "CONTRADICTS",
+    "margin": "SUPPORTS",
+    "peers": "INSUFFICIENT_EVIDENCE"
+  },
+  "scope": "Public filing and constructed conditions only; no user notebook or supplemental sources",
+  "source_packet": "docs/evaluations/official-ai-2026-10-04/packet.json",
+  "source_packet_sha256": "4408724c9703cfe90ec508b0a5836c3ffb30cb095240cfb4478242692029c9d0"
+}

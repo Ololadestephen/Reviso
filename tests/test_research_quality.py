@@ -99,13 +99,20 @@ def test_stale_metric_cannot_be_supported_and_manual_review_is_separate(thesis):
 
 
 @pytest.mark.parametrize("has_facts", [False, True])
-def test_abstention_can_be_uncited_but_reported_facts_need_a_source(thesis, has_facts):
+def test_abstention_still_works_but_each_reported_fact_needs_a_source(thesis, has_facts):
     evidence = available_evidence(CUTOFFS[1])
     answer = {
-        "summary": "This filing does not answer the question about future demand.",
-        "facts": ["A reported fact without a citation."] if has_facts else [],
-        "uncertainty": "Future demand cannot be established from this filing.",
-        "evidence_ids": [],
+        "summary": {
+            "text": "This filing does not answer the question about future demand.",
+            "evidence_ids": [evidence[0].id],
+        },
+        "facts": [{"text": "A reported fact without a citation.", "evidence_ids": []}]
+        if has_facts
+        else [],
+        "uncertainty": {
+            "text": "Future demand cannot be established from this filing.",
+            "evidence_ids": [],
+        },
     }
     calls = []
 

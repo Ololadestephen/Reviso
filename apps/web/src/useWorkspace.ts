@@ -26,6 +26,7 @@ import {
   useLlmStatus,
   useRecordDecision,
   useRefreshEvidence,
+  useOfficialResearch,
   useReplayStep,
   useReviewEvidence,
   useReviseThesis,
@@ -47,7 +48,7 @@ const unconfiguredLlm: LLMStatus = {
   model: "qwen3.8-max",
   configured: false,
   extraction_prompt: "thesis-extraction-v2",
-  review_prompt: "evidence-review-v4",
+  review_prompt: "evidence-review-v5",
   streaming: "untested",
   chat_provider: "groq",
   chat_model: "qwen/qwen3.8-27b",
@@ -120,6 +121,7 @@ export function useWorkspace(
   const confirmMutation = useConfirmThesis(record);
   const replayMutation = useReplayStep(record);
   const refreshMutation = useRefreshEvidence(record);
+  const researchMutation = useOfficialResearch(record);
   const reviewMutation = useReviewEvidence(record);
   const decideMutation = useRecordDecision(record);
   const reviseMutation = useReviseThesis(record);
@@ -132,6 +134,7 @@ export function useWorkspace(
     confirmMutation,
     replayMutation,
     refreshMutation,
+    researchMutation,
     reviewMutation,
     decideMutation,
     reviseMutation,
@@ -180,6 +183,7 @@ export function useWorkspace(
       ? (replayMutation.variables ?? null)
       : null,
     refresh: refreshMutation.isPending,
+    research: researchMutation.isPending,
     review: reviewMutation.isPending,
     decide: decideMutation.isPending,
     revise: reviseMutation.isPending,
@@ -230,6 +234,10 @@ export function useWorkspace(
     refresh: () => {
       clearErrors();
       refreshMutation.mutate();
+    },
+    loadResearch: () => {
+      clearErrors();
+      if (latest) researchMutation.mutate(latest.input_hash);
     },
     reviewWithAI: () => {
       clearErrors();

@@ -535,6 +535,17 @@
             ],
             "title": "Instrument Id"
           },
+          "kind": {
+            "default": "COMPANY_FACTS",
+            "enum": [
+              "COMPANY_FACTS",
+              "COMPANY_REPORT",
+              "MONETARY_POLICY",
+              "ECONOMIC_DATA"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
           "limitations": {
             "title": "Limitations",
             "type": "string"
@@ -896,6 +907,21 @@
           "evidence_ids"
         ],
         "title": "ResearchAnswer",
+        "type": "object"
+      },
+      "ResearchLoadInput": {
+        "additionalProperties": false,
+        "properties": {
+          "assessment_input_hash": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Assessment Input Hash",
+            "type": "string"
+          }
+        },
+        "required": [
+          "assessment_input_hash"
+        ],
+        "title": "ResearchLoadInput",
         "type": "object"
       },
       "ResearchQuestionInput": {
@@ -2712,6 +2738,57 @@
           }
         },
         "summary": "Refresh"
+      }
+    },
+    "/theses/{thesis_id}/research-context": {
+      "post": {
+        "operationId": "load_research_theses__thesis_id__research_context_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "thesis_id",
+            "required": true,
+            "schema": {
+              "title": "Thesis Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResearchLoadInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Load Research Theses  Thesis Id  Research Context Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Load Research"
       }
     },
     "/theses/{thesis_id}/revisions": {

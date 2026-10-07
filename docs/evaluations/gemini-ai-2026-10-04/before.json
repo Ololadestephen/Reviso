@@ -1,0 +1,94 @@
+{
+  "state": "INVALIDATED",
+  "assumptions": [
+    {
+      "assumption_id": "growth",
+      "state": "INVALIDATED",
+      "explanation": "Reported 106%; confirmed minimum 120%. This satisfies the declared invalidation condition.",
+      "evidence_ids": [
+        "nvda-public-acc61d7488198c00a3767dc764e5c3e6703ca2ebacdae3f57db04608472e285c"
+      ],
+      "essential": true
+    },
+    {
+      "assumption_id": "margin",
+      "state": "SUPPORTED",
+      "explanation": "Reported 75.0%; confirmed minimum 75%. The reported metric meets the condition for this period; future performance is unknown.",
+      "evidence_ids": [
+        "nvda-public-acc61d7488198c00a3767dc764e5c3e6703ca2ebacdae3f57db04608472e285c"
+      ],
+      "essential": true
+    },
+    {
+      "assumption_id": "peers",
+      "state": "INSUFFICIENT_EVIDENCE",
+      "explanation": "No suitable current passage for this confirmed metric. Manual claims require research review.",
+      "evidence_ids": [],
+      "essential": true
+    }
+  ],
+  "numerical": {
+    "mode": "CONTROLLED_SCENARIO",
+    "quantity": "100",
+    "price_pnl": "-1000.0",
+    "loss_breach": false,
+    "execution": null,
+    "premium": null,
+    "premium_reason": "No synchronized USD/USDT-adjusted share reference and verified unit ratio.",
+    "breaking_move_pct": "-10.1",
+    "search": "Smallest found within the tested scenario set: price decline 0\u2013100%, 0.1 percentage-point steps; strict loss > limit. Spread/depth fixed; no mixed-shock optimum claimed.",
+    "costs": "Exit fee included at declared bps; entry fees, taxes and FX omitted. Spread is an additional symmetric shock around midpoint. Depth is not a fill guarantee."
+  },
+  "missing": [
+    "Compatible current share reference and unit ratio",
+    "Narrative AI review has not been added to this assessment",
+    "Token terms and current redemption availability"
+  ],
+  "next_question": "Does the latest primary disclosure still meet your essential metric floor?",
+  "thesis_id": "36cd8862-84af-4d73-a31b-8662f4ee7df1",
+  "thesis_version": 2,
+  "mode": "LIVE_REFRESH",
+  "evidence_cutoff": "2026-10-04T22:48:48.655895+00:00",
+  "evaluated_at": "2026-10-04T22:48:48.656031+00:00",
+  "evidence": [
+    {
+      "id": "nvda-public-acc61d7488198c00a3767dc764e5c3e6703ca2ebacdae3f57db04608472e285c",
+      "instrument_id": "RNVDAUSDT",
+      "source_url": "https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-second-quarter-fiscal-2027",
+      "publisher": "NVIDIA Newsroom",
+      "title": "NVIDIA Announces Financial Results for Second Quarter Fiscal 2027",
+      "excerpt": "NVIDIA (NASDAQ: NVDA) today reported revenue for the second quarter ended July 26, 2026, of $96.2 billion, up 18% from the previous quarter and up 106% from a year ago. For the quarter, GAAP and non-GAAP gross margins were both 75.0%. GAAP and non-GAAP earnings per diluted share were $2.46 and $2.22, respectively.\n\nGAAP table \u00b7 Q2 FY27 \u00b7 Gross margin: 75.0 %",
+      "published_at": "2026-08-26T00:00:00Z",
+      "available_at": "2026-08-27T00:00:00Z",
+      "observed_at": "2026-07-26T00:00:00Z",
+      "retrieved_at": "2026-10-04T20:02:15.941032Z",
+      "content_hash": "9536ed274360b82fe16193f57732bdc275d2ca36352b52d28ff00d3e43cdd2b2",
+      "duplicate_family": "NVIDIA-FY2027-Second",
+      "scope": "NVIDIA company; quarter ended 2026-07-26 only",
+      "limitations": "Selected introduction and labeled GAAP table row, not the full disclosure. Day-level publication precision. Reported results are not forecasts or token rights. Missing or ambiguous metrics remain unavailable.",
+      "metrics": {
+        "revenue_growth_yoy_pct": "106",
+        "gaap_margin_pct": "75.0"
+      },
+      "origin": "PUBLIC_RETRIEVAL",
+      "document_hash": "3c6ec3d35d1cd950dbdbdd937b778c9a9e091e93fed695b713e84f656c8c14bf",
+      "parser_version": "nvidia-earnings-v1",
+      "kind": "COMPANY_FACTS"
+    }
+  ],
+  "versions": {
+    "model": "none-manual-confirmation",
+    "prompt": "none",
+    "engine": "decimal-v1",
+    "policy": "confirmed-metric-floor-v1"
+  },
+  "scenario": {
+    "price_move_pct": "-10",
+    "spread_bps": "20",
+    "depth_multiplier": "1",
+    "fee_bps": "0",
+    "bids": null
+  },
+  "input_hash": "040a663c1e1d4bbcde7b7dddccb700f3e6aa78861dc1f4aebd9adb2ec5a07b6e",
+  "result_hash": "b1210aa48863fa062b0621c9654d797be0237644449831976d6dca09f22f80bd"
+}

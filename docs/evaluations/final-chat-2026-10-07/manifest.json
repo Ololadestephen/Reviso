@@ -1,0 +1,28 @@
+{
+  "frozen_at": "2026-10-07T09:37:48.769003+00:00",
+  "request_cap": 2,
+  "actions": [
+    "company_followup"
+  ],
+  "sources": {
+    "backend/api.py": "f87b93443625811fd76e7533abab4424aec65ad64c9979e988c589fc0655bba8",
+    "backend/answer_validation.py": "306b7116607227a91bd30600a132e1e96b627d436294447e1d4435aeb8a0a2c9",
+    "backend/contracts.py": "7cf26483b1c4379ac0321a399cd8394d82aaf337cdee3c319aa19b8500a1622d",
+    "backend/llm.py": "3693401d74f4cf4d793789368a16cfbf7d2bb40230d0f237a5283855ef5d3913",
+    "backend/routes.py": "a80837799104a35b3089626d3b9da0165b6cec71203d01c1a6eb6ac94c260d33",
+    "backend/services.py": "8dc26aab7e68ac73bf26eca63e46e76949a57c3cf6566120ab9d0d1751c58cc8",
+    "backend/storage.py": "b5491211ba16d45066e687dd62706ca68244fafd8313395441b58689134aadb1",
+    "backend/research_chat.py": "7351cfb329eb5284c6290e4e2378faceeee16f269ffd092f149f9c2bd54b1b93",
+    "backend/research_context.py": "c7006de58050b07b2aa9a717af53928a480cc4661e196d9cb79cfa8aefe04ad7",
+    "backend/research_routes.py": "9f0881e23b06d516ed25ef0b0329bac775255b2c3ea9c4529ff9e1399102fb1e",
+    "backend/official_research.py": "0da30897abd8fb17479470c3a43b9389fa8fff57195abe01528b37e30eaf4055",
+    "backend/official_transport.py": "cf4f48efa9e34fdbcbead0c92b99fec8dd6731dd9d299025882297ac5408357b",
+    "backend/research_parsers.py": "9a138749dcac11dc49a68368637afe3d2199cea79f12a050f345228fb46b26af",
+    "backend/exports.py": "2ae2e4d7cb15802cba8b58cceea696ca4b107e4efcfa63e9c74320017e2d4c4d",
+    "scripts/final_live_validation.py": "68e6d5cd808fa155bfea6cd3a6e7145de4e6a792c2c83bf20134e0960a1d6014",
+    "scripts/official_research_live_validation.py": "d2b50c41a11827e69a3b3f17a2331c6d84f71991d85d6c51d6d4f2efe8c199ad"
+  },
+  "packet_sha256": "4408724c9703cfe90ec508b0a5836c3ffb30cb095240cfb4478242692029c9d0",
+  "chat_model": "qwen/qwen3.8-27b",
+  "question_prompt": "research-question-v5"
+}

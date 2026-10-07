@@ -3,6 +3,9 @@ import AssumptionLedger from "../../AssumptionLedger";
 import ReplayPanel from "../../ReplayPanel";
 import EvidenceChatDock from "./EvidenceChatDock";
 import ResearchOptions from "./ResearchOptions";
+import RelatedResearch from "./RelatedResearch";
+import OfficialResearch from "./OfficialResearch";
+import { researchSources } from "../../lib/researchSources";
 import type {
   Assessment,
   Evidence,
@@ -20,6 +23,7 @@ export default function EvidenceStep({
   active,
   replay,
   refresh,
+  loadResearch,
   latest,
   reviewWithAI,
   reviewFailed = false,
@@ -42,10 +46,12 @@ export default function EvidenceStep({
     review: boolean;
     replayStep: number | null;
     stress: boolean;
+    research?: boolean;
   };
   active: boolean;
   replay: (step: number) => void;
   refresh: () => void;
+  loadResearch?: () => void;
   latest: Assessment | null;
   reviewWithAI: () => void;
   reviewFailed?: boolean;
@@ -63,15 +69,24 @@ export default function EvidenceStep({
   decision?: ReactNode;
 }) {
   const [selected, setSelected] = useState<Evidence | null>(null);
-  const currentIds = latest?.evidence.map((item) => item.id).join("|") ?? "";
+  const currentIds = latest
+    ? researchSources(latest)
+        .map((item) => item.id)
+        .join("|")
+    : "";
   const priorIds =
     lastEvidenceAssessment?.evidence.map((item) => item.id).join("|") ?? "";
 
   useEffect(() => {
     setSelected((current) => {
-      if (current && latest?.evidence.some((item) => item.id === current.id)) {
+      if (
+        current &&
+        latest &&
+        researchSources(latest).some((item) => item.id === current.id)
+      ) {
         return (
-          latest.evidence.find((item) => item.id === current.id) ?? current
+          researchSources(latest).find((item) => item.id === current.id) ??
+          current
         );
       }
       if (
@@ -153,6 +168,25 @@ export default function EvidenceStep({
             </footer>
           )}
         </section>
+        {!showDecision && latest && loadResearch && (
+          <OfficialResearch
+            latest={latest}
+            writing={writing}
+            pending={pending.research ?? false}
+            active={active}
+            onLoad={loadResearch}
+            onSource={openSource}
+            onExplain={reviewWithAI}
+            aiReady={llmStatus.review_configured ?? llmStatus.configured}
+            explaining={pending.review}
+          />
+        )}
+        {!showDecision && latest && (
+          <RelatedResearch
+            instrument={instrument}
+            evidenceCutoff={latest.evidence_cutoff}
+          />
+        )}
         <ResearchOptions
           latest={latest}
           history={history}
@@ -170,7 +204,7 @@ export default function EvidenceStep({
       {showDecision ? (
         <aside className="dashboard-aside">{decision}</aside>
       ) : null}
-      {latest?.evidence.length ? (
+      {latest && researchSources(latest).length ? (
         <EvidenceChatDock
           latest={latest}
           record={record}

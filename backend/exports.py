@@ -164,6 +164,16 @@ def markdown_snapshot(snapshot: dict) -> str:
                 ]
             )
         lines.append("")
+        for source in item.get("research_sources", []):
+            lines.extend(
+                [
+                    f"- Additional research ({source['kind']}): [{source['title']}]({source['source_url']})",
+                    f"  - Publisher: {source['publisher']} · Published: {source['published_at']}",
+                    f"  - Available: {source['available_at']} · Retrieved: {source['retrieved_at']}",
+                    f"  - Excerpt: {source['excerpt']}",
+                    f"  - Limitations: {source['limitations']}",
+                ]
+            )
     lines.extend(["", "## Cited follow-up answers", ""])
     if not snapshot["research_answers"]:
         lines.append("No saved follow-up answers for this assessment.")
@@ -419,6 +429,17 @@ def pdf_snapshot(snapshot: dict) -> bytes:
             _write(pdf, f"Published: {_when(entry['published_at'])}", 9, indent=5, color=MUTED)
             _write(pdf, f"Excerpt: {entry['excerpt']}", 9, indent=5)
             _write(pdf, f"Limitations: {entry['limitations']}", 9, indent=5, color=MUTED)
+        for entry in item.get("research_sources", []):
+            _write(pdf, f"Additional research ({entry['kind']}): {entry['title']}", 10, bold=True)
+            _write(pdf, f"{entry['publisher']} · {entry['source_url']}", 8, color=MUTED)
+            _write(
+                pdf,
+                f"Published: {_when(entry['published_at'])} · Retrieved: {_when(entry['retrieved_at'])}",
+                9,
+                color=MUTED,
+            )
+            _write(pdf, entry["excerpt"], 9)
+            _write(pdf, entry["limitations"], 9, color=MUTED)
         pdf.ln(2)
 
     _section(pdf, "Cited follow-up answers")

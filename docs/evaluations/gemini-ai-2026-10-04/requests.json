@@ -1,0 +1,32 @@
+[
+  {
+    "number": 1,
+    "action": "mixed_explanation",
+    "started_at": "2026-10-04T22:48:48.659405+00:00",
+    "endpoint": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+    "response": {
+      "choices": [
+        {
+          "finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "content": "{\n  \"summary\": \"The evidence shows 106% revenue growth and 75.0% GAAP gross margin for the quarter. Revenue growth is below the required 120% threshold, while gross margin meets its 75% target. Competitor demand comparisons remain unknown due to lack of evidence.\",\n  \"next_question\": \"What are the specific revenue growth projections and competitor demand metrics for the next fiscal period?\",\n  \"items\": [\n    {\n      \"assumption_id\": \"growth\",\n      \"stance\": \"CONTRADICTS\",\n      \"explanation\": \"Reported 106% growth, which is below the minimum 120% requirement.\",\n      \"evidence_ids\": [\n        \"nvda-public-acc61d7488198c00a3767dc764e5c3e6703ca2ebacdae3f57db04608472e285c\"\n      ]\n    },\n    {\n      \"assumption_id\": \"margin\",\n      \"stance\": \"SUPPORTS\",\n      \"explanation\": \"Reported 75.0% GAAP gross margin meets the minimum 75% threshold.\",\n      \"evidence_ids\": [\n        \"nvda-public-acc61d7488198c00a3767dc764e5c3e6703ca2ebacdae3f57db04608472e285c\"\n      ]\n    },\n    {\n      \"assumption_id\": \"peers\",\n      \"stance\": \"INSUFFICIENT_EVIDENCE\",\n      \"explanation\": \"No suitable current passage establishes competitor demand comparisons.\",\n      \"evidence_ids\": []\n    }\n  ]\n}",
+            "extra_content": {
+              "google": {
+                "thought_signature": "EmAKXgFpFH0TaTpGTOv6HzGdNJ1YkxQvwAKHtzD4c7X3yHpN67C2hn4D3Zp11lPQP5xaUwkl3DroxM8W3ZRn26UV0BrJA/hlCu4rNGxBYPgsBv/ABWs/pCv8/wH3LW1vyfk="
+              }
+            },
+            "role": "assistant"
+          }
+        }
+      ],
+      "usage": {
+        "completion_tokens": 413,
+        "prompt_tokens": 1076,
+        "total_tokens": 1489
+      },
+      "model": "gemini-3.5-flash-lite"
+    },
+    "seconds": 2.438
+  }
+]

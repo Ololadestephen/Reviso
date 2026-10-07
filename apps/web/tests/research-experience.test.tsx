@@ -28,6 +28,72 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
+test.each([
+  [null, "Check latest NVIDIA filing"],
+  [makeAssessment(), "Refresh filing"],
+  [
+    makeAssessment({
+      disclosure_retrieval: {
+        availability: "UNAVAILABLE",
+        source: "NVIDIA Newsroom",
+        checked_at: "2026-10-04T09:00:00Z",
+        source_url: null,
+        warnings: ["Source unavailable"],
+        cached: false,
+      },
+    }),
+    "Retry filing",
+  ],
+] as const)("filing action is prominent for %s", (latest, label) => {
+  const refresh = vi.fn();
+  render(
+    <ReplayPanel
+      latest={latest}
+      writing={false}
+      pending={idlePending}
+      active
+      refresh={refresh}
+      reviewWithAI={vi.fn()}
+      llmStatus={makeLlmStatus({ configured: false })}
+      instrument={makeInstrument()}
+    />,
+  );
+  const button = screen.getByRole("button", { name: label });
+  expect(button.classList.contains("primary")).toBe(true);
+  expect(button.classList.contains("text-link")).toBe(false);
+  fireEvent.click(button);
+  expect(refresh).toHaveBeenCalledOnce();
+});
+
+test.each([
+  { active: false, writing: false, refreshing: false },
+  { active: true, writing: true, refreshing: false },
+  { active: true, writing: true, refreshing: true },
+])("filing action retains disabled/busy guards: %s", (state) => {
+  const refresh = vi.fn();
+  render(
+    <ReplayPanel
+      latest={null}
+      writing={state.writing}
+      pending={{ ...idlePending, refresh: state.refreshing }}
+      active={state.active}
+      refresh={refresh}
+      reviewWithAI={vi.fn()}
+      llmStatus={makeLlmStatus({ configured: false })}
+      instrument={makeInstrument()}
+    />,
+  );
+  const button = screen.getByRole("button", {
+    name: state.refreshing
+      ? "Checking the official filing…"
+      : "Check latest NVIDIA filing",
+  });
+  expect((button as HTMLButtonElement).disabled).toBe(true);
+  expect(button.getAttribute("aria-busy")).toBe(String(state.refreshing));
+  fireEvent.click(button);
+  expect(refresh).not.toHaveBeenCalled();
+});
+
 function chatProps(hash = "a".repeat(64)) {
   return {
     latest: makeAssessment({ input_hash: hash, evidence: [makeEvidence()] }),
@@ -36,6 +102,29 @@ function chatProps(hash = "a".repeat(64)) {
     onSource: vi.fn(),
   };
 }
+
+test.each([
+  { configured: false, review_configured: true, expected: 1 },
+  { configured: true, review_configured: false, expected: 0 },
+])("auto-explanation uses its own provider readiness: %s", (status) => {
+  const review = vi.fn();
+  render(
+    <ReplayPanel
+      latest={makeAssessment({
+        evidence: [makeEvidence()],
+        narrative_review: undefined,
+      })}
+      writing={false}
+      pending={idlePending}
+      active
+      refresh={vi.fn()}
+      reviewWithAI={review}
+      llmStatus={makeLlmStatus(status)}
+      instrument={makeInstrument()}
+    />,
+  );
+  expect(review).toHaveBeenCalledTimes(status.expected);
+});
 
 function wrapper({ children }: { children: React.ReactNode }) {
   const [client] = useState(

@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import type { Evidence } from "./api/schemas";
+import { sourceKindLabel } from "./lib/researchSources";
 
 /**
  * An assessment saved before provenance tracking records no origin. Saying so
@@ -41,6 +42,7 @@ export default function SourceDrawer({
           </a>
           <dl>
             {[
+              ["Source type", sourceKindLabel(evidence)],
               [
                 "Published",
                 new Date(evidence.published_at).toLocaleDateString(undefined, {
@@ -48,7 +50,11 @@ export default function SourceDrawer({
                 }),
               ],
               [
-                "Period ended",
+                evidence.kind === "MONETARY_POLICY"
+                  ? "Statement date"
+                  : evidence.kind === "ECONOMIC_DATA"
+                    ? "Reference month"
+                    : "Period ended",
                 new Date(evidence.observed_at).toLocaleDateString(undefined, {
                   timeZone: "UTC",
                 }),

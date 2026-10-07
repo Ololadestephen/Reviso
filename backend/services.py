@@ -37,7 +37,16 @@ def narrative_context_hash(
                 }
                 for item in thesis.assumptions
             ],
-            "evidence": [{"id": item.id, "content_hash": item.content_hash} for item in evidence],
+            "evidence": [
+                {
+                    "id": item.id,
+                    "content_hash": item.content_hash,
+                    "kind": item.kind,
+                    "scope": item.scope,
+                    "limitations": item.limitations,
+                }
+                for item in evidence
+            ],
             "saved_finding": finding.cache_payload() if finding else None,
         }
     )
@@ -52,6 +61,7 @@ def evaluate(
             item
             for item in evidence
             if item.available_at <= cutoff
+            and item.kind == "COMPANY_FACTS"
             and (
                 item.instrument_id == thesis.instrument_id
                 or (item.instrument_id is None and thesis.instrument_id == "RNVDAUSDT")

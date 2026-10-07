@@ -1,5 +1,27 @@
 import HowItWorksSteps from "../components/HowItWorksSteps";
 
+function AiGuide() {
+  return (
+    <>
+      <h2>What AI does</h2>
+      <p>
+        Sponsored Bitget Qwen 3.8 Max extracts ideas and explains saved filings
+        by default. The server can instead use Gemini Flash-Lite for the
+        explanation only. Groq gpt-oss-20b can help draft editable conditions.
+        Groq Qwen 3.8 27B answers follow-up questions from saved sources and
+        their citations. The short explanation sits with the result and does not
+        change it.
+      </p>
+      <p>
+        These models cannot confirm conditions, fetch an arbitrary website,
+        compute the financial result, record keep/change/set aside, or place a
+        trade. Repair attempts count toward the daily allowance. This public
+        page does not call them.
+      </p>
+    </>
+  );
+}
+
 export default function Guide() {
   return (
     <article className="static-page">
@@ -79,19 +101,45 @@ export default function Guide() {
           overwrite the comparison.
         </p>
 
-        <h2>What Qwen does</h2>
+        <h2>More research: company reports, Fed and BLS</h2>
         <p>
-          Sponsored Bitget Qwen 3.8 Max extracts and reviews a saved filing.
-          Groq gpt-oss-20b can help draft editable conditions. Groq Qwen 3.8 27B
-          answers follow-up questions from that filing’s citations. The short
-          explanation sits with the result and does not change it.
+          Open More research on a current result to load three useful sources:
+          the company's management discussion and risks, the latest available
+          Fed interest-rate statement, and US inflation and jobs releases from
+          BLS. Newer sources appear first. Each passage has a date and a link to
+          the full document.
         </p>
         <p>
-          These models cannot confirm conditions, fetch an arbitrary website,
-          compute the financial result, record keep/change/set aside, or place a
-          trade. Repair attempts count toward the daily allowance. This public
-          page does not call them.
+          This saves a new check using your existing financial filing, not new
+          filing numbers or a fresh price. Your previous check stays saved.
+          Company statements are not independent proof; economy-wide releases
+          cannot confirm a company condition or fill a missing number. These are
+          selected openings, not complete reports. A source may be blocked, too
+          old or in a format Reviso cannot read; its status is shown.
         </p>
+        <p>
+          Loading sources does not call AI. You can then ask the chat about
+          them, or choose Explain with these sources for a new explanation.
+          Those AI actions use your allowance. Historical examples and test
+          scenarios do not load today's releases. BLS release pages can change,
+          so their saved availability starts when Reviso retrieved them.
+        </p>
+
+        <h2>Related reading from xStocks</h2>
+        <p>
+          The result page also offers a small selection of dated xStocks
+          research links. Company mentions are labelled separately from wider
+          market topics, with newer articles first. Older checks do not show
+          articles published after their evidence date.
+        </p>
+        <p>
+          These links open on xStocks. Reviso does not read or summarise the
+          articles, and they are not used in your finding or filing chat. This
+          is a manually checked reading list, not an automatic news feed. The
+          separate xStocks price remains under Advanced view → Market details.
+        </p>
+
+        <AiGuide />
 
         <h2>What is saved</h2>
         <p>

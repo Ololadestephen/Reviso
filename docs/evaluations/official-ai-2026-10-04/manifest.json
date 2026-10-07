@@ -1,0 +1,30 @@
+{
+  "frozen_at": "2026-10-04T20:02:18.928004+00:00",
+  "request_cap": 6,
+  "per_action_cap": 2,
+  "actions": [
+    "source_review",
+    "company_followup",
+    "macro_boundary"
+  ],
+  "sources": {
+    "backend/api.py": "7f2b3982497bd4be2b780f550a7eeb4898f0c879bf8c7f4fdbdffd86b91b84d0",
+    "backend/contracts.py": "7cf26483b1c4379ac0321a399cd8394d82aaf337cdee3c319aa19b8500a1622d",
+    "backend/llm.py": "9bd5641ad40a3eaf6a6b7991917e25a4798d4b8b651fb8f3506fa1cbcf5c3105",
+    "backend/routes.py": "8bb5825709beafed11cac21e9d7d692cdbe05e0922fb05ea3e772b3f43dda63a",
+    "backend/services.py": "8dc26aab7e68ac73bf26eca63e46e76949a57c3cf6566120ab9d0d1751c58cc8",
+    "backend/storage.py": "8c31d431221a73420070ba97c5d88b3adc43b5cd3f0b6ed9159ad5df269b6308",
+    "backend/research_chat.py": "80f6eb4a738863801809d623f8316f3058d3d414a75d1ceb7294392fd4f193bc",
+    "backend/research_context.py": "c7006de58050b07b2aa9a717af53928a480cc4661e196d9cb79cfa8aefe04ad7",
+    "backend/research_routes.py": "9f0881e23b06d516ed25ef0b0329bac775255b2c3ea9c4529ff9e1399102fb1e",
+    "backend/official_research.py": "0da30897abd8fb17479470c3a43b9389fa8fff57195abe01528b37e30eaf4055",
+    "backend/official_transport.py": "cf4f48efa9e34fdbcbead0c92b99fec8dd6731dd9d299025882297ac5408357b",
+    "backend/research_parsers.py": "9a138749dcac11dc49a68368637afe3d2199cea79f12a050f345228fb46b26af",
+    "backend/exports.py": "2ae2e4d7cb15802cba8b58cceea696ca4b107e4efcfa63e9c74320017e2d4c4d",
+    "scripts/final_live_validation.py": "13c90404f6e1e38847ebbf684fc7ffe2827599227b846f8009e52d80f4679dd7",
+    "scripts/official_research_live_validation.py": "5e1189a33778b3c35a9b84880d4876ba660de6d3ee5ce0cd59fb20ebf5c54cb1"
+  },
+  "packet_sha256": "4408724c9703cfe90ec508b0a5836c3ffb30cb095240cfb4478242692029c9d0",
+  "review_prompt": "evidence-review-v5",
+  "question_prompt": "research-question-v4"
+}

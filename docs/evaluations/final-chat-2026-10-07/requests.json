@@ -1,0 +1,32 @@
+[
+  {
+    "number": 1,
+    "action": "company_followup",
+    "started_at": "2026-10-07T09:38:06.354466+00:00",
+    "endpoint": "https://api.groq.com/openai/v1/chat/completions",
+    "response": {
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "{\"facts\": [{\"evidence_ids\": [\"research-d36fa16e34554716918c35dbb0316929d1fe45636eda8a5ae033a7ff58291261\"], \"text\": \"The 10-Q excerpt only lists forward-looking statement disclaimers.\"}], \"summary\": {\"evidence_ids\": [\"research-d36fa16e34554716918c35dbb0316929d1fe45636eda8a5ae033a7ff58291261\"], \"text\": \"The saved NVIDIA management discussion excerpt contains only forward-looking statement disclaimers. It does not report specific demand commentary. This is company-prepared text, not independent proof.\"}, \"uncertainty\": {\"evidence_ids\": [], \"text\": \"Peer comparison data is missing, so relative demand strength remains unverified.\"}}"
+          },
+          "logprobs": null,
+          "finish_reason": "stop"
+        }
+      ],
+      "usage": {
+        "queue_time": 0.021090059,
+        "prompt_tokens": 3285,
+        "prompt_time": 0.265026143,
+        "completion_tokens": 226,
+        "completion_time": 0.493648367,
+        "total_tokens": 3511,
+        "total_time": 0.75867451
+      },
+      "model": "qwen/qwen3.8-27b"
+    },
+    "seconds": 1.157
+  }
+]

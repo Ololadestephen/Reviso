@@ -1,0 +1,50 @@
+{
+  "status": "PREPARATION_NOT_FROZEN",
+  "preparation_baseline_commit": "9f93003361a9d6b48a9dcc576808c59b1a7eafde",
+  "evaluated_commit": null,
+  "frozen_at": null,
+  "manifest_sha256": null,
+  "source_sha256": null,
+  "case_count": 24,
+  "followup_case_ids": [],
+  "planned_actions": { "explanations": 24, "followups": 6 },
+  "request_budget": {
+    "proposed_initial_requests": 30,
+    "proposed_provider_request_cap_including_repairs": 60,
+    "max_attempts_per_action": 2,
+    "authorized_requests": 0,
+    "baseline_enabled": false,
+    "http_status_retries": 0,
+    "reruns_allowed": false
+  },
+  "proposed_routes_to_verify_at_freeze": {
+    "review": {
+      "provider": "bitget-qwen",
+      "model": "qwen3.8-max",
+      "prompt": "evidence-review-v4"
+    },
+    "followup": {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "prompt": "research-question-v3"
+    }
+  },
+  "rubric": {
+    "finding": "exact metric, period and per-condition/overall state; all 24 cases remain in denominator",
+    "citation": "human checks every material claim against its cited source passage",
+    "uncertainty": "missing, stale and manual observations remain unresolved; flag invented values or future facts",
+    "explanation": {
+      "0": "misleading or incorrect",
+      "1": "partly clear or incomplete",
+      "2": "clear and correct"
+    },
+    "followup": "six preselected questions: relevance, cited support and remaining uncertainty",
+    "operations": "raw passes, errors, timeouts, repairs, attempts, tokens and per-action latency; no invented dollar cost"
+  },
+  "gates": {
+    "independent_selection_and_expectations_complete": false,
+    "offline_contract_and_parser_checks_passed": false,
+    "bounded_frozen_runner_implemented_and_tested": false,
+    "paid_run_explicitly_approved": false
+  }
+}

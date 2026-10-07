@@ -207,6 +207,36 @@ class Evidence(Contract):
     origin: Literal["CURATED_REPLAY", "PUBLIC_RETRIEVAL"] = "CURATED_REPLAY"
     document_hash: str | None = None
     parser_version: str | None = None
+    kind: Literal["COMPANY_FACTS", "COMPANY_REPORT", "MONETARY_POLICY", "ECONOMIC_DATA"] = (
+        "COMPANY_FACTS"
+    )
+
+    @model_validator(mode="after")
+    def research_is_not_numerical_evidence(self):
+        if self.kind != "COMPANY_FACTS" and self.metrics:
+            raise ValueError("Supplemental research cannot contain engine metrics")
+        if self.kind in {"MONETARY_POLICY", "ECONOMIC_DATA"} and self.instrument_id is not None:
+            raise ValueError("Economy-wide context cannot be assigned to a company")
+        if self.kind == "COMPANY_REPORT" and self.instrument_id is None:
+            raise ValueError("Company reports require an explicit issuer identity")
+        return self
+
+
+class ResearchLoadInput(Contract):
+    assessment_input_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+class ResearchRetrieval(Contract):
+    provider: Literal["SEC", "FED", "BLS"]
+    availability: Literal["AVAILABLE", "PARTIAL", "UNAVAILABLE"]
+    checked_at: AwareDatetime
+    cached: bool = False
+    warnings: list[str] = Field(default_factory=list)
+
+
+class ResearchSources(Contract):
+    sources: list[Evidence] = Field(default_factory=list)
+    retrieval: list[ResearchRetrieval] = Field(default_factory=list)
 
 
 class XStocksContext(Contract):

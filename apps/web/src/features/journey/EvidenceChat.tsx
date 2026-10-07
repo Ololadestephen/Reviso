@@ -10,6 +10,7 @@ import {
   useConversation,
 } from "../../queries/workspace";
 import { followUpReady } from "../../lib/format";
+import { researchSources } from "../../lib/researchSources";
 
 const suggestions = [
   "Why this result?",
@@ -44,11 +45,11 @@ export default function EvidenceChat({
   const conversation = useConversation(
     record.id,
     latest.input_hash,
-    latest.evidence.length > 0,
+    researchSources(latest).length > 0,
   );
   const ask = useContinueConversation(record);
   const chatReady = followUpReady(llmStatus);
-  const newestSource = latest.evidence.reduce<Evidence | undefined>(
+  const newestSource = researchSources(latest).reduce<Evidence | undefined>(
     (newest, source) =>
       !newest ||
       Date.parse(source.published_at) > Date.parse(newest.published_at)
@@ -122,7 +123,11 @@ export default function EvidenceChat({
       <div className="drawer-head">
         <div>
           <span className="eyebrow">FOLLOW-UP</span>
-          <h2 id="evidence-chat-title">Ask about this filing</h2>
+          <h2 id="evidence-chat-title">
+            {latest.research_sources?.length
+              ? "Ask about this research"
+              : "Ask about this filing"}
+          </h2>
           <p className="caption chat-context">
             {newestSource?.title} ·{" "}
             {latest.mode === "HISTORICAL_REPLAY"
@@ -175,7 +180,7 @@ export default function EvidenceChat({
             {item.evidence_ids.length > 0 && (
               <div className="evidence-links">
                 {item.evidence_ids.map((id) => {
-                  const source = latest.evidence.find(
+                  const source = researchSources(latest).find(
                     (entry) => entry.id === id,
                   );
                   return source ? (

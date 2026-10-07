@@ -15,6 +15,7 @@ import {
   fetchXStocksContext,
   recordDecision,
   refreshEvidence,
+  loadOfficialResearch,
   replayEvidence,
   reviewEvidence,
   runStress,
@@ -202,6 +203,12 @@ export function useRefreshEvidence(record: ThesisRecord | null) {
 export function useReviewEvidence(record: ThesisRecord | null) {
   return useEvidenceMutation(record?.id ?? null, () =>
     reviewEvidence(record as ThesisRecord),
+  );
+}
+
+export function useOfficialResearch(record: ThesisRecord | null) {
+  return useEvidenceMutation(record?.id ?? null, (assessmentHash: string) =>
+    loadOfficialResearch(record as ThesisRecord, assessmentHash),
   );
 }
 

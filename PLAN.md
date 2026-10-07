@@ -10,6 +10,51 @@ The research slice is already built: NVIDIA thesis → confirmed conditions → 
 
 ## Active close-out — 4 October 2026
 
+### Submission-day chat fix — 7 October 2026
+
+Approved final regression passed on October 7: one Groq request of a two-request
+ceiling, no repair, accurate citation of the saved public NVIDIA excerpt, cache,
+restart, export and immutable checks. Local release checks now pass 241 backend
+and 121 frontend tests. Production SQLite was backed up and integrity-checked
+before publication. Current explanation provider is retained; Gemini is inactive.
+See [the final regression report](docs/evaluations/final-chat-2026-10-07/REPORT.md).
+The earlier pending statements below describe preparation, not the current approval.
+
+The approved local citation fix is complete. `research-question-v5` requires
+separate summary/fact/uncertainty citations at the provider boundary, validates
+percentage attribution against the supplied excerpt/metrics, and caps the entire
+reply at 70 words (160 for requested detail). Public saved-answer contracts and
+old chat history are unchanged. Duplicate reuse now respects prompt/provider/model.
+238 backend and 121 frontend tests, Ruff, formatting, TypeScript and build passed.
+Separate quality scans show no remaining new findings. No live AI request,
+provider activation, original notebook mutation, commit/push or deployment.
+The changed chat prompt still needs a fresh approved bounded live check; the
+previous live batch remains a partial source-fidelity result, not rewritten as a pass.
+[Verification, limitations and all quality scores](docs/evaluations/2026-10-07-chat-citations.md).
+
+Next: choose the production explanation provider. Gemini's earlier constructed
+explanation passed, but its free-tier privacy/region restrictions remain a gate;
+do not silently activate it for private user notebooks or change AWS config.
+The user subsequently selected the current explanation provider for submission.
+Keep Bitget-first review/extraction and Groq chat/drafting; Gemini stays inactive.
+The final citation-regression proposal is one public-sample chat action, capped
+at two Groq requests including repair, awaiting explicit live-call approval.
+Git publication, production SQLite backup/deployment and signed-in verification
+remain separate release steps requiring approval.
+
+Optional Gemini explanation adapter: local implementation and offline checks
+only. Accept `Gemini_API`, keep it server-side, require explicit review-provider
+selection, preserve Groq drafting/chat and the numerical engine. Confirm data-use
+tier and obtain separate live-call approval before testing or enabling it on AWS.
+Offline verification passed: 216 backend and 121 frontend tests, Ruff,
+Prettier, TypeScript/build and separate quality rescans. No Gemini request,
+activation, commit/push or deployment. [Verification and all quality scores](docs/evaluations/2026-10-04-gemini-local.md).
+The subsequently approved free-tier Gemini check passed one constructed NVIDIA
+explanation in 2.438 seconds, using 1/2 provider requests and no repairs. Saved
+states, cached reuse, restart and export persistence passed in an isolated
+notebook. Normal app activation remains off; free-tier privacy/region gates
+still apply. [Live check and limits](docs/evaluations/gemini-ai-2026-10-04/REPORT.md).
+
 The user owns the small user study. Do not conduct it or invent its findings. Focus local work on research quality, source/tool integration and natural-language interaction; keep the six-company boundary.
 
 - [x] Give AI review/chat the saved numerical finding, confirmed conditions, dated evidence, publisher and reported metrics, rather than expecting the model to reconstruct the comparison.
@@ -21,6 +66,16 @@ The user owns the small user study. Do not conduct it or invent its findings. Fo
 - [x] Run the separately authorized bounded live check: draft, mixed review and cited follow-up passed with 3/6 provider requests and no repairs. See [the live report](docs/evaluations/final-ai-2026-10-04b/REPORT.md).
 - [ ] After release approval: commit/push, integrity-check a SQLite backup, deploy while preserving accounts/secrets, and verify the signed-in live journey.
 - [ ] Final recording, X post and form submission: user approval required. User study: user-owned.
+
+### Approved local follow-up — independent pilot and xStocks reading
+
+- [x] Prepare a 24-slot independent research pilot with source/expectation templates, a freeze/scoring protocol and a proposed capped AI batch; no independently selected cases or completed benchmark claimed.
+- [x] Add a compact, dated xStocks reading list separate from prices, findings and chat, with issuer relevance and no articles newer than the saved check date.
+- [x] Document the article/PDF permission gate and draft an enquiry for the user; do not send it or build a website scraper.
+- [x] Verify locally: 148 backend and 104 frontend tests, static/format checks, production build, JSON preparation invariants and disposable desktop/mobile inspection. [Verification and quality notes](docs/evaluations/2026-10-04-xstocks-reading-and-validation-prep.md).
+- [ ] Independent selector/verifier supplies unfamiliar source packets and expected answers. User study remains user-owned.
+- [ ] Implement/test the offline frozen runner after source cases exist; seek separate approval for the final paid batch (proposed maximum 60 provider requests including repairs).
+- [ ] Obtain content permission before a cited xStocks article/PDF context connector. Publishing/commit/push/deployment remain separately gated.
 
 ## Close-out plan — 17 September 2026
 
@@ -121,3 +176,34 @@ Commit `1e34353` is on `revisoagent.xyz`. Backup `reviso-before-1e34353-20260919
 ## Earlier verification — September 12, 2026
 
 101 Python tests, 40 frontend tests, formatting/static checks, TypeScript and the production frontend build passed for the earlier newcomer tree. Public Bitget market probes returned available tickers, books and online Reality catalog identities for Alphabet, Amazon and Tesla. Their issuer-bound SEC checks returned current CY2026Q2 evidence without a Qwen request. The final production-built browser journey completed blank start → Apple → manual assumptions → confirmation → public SEC/Bitget refresh → retained decision → deep-link reload and immutable exports, with keyboard focus and 390px/768px checks. The frozen newcomer live-Qwen batch remains 6/10 requests: Apple and Microsoft suggestions timed out, NVIDIA failed the exact condition contract after one repair, and both cited-question integrations passed after correcting one raw harness false negative offline. See docs/EVALUATION.md and the dated reports under docs/evaluations.
+# Approved optional research expansion — 2026-10-04
+
+Add three public, dated research sources without extending the six-company picker:
+selected SEC report passages, Federal Reserve policy statements, and BLS inflation/jobs
+releases. Keep these separate from numerical evidence. Load them explicitly into a new,
+immutable live check; preserve the previous check, user ownership and saved filing.
+Expose a collapsed More research section, cited AI/chat context and saved exports.
+Historical replays must not fetch today's context. No paid validation or publishing is
+authorized by this implementation request. Further xStocks ingestion remains paused.
+
+Local implementation is complete: 183 backend and 113 frontend tests, formatting,
+type checks, production build and disposable desktop/mobile checks passed.
+Public Fed/BLS retrieval succeeded; live SEC passage retrieval needs a genuine
+server User-Agent contact. The changed AI prompts have not been live-validated.
+See [the verification report](docs/evaluations/2026-10-04-official-research.md).
+
+Subsequent SEC verification succeeded for all six companies after CIK-scoped
+NVIDIA/Microsoft metadata name variants, a bounded 10 MB archive limit, and
+named-section parsing that ignores bare running page headers. The user's `.env`
+now parses cleanly. 195 backend tests passed; the changed AI prompts still need
+separately approved live validation. See [the SEC follow-up](docs/evaluations/2026-10-04-sec-live.md).
+# Latest approved AI verification — 4 October 2026
+
+The supplemental-source batch is complete: 3/6 provider requests, no repairs,
+three contract passes and persistence/cache/export checks in an isolated notebook.
+Manual inspection found incomplete citation coverage in one answer's summary;
+do not call this a clean research-quality pass. Fix summary attribution and clear
+reply-length boundaries offline before a separately approved fresh frozen check.
+SEC management excerpt usefulness also needs attention. 198 backend tests and
+Ruff pass. No user notebook mutation, core prompt change, commit/push or AWS change.
+[Completed batch](docs/evaluations/official-ai-2026-10-04/REPORT.md).

@@ -33,6 +33,7 @@ from backend.llm import (
 ROOT = Path(__file__).resolve().parents[1]
 SOURCES = (
     "backend/api.py",
+    "backend/answer_validation.py",
     "backend/contracts.py",
     "backend/instruments.py",
     "backend/llm.py",
@@ -104,8 +105,11 @@ def freeze(directory: Path) -> None:
 
 
 class RequestBudget:
-    def __init__(self, directory: Path):
+    def __init__(self, directory: Path, max_requests: int = 6):
+        if not 1 <= max_requests <= 6:
+            raise ValueError("Request ceiling must be between one and six")
         self.directory = directory
+        self.max_requests = max_requests
         self.attempts: list[dict] = []
         self.action = "draft"
 
@@ -113,7 +117,7 @@ class RequestBudget:
         if endpoint not in {BITGET_QWEN_ENDPOINT, GROQ_ENDPOINT}:
             raise RuntimeError("Unapproved provider endpoint")
         count = sum(item["action"] == self.action for item in self.attempts)
-        if len(self.attempts) >= 6 or count >= 2:
+        if len(self.attempts) >= self.max_requests or count >= 2:
             raise RuntimeError("Approved live request ceiling reached")
         attempt = {
             "number": len(self.attempts) + 1,

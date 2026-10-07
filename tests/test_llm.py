@@ -11,6 +11,7 @@ from backend.contracts import (
     ThesisIdeaInput,
     ThesisSuggestion,
 )
+from backend.gemini import GEMINI_MODEL, GeminiLanguageModel
 from backend.llm import (
     BITGET_QWEN_ENDPOINT,
     BITGET_QWEN_MAX_OUTPUT_TOKENS,
@@ -263,12 +264,11 @@ def test_groq_question_repairs_citation_outside_allowlist_and_treats_input_as_da
     evidence = available_evidence(CUTOFFS[0])
     calls = []
     invalid = {
-        "summary": "A bounded answer.",
-        "facts": ["One reported fact."],
-        "uncertainty": "Later reporting remains unknown.",
-        "evidence_ids": ["invented-document"],
+        "summary": {"text": "A bounded answer.", "evidence_ids": ["invented-document"]},
+        "facts": [{"text": "One reported fact.", "evidence_ids": [evidence[0].id]}],
+        "uncertainty": {"text": "Later reporting remains unknown.", "evidence_ids": []},
     }
-    valid = {**invalid, "evidence_ids": [evidence[0].id]}
+    valid = {**invalid, "summary": {**invalid["summary"], "evidence_ids": [evidence[0].id]}}
 
     def handler(request: httpx.Request):
         calls.append(json.loads(request.content))
@@ -628,6 +628,63 @@ def test_ai_review_is_saved_idempotently_without_overriding_invalidation(tmp_pat
         assert len(history["assessments"]) == 2
 
 
+def test_gemini_review_is_separate_from_extraction_and_chat_and_cached(tmp_path, thesis):
+    calls = []
+
+    def handler(request):
+        calls.append(request)
+        evidence_id = available_evidence(CUTOFFS[0])[-1].id
+        return httpx.Response(
+            200,
+            json={
+                "choices": [
+                    {
+                        "finish_reason": "stop",
+                        "message": {"content": json.dumps(valid_review(thesis, evidence_id))},
+                    }
+                ],
+            },
+        )
+
+    primary = FakeLanguageModel()
+    chat = FakeLanguageModel()
+    transport = httpx.Client(transport=httpx.MockTransport(handler))
+    review = GeminiLanguageModel("fake-key", transport)
+    with TestClient(
+        create_app(
+            str(tmp_path / "gemini-review.sqlite3"), llm=primary, chat_llm=chat, review_llm=review
+        )
+    ) as client:
+        status = client.get("/llm/status").json()
+        assert status["provider"] == "groq"
+        assert status["review_provider"] == "gemini"
+        assert status["review_model"] == GEMINI_MODEL
+        assert status["review_configured"] is True
+        assert status["chat_provider"] == "groq"
+        draft = client.post("/theses/draft", json=thesis.model_dump(mode="json")).json()
+        base = f"/theses/{draft['id']}"
+        client.post(base + "/confirm", json={**draft["thesis"], "expected_version": 1})
+        replay = client.post(
+            "/replays/nvidia-margin/step",
+            json={
+                "thesis_id": draft["id"],
+                "expected_version": 2,
+                "step": 0,
+            },
+        ).json()
+        first = client.post(base + "/ai-review", json={})
+        assert first.status_code == 200, first.text
+        second = client.post(base + "/ai-review", json={}).json()
+        assert first.json()["input_hash"] == second["input_hash"]
+        assert first.json()["state"] == replay["state"]
+        assert first.json()["llm_provenance"]["provider"] == "gemini"
+        assert first.json()["llm_provenance"]["model"] == GEMINI_MODEL
+        assert len(calls) == 1
+        assert primary.review_calls == chat.review_calls == 0
+    assert transport.is_closed
+    assert primary.closed and chat.closed
+
+
 def test_cited_questions_are_context_bound_idempotent_and_persisted(tmp_path, thesis):
     model = FakeLanguageModel()
     path = str(tmp_path / "questions.sqlite3")
@@ -777,4 +834,4 @@ def test_unconfigured_api_returns_503_without_changing_input(tmp_path, thesis):
     ) as client:
         response = client.post("/theses/extract", json={"current": thesis.model_dump(mode="json")})
         assert response.status_code == 503
-        assert response.json()["detail"] == "Qwen is not configured on the server"
+        assert response.json()["detail"] == "AI is not configured on the server"

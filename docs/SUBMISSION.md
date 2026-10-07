@@ -1,6 +1,6 @@
 # Season 2 submission checklist
 
-Current working target, October 4: finish by October 7 Lagos for the user-supplied October 8 extension. The exact organizer cutoff hour/time zone remains unconfirmed. Keep the dated rules below distinct from that planning assumption. The small user study belongs to the user; the [local close-out report](evaluations/2026-10-04-research-closeout.md) supplies engineering evidence, not study results or an official grade.
+Submission-day target, October 7: the user has chosen to submit today. The exact organizer cutoff hour/time zone remains unconfirmed. Keep the dated rules below distinct from the user-supplied October 8 extension. The small user study belongs to the user; engineering checks are not study results or an official grade. Latest local checks: [chat citation verification](evaluations/2026-10-07-chat-citations.md).
 
 Verified 2026-09-10 by following the Developer guide button in the live event page to [the Season 2 handbook](https://bitget-ai.gitbook.io/bitgetai_hackathons2). Direct crawler and the root `.md` URL failed earlier; the actual Markdown page linked by the handbook is `/bitgetai_hackathons2/base-camp-hackathon-s2-en.md`.
 
@@ -9,8 +9,8 @@ Verified 2026-09-10 by following the Developer guide button in the live event pa
 - Track: AI Trading Desk. Sub-theme: Decision Stress Testing. Judges assess research quality, effective source/tool integration, natural-language interaction and a personalized thesis. This track uses judge scoring, not trading-return scoring.
 - Required: accessible demo and a complete research task from question to actionable insight. Screen recording is optional; public code, docs and logs can accompany the demo.
 - Complete the project description in the form itself. External links cannot replace it. Cover thesis/pain point, concrete target user and value, validation/metrics, progress, deliverables, and optionally perspective on AI trading. First three carry the most weight. Distinguish observed, estimated and target figures.
-- Separate required field: actual LLM role and models used. Current routing is sponsored Bitget Qwen 3.8 Max for extraction/review (Groq fallback), Groq `openai/gpt-oss-20b` for editable condition drafts, and Groq Qwen 3.8 27B for cited filing follow-ups. A 21-case live calibration used 25 provider requests. Raw judgments matched the small constructed narrative set, but response-shape failures left only one full application pass. After compatibility changes, a frozen five-case v2 validation passed extraction, mixed evidence, injection resistance, abstention and saved-review integration using five first-attempt requests. State the small constructed scope; do not claim general research accuracy. October's prompt changes still require a separately authorized live check.
-- Required X promotional post: introduce the product and include `#BitgetHackathon` and `@Bitget_AI`. Handbook also asks for a retweet of the official post, but that link is still marked TBD. No X post means incomplete submission.
+- Separate required field: actual LLM role and models used. The user retained sponsored Bitget Qwen 3.8 Max for extraction/review (Groq fallback), Groq `openai/gpt-oss-20b` for editable condition drafts, and Groq Qwen 3.8 27B for cited filing follow-ups. Gemini is implemented and tested on a constructed example, but is not selected for the submission's normal app traffic. A 21-case live calibration used 25 provider requests; response-shape failures left only one full application pass. A subsequent frozen five-case v2 validation passed using five first-attempt requests. The October 4 supplemental-source batch had three contract passes but one partial source-fidelity result. Its citation defect was fixed offline; the new chat prompt awaits a fresh approved live check. State the small constructed scope; do not claim general research accuracy.
+- Required X promotional post: introduce the product and include `#BitgetHackathon` and `@Bitget_AI`. The October 7 handbook inspection provides the [official kickoff post](https://x.com/Bitget_AI/status/2100519318824055159?s=20) to quote. No X post means incomplete submission. No post has been published by this preparation.
 - [Official submission form](https://forms.gle/GyWZCMCPocgJdJon6). No separate registration is required. At most two independent projects/themes per team, each in a separate form entry. Do not submit simple renames/minor ports of Season 1 work.
 - Optional fields include university, Demo Day and K3 subsidy. The Qwen build-credit application was granted on September 11; the credential remains server-side and must not appear in submission materials.
 
@@ -34,7 +34,7 @@ The September 10 handbook inspection recorded September 3–21 UTC+8, conflictin
 - [ ] Exact deadline/official promotional post confirmed.
 - [x] AWS Lightsail, persistent SQLite and Google owner-scoped access implemented; historical deployment reports retained.
 - [x] Local October research/source/chat improvements verified with mocks and disposable replay.
-- [ ] New prompt versions validated live after paid-call approval.
+- [x] Final bounded chat regression approved and passed: one request, no repair, sourced reply and persistence. This is not an independent benchmark.
 - [ ] October release approved, backed up, deployed and verified on the signed-in live domain.
 - [ ] Final X post and submission approved by user.
 
@@ -46,7 +46,7 @@ The current selection covers six familiar companies. Official Bitget tools suppl
 
 AI helps draft editable conditions, explain the saved result and answer filing-bound questions with source links. The server checks schemas, source IDs and numerical review consistency; it does not treat that as proof every sentence is correct. Google sign-in separates notebooks. Previous versions, findings and human decisions remain saved and can be exported.
 
-Local verification now has 142 backend and 76 frontend passing tests plus a disposable browser walkthrough. Earlier live calibration and validation reports include successes and failures; the current prompt changes await approved live validation. The user study is pending with the project owner. No general accuracy, investment return or guaranteed response-time claim is made.
+Local verification now has 241 backend and 121 frontend passing tests, static/format checks and a production build. Earlier live calibration and validation reports include successes and failures; the final chat attribution regression passed with one request and no repair on October 7. The user study is pending with the project owner. No general accuracy, investment return or guaranteed response-time claim is made.
 
 ## Draft X post — not published
 

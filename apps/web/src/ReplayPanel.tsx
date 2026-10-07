@@ -55,17 +55,19 @@ export default function ReplayPanel({
   const headline = resultHeading(latest);
   const hasEvidence = Boolean(latest?.evidence.length);
   const review = latest?.narrative_review;
+  const reviewReady = llmStatus.review_configured ?? llmStatus.configured;
   const source = latest ? newestSource(latest.evidence) : undefined;
 
   useEffect(() => {
     const key = latest?.input_hash ?? "";
     if (
       !hasEvidence ||
+      latest?.research_retrieval !== undefined ||
       review ||
       pending.review ||
       pending.refresh ||
       pending.replayStep !== null ||
-      !llmStatus.configured ||
+      !reviewReady ||
       reviewFailed ||
       !active ||
       !key
@@ -79,7 +81,8 @@ export default function ReplayPanel({
     active,
     hasEvidence,
     latest?.input_hash,
-    llmStatus.configured,
+    latest?.research_retrieval,
+    reviewReady,
     pending.refresh,
     pending.replayStep,
     pending.review,
@@ -97,7 +100,9 @@ export default function ReplayPanel({
           {latest ? resultMode(latest.mode) : "No report loaded"}
         </span>
         <button
-          className="text-link"
+          type="button"
+          className="primary filing-check"
+          aria-busy={pending.refresh}
           disabled={writing || !active}
           onClick={refresh}
         >
@@ -158,7 +163,7 @@ export default function ReplayPanel({
       {hasEvidence &&
         !review &&
         !pending.review &&
-        !llmStatus.configured &&
+        !reviewReady &&
         !reviewFailed && (
           <p className="caption">
             AI explanation is off. You can still check the numbers.

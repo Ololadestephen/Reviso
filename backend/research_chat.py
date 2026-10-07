@@ -10,6 +10,7 @@ from backend.contracts import (
     utc_now,
 )
 from backend.llm import HISTORY_TURNS, QUESTION_PROMPT_VERSION, provenance
+from backend.official_research import research_evidence
 from backend.research_context import ResearchContext
 from backend.services import digest, narrative_context_hash
 from backend.storage import Repository
@@ -17,7 +18,7 @@ from backend.storage import Repository
 
 def context_for(record: dict, assessment: dict) -> tuple[ThesisInput, list[Evidence], str]:
     thesis = ThesisInput.model_validate(record["thesis"])
-    evidence = [Evidence.model_validate(item) for item in assessment["evidence"]]
+    evidence = research_evidence(assessment)
     return (
         thesis,
         evidence,
@@ -99,6 +100,20 @@ def last_turn(thread: dict) -> tuple[str | None, bool]:
     return None, False
 
 
+def last_answer_is_current(repo: Repository, owner_id: str, thread: dict, llm) -> bool:
+    if not thread["messages"] or thread["messages"][-1]["role"] != "assistant":
+        return False
+    saved = repo.research_answer_by_id(owner_id, thread["thesis_id"], thread["messages"][-1]["id"])
+    if not saved:
+        return False
+    metadata = saved["llm_provenance"]
+    return (
+        metadata["prompt_version"] == QUESTION_PROMPT_VERSION
+        and metadata["provider"] == llm.descriptor.provider
+        and metadata["model"] == llm.descriptor.model
+    )
+
+
 def append_exchange(
     repo: Repository,
     llm,
@@ -112,7 +127,11 @@ def append_exchange(
     thesis, evidence, context_hash = context_for(record, selected)
     thread = conversation_for(repo, owner_id, record["id"], selected, record)
     last_question, last_detail = last_turn(thread)
-    if last_question == question and last_detail == detail:
+    if (
+        last_question == question
+        and last_detail == detail
+        and last_answer_is_current(repo, owner_id, thread, llm)
+    ):
         return thread
     input_hash = digest(
         {

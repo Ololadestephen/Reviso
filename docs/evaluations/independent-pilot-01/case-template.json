@@ -1,0 +1,40 @@
+{
+  "status": "TEMPLATE_NOT_RUNNABLE",
+  "case_id": null,
+  "instrument_id": null,
+  "bucket": null,
+  "selected_by": null,
+  "verified_by": null,
+  "prior_exposure": null,
+  "input": {
+    "idea": null,
+    "confirmed_thesis": null,
+    "evidence_cutoff": null,
+    "followup_question": null
+  },
+  "source_packets": [
+    {
+      "publisher": null,
+      "source_url": null,
+      "issuer_cik": null,
+      "published_at": null,
+      "available_at": null,
+      "period_ended": null,
+      "retrieved_at": null,
+      "snapshot_path": null,
+      "sha256": null,
+      "prior_development_use_checked": false
+    }
+  ],
+  "independent_expectation_not_model_input": {
+    "metrics_decimal_strings": null,
+    "condition_states": null,
+    "overall_state": null,
+    "supporting_passages_and_locations": null,
+    "acceptable_explanation": null,
+    "missing_information": null,
+    "forbidden_claims": null,
+    "adjudication_notes": null,
+    "agreed_before_run_at": null
+  }
+}

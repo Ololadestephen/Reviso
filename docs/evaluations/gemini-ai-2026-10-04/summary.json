@@ -1,0 +1,25 @@
+{
+  "status": "PASS",
+  "provider_requests": 1,
+  "request_cap": 2,
+  "provider_seconds": 2.438,
+  "action_seconds": 2.446,
+  "repair_attempts": 0,
+  "state_preserved": true,
+  "restart_persistence": true,
+  "export_persistence": true,
+  "cached_repeat": true,
+  "usage": {
+    "day": "2026-10-04",
+    "user": 1,
+    "total": 1
+  },
+  "provider_usage": {
+    "completion_tokens": 413,
+    "prompt_tokens": 1076,
+    "total_tokens": 1489
+  },
+  "response_model": "gemini-3.5-flash-lite",
+  "summary_words": 39,
+  "reporting_note": "Post-check bookkeeping called llm_usage with an extra date argument. Corrected offline; no provider rerun."
+}

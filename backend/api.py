@@ -12,6 +12,7 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 from backend.auth import csrf_is_required, resolve_principal, valid_csrf
 from backend.company_disclosures import CompanyDisclosureProvider
 from backend.deployment import DeploymentSettings
+from backend.gemini import review_language_model_from_environment
 from backend.google_token import GoogleTokenInfoVerifier, GoogleTokenVerifier
 from backend.llm import (
     LanguageModel,
@@ -22,7 +23,9 @@ from backend.llm import (
     language_model_from_environment,
 )
 from backend.llm_budget import DuplicateLlmRequest, LlmAllowanceExceeded
+from backend.official_research import OfficialResearchProvider
 from backend.providers import BitgetProvider
+from backend.research_routes import router as research_router
 from backend.routes import router
 from backend.storage import ConflictError, Repository
 from backend.xstocks import XStocksProvider
@@ -76,15 +79,14 @@ async def llm_duplicate(_request: Request, _error: DuplicateLlmRequest):
 def budget_message(scope: str) -> str:
     if scope == "user":
         return (
-            "Today's Qwen allowance for this account is used. "
+            "Today's AI allowance for this account is used. "
             "Saved findings stay available; continue manually."
         )
     if scope == "total":
         return (
-            "Today's shared Qwen allowance is used. "
-            "Saved findings stay available; continue manually."
+            "Today's shared AI allowance is used. Saved findings stay available; continue manually."
         )
-    return "Qwen is busy. Wait a moment and try again, or continue manually."
+    return "AI is busy. Wait a moment and try again, or continue manually."
 
 
 def _close_language_model(model: LanguageModel | None) -> None:
@@ -99,6 +101,7 @@ def create_app(
     google_verifier: GoogleTokenVerifier | None = None,
     chat_llm: LanguageModel | None = None,
     draft_llm: LanguageModel | None = None,
+    review_llm: LanguageModel | None = None,
 ) -> FastAPI:
     deployment = DeploymentSettings.from_environment()
 
@@ -110,7 +113,14 @@ def create_app(
         app.state.provider = BitgetProvider()
         app.state.xstocks = XStocksProvider()
         app.state.disclosures = CompanyDisclosureProvider()
+        app.state.official_research = OfficialResearchProvider()
         app.state.llm = llm or language_model_from_environment()
+        if review_llm is not None:
+            app.state.review_llm = review_llm
+        elif llm is not None:
+            app.state.review_llm = llm
+        else:
+            app.state.review_llm = review_language_model_from_environment(app.state.llm)
         if chat_llm is not None:
             app.state.chat_llm = chat_llm
         elif llm is not None:
@@ -126,16 +136,20 @@ def create_app(
         try:
             yield
         finally:
+            app.state.official_research.close()
             app.state.disclosures.close()
             app.state.xstocks.close()
             primary = app.state.llm
             chat = app.state.chat_llm
             draft = app.state.draft_llm
+            review = app.state.review_llm
             _close_language_model(primary)
             if chat is not primary:
                 _close_language_model(chat)
             if draft is not primary and draft is not chat:
                 _close_language_model(draft)
+            if review is not primary and review is not chat and review is not draft:
+                _close_language_model(review)
 
     docs_enabled = not deployment.public_demo
     app = FastAPI(
@@ -184,8 +198,10 @@ def create_app(
     app.add_exception_handler(LlmAllowanceExceeded, llm_budget)
     app.add_exception_handler(DuplicateLlmRequest, llm_duplicate)
     app.include_router(router)
+    app.include_router(research_router)
     if deployment.web_dist is not None:
         app.include_router(router, prefix="/api", include_in_schema=False)
+        app.include_router(research_router, prefix="/api", include_in_schema=False)
         app.mount(
             "/",
             SinglePageFiles(directory=deployment.web_dist, html=True),

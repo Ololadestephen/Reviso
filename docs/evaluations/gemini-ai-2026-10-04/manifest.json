@@ -1,0 +1,24 @@
+{
+  "frozen_at": "2026-10-04T22:47:38.494564+00:00",
+  "user_approval": "2026-10-04: free and run ai check its approved",
+  "provider": "gemini",
+  "model": "gemini-3.5-flash-lite",
+  "endpoint": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+  "review_prompt": "evidence-review-v5",
+  "request_cap": 2,
+  "actions": [
+    "mixed_explanation"
+  ],
+  "packet_sha256": "b5acdea24a959b0838c347b72864928b34be9590dfac2ec67948ba5cfbecc382",
+  "source_sha256": {
+    "backend/gemini.py": "5b5ba8597e0bd8e2912e1397b303f3f2753d349fe6cc0765ac0c9e4c16529f7b",
+    "backend/llm.py": "2371f539a2f52d4142d9b58977d0c1718f910e9e7fc47fd0e04727c96f40da4b",
+    "backend/api.py": "f87b93443625811fd76e7533abab4424aec65ad64c9979e988c589fc0655bba8",
+    "backend/routes.py": "a80837799104a35b3089626d3b9da0165b6cec71203d01c1a6eb6ac94c260d33",
+    "backend/contracts.py": "7cf26483b1c4379ac0321a399cd8394d82aaf337cdee3c319aa19b8500a1622d",
+    "backend/research_context.py": "c7006de58050b07b2aa9a717af53928a480cc4661e196d9cb79cfa8aefe04ad7",
+    "backend/services.py": "8dc26aab7e68ac73bf26eca63e46e76949a57c3cf6566120ab9d0d1751c58cc8",
+    "backend/storage.py": "8c31d431221a73420070ba97c5d88b3adc43b5cd3f0b6ed9159ad5df269b6308",
+    "backend/llm_budget.py": "3a9100a4ec3b32802c22e8e3e6d6612a79d43219bbab30e36e565b5e102050cb"
+  }
+}

@@ -17,26 +17,41 @@ export default function Privacy() {
         </p>
         <h2>Saved research</h2>
         <p>
-          Ideas, conditions, evidence checks, Qwen findings, follow-up chats and
-          decisions are stored in the server database under your internal user
-          ID. Another signed-in person cannot read that record. Existing demo
-          research created before accounts remains operator-owned until it is
-          explicitly linked.
+          Ideas, conditions, evidence checks, AI explanations, follow-up chats
+          and decisions are stored in the server database under your internal
+          user ID. Another signed-in person cannot read that record. Existing
+          demo research created before accounts remains operator-owned until it
+          is explicitly linked.
         </p>
         <h2>AI requests</h2>
         <p>
           When you choose an AI action, the server sends the bounded research
-          context needed for that action to the configured Qwen provider. It
-          does not place credentials in the browser. Per-account and total daily
-          allowances apply, including repair attempts. Saved findings stay
-          readable if an allowance runs out.
+          context needed for that action to the configured AI provider. Bitget
+          Qwen or Groq handles idea extraction; Groq handles drafting and chat.
+          The explanation can use the primary provider or, if enabled on the
+          server, Google Gemini. It does not place credentials in the browser.
+          Per-account and total daily allowances apply, including repair
+          attempts. Saved findings stay readable if an allowance runs out.
+        </p>
+        <p>
+          Adding a Gemini key alone does not enable it. Google's free-tier terms
+          may allow submitted content to be used to improve its products. The
+          operator must confirm the applicable tier and data terms before
+          enabling it for other people's research. See{" "}
+          <a
+            href="https://ai.google.dev/gemini-api/terms"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Google's Gemini API terms
+          </a>
+          .
         </p>
         <h2>Public pages</h2>
         <p>
           The landing page, guide and prepared example do not read the saved
-          research database and do not make Qwen requests. Public company
-          filings and market snapshots can use a shared cache; your notebook
-          does not.
+          research database and do not make AI requests. Public company filings
+          and market snapshots can use a shared cache; your notebook does not.
         </p>
         <h2>Account picture</h2>
         <p>

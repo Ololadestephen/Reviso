@@ -1,5 +1,6 @@
 import { useId, useState } from "react";
 import type { Assessment, Evidence } from "../../api/schemas";
+import { researchSources } from "../../lib/researchSources";
 
 function shortReading(text: string) {
   if (text.length <= 240) return text;
@@ -21,7 +22,7 @@ export default function ResultExplanation({
   const review = latest.narrative_review;
   if (!review) return null;
   const citedIds = new Set(review.items.flatMap((item) => item.evidence_ids));
-  const additionalSources = latest.evidence.filter(
+  const additionalSources = researchSources(latest).filter(
     (item) => citedIds.has(item.id) && item.id !== primarySourceId,
   );
   return (
