@@ -1,189 +1,143 @@
 # Reviso demo script
 
-Allow three to four minutes with screen pauses. Speak naturally. The timings below are a guide.
+Aim for about three minutes. Speak slowly and pause when the screen changes.
+Read only the voiceover, not the recording instructions.
 
-This walkthrough uses one NVIDIA idea and two older company reports. Both tests pass in the first report. One fails in the next. That is the point: you wrote the limits before the new numbers arrived.
+The structure follows the user's selected
+[demo guide](https://gist.github.com/dabit3/caef5eee4753dd7d23767bc31e70da28):
+problem, solution, one product story, proof and a clear ending.
 
-Reviso does not place trades. Do not say it does. Do not say a token is the same as owning NVIDIA shares. Do not say the app is telling anyone to buy or sell.
+## Before recording
 
-## Prepare
+- Sign in first. Hide your email, private research and notifications.
+- Use a separate demo record with two saved historical NVIDIA checks. Confirm
+  a 75% GAAP gross-margin minimum and an 80% year-over-year revenue-growth
+  minimum. These are example conditions, not recommended investment targets.
+- Keep **Historical NVIDIA example — 2024 reports** visible. The replay becomes
+  available on 29 August and 21 November 2024; it is not today's report or price.
+- Prepare the saved results, source and export first. Loading a new check can
+  automatically request an AI explanation: approve any new calls separately.
+  Do not assume a replay is credit-free. Do not click Refresh filing, Help me
+  draft or Send just for the recording.
+- Use an already saved chat reply for **that same historical check**. The October 7
+  management-discussion regression is a different context; do not use its answer
+  as an explanation of this historical mixed result.
+- If the checks or matching chat reply are not ready, show the public written
+  NVIDIA example for the numbers and omit the chat shot. Say it is a written
+  example, not a newly performed app check.
+- Keep Market details and Advanced view closed. Never show API keys. Reviso
+  does not place trades; the Bitget token is not a registered NVIDIA share.
 
-1. Record on [revisoagent.xyz](https://revisoagent.xyz). A GitHub push does not update the live site.
-2. Sign in before you press record. Use a throwaway research record, not your real notebook.
-3. Hide notifications and your email.
-4. Write this idea:
+## Screen order
 
-   > I like NVIDIA because sales are growing. I would think again if gross margin falls below 75%, or if sales grow less than 80% from a year ago.
+1. **Opening — 20 seconds:** landing page and Reviso name.
+2. **The idea — 30 seconds:** NVIDIA and the saved idea in the Idea tab.
+3. **Conditions — 30 seconds:** the 75% margin and 80% growth limits.
+4. **Evidence — 45 seconds:** first saved historical check, then the second.
+   Point at each reported number beside its limit. Open a source.
+5. **AI — 20 seconds:** show a saved explanation and, if ready, a matching
+   saved chat answer and source. Do not send a new question.
+6. **Decision — 25 seconds:** show the recorded Set aside decision and reason,
+   then the download or history. Do not pretend a saved action is new.
+7. **Close — 10 seconds:** Reviso name and revisoagent.xyz.
 
-5. Confirm two conditions, both marked as things Reviso can check with numbers:
-   - Reported GAAP gross margin stays at or above 75%.
-   - Sales growth from a year ago stays at or above 80%.
-6. If the form asks for size and time, use examples only: 1,000 USDT, 100 USDT entry, 100 USDT max loss, 90 days. Say they are examples. Do not treat 100 as a live price.
-7. On the evidence screen, open **See an older NVIDIA filing example**. Load **August 29, 2024**, then **November 21, 2024**. Do not press “Check latest filing” during this demo. Today’s report is a different story.
-8. Before recording, click a source once, and check that **Download this version** opens. Leave **Market details** closed.
-9. Prefer a saved chat answer. Do not make a live AI call unless you have already approved the credit. If you use a saved answer, say it is saved.
+If using the public example, introduce it with:
+“Here is a written NVIDIA example using two older company reports.”
 
-## Timed walkthrough
+## Voiceover
 
-### 0:00–0:20 — The problem
+It is easy to find reasons to like a stock. But what would make you change
+your mind?
 
-**Screen:** Landing page. Hero line visible. Then click **Start my research** (already signed in).
+That is what Reviso helps you work out.
 
-**Say:**
-
-You have a stock idea. Most people never write down what would make them change their mind. So the idea just sits there.
-
-Reviso is a research notebook. You write the idea, you write the tests, you check a company report, then you decide. It does not buy or sell anything.
+You write your idea, choose what needs to stay true, check the evidence,
+and save your own decision.
 
 Let me show you with NVIDIA.
 
-### 0:20–0:50 — Write the idea
+My idea is simple: I like NVIDIA because its sales are growing. But I want
+to know if the business stops meeting my expectations.
 
-**Screen:** NVIDIA selected. Idea text on screen. If the record is already saved, open the Idea tab instead of typing live.
+For this example, I choose two conditions.
 
-**Say:**
+First, gross margin must stay at least seventy-five percent. That is the
+share of sales left after the direct cost of the products.
 
-I pick NVIDIA.
+Second, sales must grow at least eighty percent compared with a year earlier.
 
-I write why I care, in my own words. I like NVIDIA because sales are growing. But I would think again if the business got weaker.
+These are my conditions, not targets chosen by Reviso. If I change them
+later, the earlier version stays saved.
 
-Reviso can help me put that into clear tests. I review the conditions before confirming them.
+Now let us look at two older NVIDIA reports from twenty twenty-four.
 
-### 0:50–1:10 — Save the tests
+In the first report, both conditions hold. Gross margin is seventy-five
+point one percent, and sales grew one hundred and twenty-two percent.
 
-**Screen:** Two conditions. 75% gross margin. 80% sales growth. Click confirm.
+Then comes the next report.
 
-**Say:**
+Sales grew ninety-four percent, so that condition still holds.
 
-Here are my two tests for this example.
+But gross margin fell to seventy-four point six percent. That is below
+the seventy-five percent minimum I set.
 
-First: gross margin must stay at least seventy-five percent. Gross margin is the share of sales left after the direct cost of making the products.
+The result is mixed. One condition holds, and one does not.
 
-Second: I want sales to grow at least eighty percent from a year ago.
+I can see the numbers beside my conditions and open the source to check them.
+If a number is missing, Reviso says so.
 
-These are my limits, not a target from the app. When I confirm them, they freeze. If I change them later, the old version stays in the history.
+AI helps explain the saved result in plain language. It can also answer
+questions about the report with source links. The app checks the numbers;
+AI does not choose my decision.
 
-### 1:10–1:35 — First report, both pass
+For this example, I set the idea aside because the margin condition did not
+hold, even though sales growth stayed strong.
 
-**Screen:** Evidence. Open the older NVIDIA example. Load August 29, 2024. Show the result, click the source, expand a condition so the numbers show.
+My idea, conditions, results and reason stay together. I can reopen them
+or download the record.
 
-**Say:**
+Bitget provides the token's market information. Company reports provide
+the business evidence. They are kept separate.
 
-Now I check an older NVIDIA report. This is an example from twenty twenty-four. It is not today’s news.
+Reviso is a working app with Google sign-in and private saved research.
 
-In this first report, both tests pass. Margin is seventy-five point one percent. Sales grew one hundred and twenty-two percent.
+Do not just save a stock idea. Save what would change your mind.
 
-I can click the source and see where those numbers came from. I can open a condition and see the number next to the limit I wrote.
+Try Reviso at revisoagent.xyz.
 
-### 1:35–2:00 — Next report, mixed result
+## Optional saved-chat line
 
-**Screen:** Load November 21, 2024. Result should read like: one condition supported, one did not hold. Expand the margin condition: 74.6% versus 75%.
+Use this only when a matching saved answer is visible:
 
-**Say:**
+“Here is a saved answer explaining which condition failed. I can follow
+the source link and check it myself.”
 
-Now the next report.
+## Text for the screen
 
-Sales grew ninety-four percent. That still passes my test.
+**Idea:**
 
-But margin fell to seventy-four point six percent. That is under my seventy-five percent line.
+> I like NVIDIA because sales are growing. I would think again if gross
+> margin falls below 75%, or if sales grow less than 80% from a year ago.
 
-So the result is mixed. One condition held. One did not. Reviso does not hide that. It keeps the limits I wrote before this report arrived.
+**Decision reason:**
 
-### 2:00–2:20 — A question, if you have an answer ready
+> I am setting this idea aside because gross margin fell below 75%, even
+> though sales growth stayed above 80%.
 
-**Screen:** Chat bubble, **Ask about this filing**. Show a saved answer to: “Which test failed, and what number shows that?” Click the source in the answer.
+## Questions to prepare for
 
-**If there is no saved answer and you are not making a live call:** skip the send. Point at the open condition and the source instead.
+**What does AI do?** It helps draft conditions, explain saved findings and
+answer questions using the supplied sources. You confirm the conditions and decide.
 
-**Say, with a saved answer:**
+**How is this different from ordinary chat?** Your original conditions, dated
+sources, results and reasons stay together. Changing your idea does not erase
+what you wrote before.
 
-Here’s a saved answer to my question. Qwen explains which condition failed and points back to the report, so I can check the answer against the source.
+**Does supported mean buy?** No. It means that reported number met the condition
+for that report. It does not predict the future or place a trade.
 
-**Say, if you skip chat:**
+**Is xStocks research part of the AI evidence?** No. It links to further reading
+and keeps price context separate. Do not claim article ingestion or a partnership.
 
-I can also ask a follow-up question about this filing. Here, the source already shows the change: margin fell below the line I set.
-
-### 2:20–2:45 — Record the decision
-
-**Screen:** **Record your decision**. Mark margin as did not hold. Mark sales growth as still holds. Choose **Set idea aside**. Type the reason.
-
-**Reason to type:**
-
-I am setting this idea aside because gross margin fell below 75%, even though sales growth stayed above 80%.
-
-**Say:**
-
-Now I record my decision.
-
-For this example, I set the idea aside. Margin fell below my limit. Sales growth still passed, but that was not enough for me.
-
-I save that reason with my decision.
-
-### 2:45–3:05 — Close
-
-**Screen:** Decision history or the downloaded PDF. End on the Reviso name and revisoagent.xyz.
-
-**Say:**
-
-I can come back to this later. I can download it too. The idea, the two reports, and my choice stay together.
-
-Reviso helps you check your thinking before you act.
-
-Try it at revisoagent.xyz.
-
-## Full voiceover
-
-Read this if you want one continuous take. Pause at the blank lines.
-
----
-
-You have a stock idea. Most people never write down what would make them change their mind. So the idea just sits there.
-
-Reviso is a research notebook. You write the idea, you write the tests, you check a company report, then you decide. It does not buy or sell anything.
-
-Let me show you with NVIDIA.
-
-I pick NVIDIA. I write why I care, in my own words. I like NVIDIA because sales are growing. But I would think again if the business got weaker.
-
-Reviso can help me put that into clear tests. I review the conditions before confirming them.
-
-Here are my two tests for this example. First: gross margin must stay at least seventy-five percent. Gross margin is the share of sales left after the direct cost of making the products. Second: I want sales to grow at least eighty percent from a year ago.
-
-These are my limits, not a target from the app. When I confirm them, they freeze. If I change them later, the old version stays in the history.
-
-Now I check an older NVIDIA report. This is an example from twenty twenty-four. It is not today’s news.
-
-In this first report, both tests pass. Margin is seventy-five point one percent. Sales grew one hundred and twenty-two percent. I can click the source and see where those numbers came from.
-
-Now the next report. Sales grew ninety-four percent. That still passes my test. But margin fell to seventy-four point six percent. That is under my seventy-five percent line.
-
-So the result is mixed. One condition held. One did not. Reviso does not hide that. It keeps the limits I wrote before this report arrived.
-
-Here’s a saved answer to my question. Qwen explains which condition failed and points back to the report, so I can check the answer against the source.
-
-Now I record my decision. For this example, I set the idea aside. Margin fell below my limit. Sales growth still passed, but that was not enough for me. I save that reason with my decision.
-
-I can come back to this later. I can download it too. The idea, the two reports, and my choice stay together.
-
-Reviso helps you check your thinking before you act.
-
-Try it at revisoagent.xyz.
-
----
-
-## Short line, if you need one sentence
-
-Reviso helps you write a stock idea, check it against a company report, and save why you kept it or let it go.
-
-## If someone asks what the AI does
-
-It can help you draft the tests, and it can explain a report you already loaded. It cannot confirm your idea, fetch a random website, change the numbers, or decide keep or set aside. You do that.
-
-## Recording notes
-
-- Keep a caption on screen during the two reports: **Older NVIDIA example**.
-- One action per shot. Do not open Market details, Advanced checks, or settings.
-- Cut loading time. If a reply was generated earlier, say “saved answer.”
-- Keep the recording and the PDF as backups.
-- Leave extra companies, live prices, and how the servers work for questions after the demo.
-- Do not say “supported” means buy. Do not say “set aside” means the stock will fall.
+**Who is it for?** People who want to check a stock idea and keep a clear record
+of why they kept, changed or set it aside.

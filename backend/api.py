@@ -56,7 +56,8 @@ async def conflict(_request: Request, error: ConflictError):
 
 
 async def llm_unavailable(_request: Request, error: LLMUnavailableError):
-    return JSONResponse(status_code=503, content={"detail": str(error)})
+    headers = {"Retry-After": str(error.retry_after)} if error.retry_after is not None else None
+    return JSONResponse(status_code=503, content={"detail": str(error)}, headers=headers)
 
 
 async def llm_invalid(_request: Request, _error: LLMInvalidOutputError):

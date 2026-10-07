@@ -595,10 +595,10 @@ test("public landing and example explain the product without calling an API", ()
   expect(screen.queryByText(/ask Qwen for help/i)).toBeNull();
   expect(screen.getByText(/Get help writing your idea/)).toBeTruthy();
   expect(
-    screen.getByText(
+    screen.queryByText(
       /Reviso is a research tool. It cannot place trades or make decisions/,
     ),
-  ).toBeTruthy();
+  ).toBeNull();
   expect(screen.queryByText(/ugly print/i)).toBeNull();
   expect(screen.queryByText(/the invalidation was never/i)).toBeNull();
   expect(
@@ -653,6 +653,11 @@ test("public landing and example explain the product without calling an API", ()
     }),
   ).toBeTruthy();
   expect(screen.getByText(/does not fetch a live filing/i)).toBeTruthy();
+  expect(
+    screen.getByText(
+      /Reviso is a research tool. It cannot place trades or make decisions/,
+    ),
+  ).toBeTruthy();
   expect(
     screen.getByRole("heading", {
       name: "Second filing: the result is mixed",

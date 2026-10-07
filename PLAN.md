@@ -12,6 +12,15 @@ The research slice is already built: NVIDIA thesis → confirmed conditions → 
 
 ### Submission-day chat fix — 7 October 2026
 
+Late demo diagnostic: two newly authorized public NVIDIA Groq chat requests
+passed (2.674 s / 1.237 s), using the current AWS configuration without saved
+notebook mutation. The reported HTTP failure was not reproduced. Local HTTP
+error handling now identifies safe failure categories/status and bounded
+provider retry times; no automatic retries or provider switch. 274 backend
+tests and quality rescan passed with no remaining new findings. This follow-up
+is not committed, pushed or deployed; publication requires separate approval.
+See [the diagnostic and quality report](docs/evaluations/2026-10-07-groq-diagnostic.md).
+
 Approved final regression passed on October 7: one Groq request of a two-request
 ceiling, no repair, accurate citation of the saved public NVIDIA excerpt, cache,
 restart, export and immutable checks. Local release checks now pass 241 backend
@@ -72,7 +81,7 @@ The user owns the small user study. Do not conduct it or invent its findings. Fo
 - [x] Pass offline tests, formatting/static checks, build, separate Desloppify scans and a disposable browser check. See [the dated evidence report](docs/evaluations/2026-10-04-research-closeout.md).
 - [x] Run the separately authorized bounded live check: draft, mixed review and cited follow-up passed with 3/6 provider requests and no repairs. See [the live report](docs/evaluations/final-ai-2026-10-04b/REPORT.md).
 - [x] Approved signed commit/push, integrity-checked production SQLite backup, AWS deployment and public/protected boundary verification; accounts/secrets preserved.
-- [ ] User signed-in live journey: reopen existing research after deployment.
+- [x] User confirmed reopening existing research in the signed-in live app on October 7 (user-reported, not an independently recorded fresh Google login).
 - [ ] Final recording, X post and form submission: user approval required. User study: user-owned.
 
 ### Approved local follow-up — independent pilot and xStocks reading

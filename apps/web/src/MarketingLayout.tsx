@@ -1,4 +1,5 @@
-import { Link, NavLink, Outlet } from "react-router-dom";
+import { useLayoutEffect } from "react";
+import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { RevisoMark } from "./components/Brand";
 import { useScrolled } from "./lib/useScrolled";
 
@@ -16,6 +17,12 @@ export function RevisoLogo() {
 
 export default function MarketingLayout() {
   const scrolled = useScrolled(72, 24);
+  const { pathname } = useLocation();
+
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }, [pathname]);
+
   return (
     <div className="public-shell">
       <div className={`public-header${scrolled ? " scrolled" : ""}`}>
@@ -47,10 +54,12 @@ export default function MarketingLayout() {
           <Link to="/privacy">Privacy</Link>
           <Link to="/terms">Terms</Link>
         </div>
-        <p className="public-footer-note">
-          Reviso is a research tool. It cannot place trades or make decisions
-          for you. Tokenized Bitget products are not registered shares.
-        </p>
+        {pathname !== "/" && (
+          <p className="public-footer-note">
+            Reviso is a research tool. It cannot place trades or make decisions
+            for you. Tokenized Bitget products are not registered shares.
+          </p>
+        )}
       </footer>
     </div>
   );

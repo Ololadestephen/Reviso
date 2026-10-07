@@ -25,6 +25,7 @@ from backend.contracts import (
     utc_now,
 )
 from backend.instruments import INSTRUMENTS, instrument_by_id
+from backend.provider_errors import LLMUnavailableError, provider_http_failure
 from backend.research_context import ResearchContext
 
 BITGET_QWEN_ENDPOINT = "https://hackathon.bitgetops.com/v1/responses"
@@ -115,10 +116,6 @@ def compact_evidence(evidence: list[Evidence]) -> list[dict]:
         }
         for item in evidence
     ]
-
-
-class LLMUnavailableError(Exception):
-    """The configured model cannot currently answer."""
 
 
 class LLMInvalidOutputError(Exception):
@@ -326,6 +323,12 @@ class SchemaLanguageModel(ABC):
             if not isinstance(payload, dict):
                 raise TypeError("provider response is not an object")
             return payload
+        except httpx.HTTPStatusError as error:
+            raise provider_http_failure(
+                error.response,
+                provider=self.descriptor.provider,
+                model=self.descriptor.model,
+            ) from error
         except (httpx.HTTPError, json.JSONDecodeError, TypeError) as error:
             raise LLMUnavailableError(
                 f"{self.descriptor.provider} response unavailable ({type(error).__name__})"

@@ -1,3 +1,8 @@
+// jsdom has no scrolling viewport. Navigation tests spy on this browser API.
+if (typeof window !== "undefined") {
+  window.scrollTo = () => {};
+}
+
 /**
  * jsdom does not implement HTMLDialogElement's modal methods. The source
  * drawer is a native <dialog>, so give the tests just enough of it to assert

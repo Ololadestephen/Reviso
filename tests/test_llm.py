@@ -178,7 +178,7 @@ def test_groq_http_failure_is_not_retried_or_leaked(thesis):
         return httpx.Response(429, json={"error": {"message": "account detail"}})
 
     model = GroqLanguageModel("secret", client=httpx.Client(transport=httpx.MockTransport(handler)))
-    with pytest.raises(LLMUnavailableError, match="HTTPStatusError"):
+    with pytest.raises(LLMUnavailableError, match="request limit.*HTTP 429"):
         model.extract(thesis)
     assert calls == 1
     model.close()
@@ -381,7 +381,7 @@ def test_bitget_http_failure_is_not_retried_or_leaked(thesis):
     model = BitgetQwenLanguageModel(
         "secret", client=httpx.Client(transport=httpx.MockTransport(handler))
     )
-    with pytest.raises(LLMUnavailableError, match="HTTPStatusError"):
+    with pytest.raises(LLMUnavailableError, match="request limit.*HTTP 429"):
         model.extract(thesis)
     assert calls == 1
     model.close()
