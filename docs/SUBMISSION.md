@@ -35,7 +35,8 @@ The September 10 handbook inspection recorded September 3–21 UTC+8, conflictin
 - [x] AWS Lightsail, persistent SQLite and Google owner-scoped access implemented; historical deployment reports retained.
 - [x] Local October research/source/chat improvements verified with mocks and disposable replay.
 - [x] Final bounded chat regression approved and passed: one request, no repair, sourced reply and persistence. This is not an independent benchmark.
-- [ ] October release approved, backed up, deployed and verified on the signed-in live domain.
+- [x] October release approved, backed up, signed/pushed and deployed; public pages, source retrieval and account/data preservation verified.
+- [ ] User signed-in live check: reopen existing research.
 - [ ] Final X post and submission approved by user.
 
 ## Project description draft — not submitted

@@ -72,6 +72,18 @@ claim. Local only; the new prompt has not been live-tested or deployed.
 
 ## Capability matrix
 
+41. October 7 submission release: the user retained the current explanation
+provider and approved the final bounded chat regression, backup, signed push
+and AWS deployment. The chat regression passed with one Groq request and no
+repair. Release `89bb036` is live after an integrity-checked online SQLite backup;
+all account and research rows match the backup. Existing host settings and
+volumes remain, with only the SEC contact appended and passed into Compose.
+Bitget-first explanations remain selected; Gemini is inactive. Public pages,
+private API login boundaries, runtime hashes and NVIDIA/SEC/Fed/BLS retrieval
+passed. The user will verify Google sign-in and reopen an existing record.
+No additional paid AI call, X post, form submission or billed snapshot was made.
+
+
 | Capability | Source/interface | Access | Current scope/limitations |
 | --- | --- | --- | --- |
 | Instrument listing | Bitget UTA catalog + rNVDA product documentation | Public | RNVDAUSDT verified online; beneficial exposure differs from direct shares |

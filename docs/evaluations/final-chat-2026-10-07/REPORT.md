@@ -48,5 +48,6 @@ eight assessments, four events, eleven research answers and four research thread
 The private local recovery copy lives in ignored `data/backups/`; neither backup
 nor credentials are published. Source/config rollback copies are private on AWS.
 
-Deployment and live signed-in browser verification are recorded separately once
-completed. No X post, form submission or billed snapshot is authorized by this run.
+Deployment passed the public/source/persistence checks documented in
+[the AWS release report](../2026-10-07-aws-release.md). The user's signed-in reopen
+check is pending. No X post, form submission or billed snapshot was performed.

@@ -20,6 +20,13 @@ before publication. Current explanation provider is retained; Gemini is inactive
 See [the final regression report](docs/evaluations/final-chat-2026-10-07/REPORT.md).
 The earlier pending statements below describe preparation, not the current approval.
 
+Signed code release `89bb036` is pushed and live on AWS after the verified
+production backup. Accounts, identities and all saved research rows match the
+backup; Google/Bitget settings and persistent volume are preserved. Public pages,
+login boundary, runtime source hashes and NVIDIA/SEC/Fed/BLS retrieval passed.
+The user will perform the signed-in reopen check. See
+[the AWS release report](docs/evaluations/2026-10-07-aws-release.md).
+
 The approved local citation fix is complete. `research-question-v5` requires
 separate summary/fact/uncertainty citations at the provider boundary, validates
 percentage attribution against the supplied excerpt/metrics, and caps the entire
@@ -64,7 +71,8 @@ The user owns the small user study. Do not conduct it or invent its findings. Fo
 - [x] Keep a plain-language deterministic explanation when AI is absent/fails; simplify source details without removing provenance.
 - [x] Pass offline tests, formatting/static checks, build, separate Desloppify scans and a disposable browser check. See [the dated evidence report](docs/evaluations/2026-10-04-research-closeout.md).
 - [x] Run the separately authorized bounded live check: draft, mixed review and cited follow-up passed with 3/6 provider requests and no repairs. See [the live report](docs/evaluations/final-ai-2026-10-04b/REPORT.md).
-- [ ] After release approval: commit/push, integrity-check a SQLite backup, deploy while preserving accounts/secrets, and verify the signed-in live journey.
+- [x] Approved signed commit/push, integrity-checked production SQLite backup, AWS deployment and public/protected boundary verification; accounts/secrets preserved.
+- [ ] User signed-in live journey: reopen existing research after deployment.
 - [ ] Final recording, X post and form submission: user approval required. User study: user-owned.
 
 ### Approved local follow-up — independent pilot and xStocks reading
