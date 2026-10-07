@@ -17,9 +17,12 @@ passed (2.674 s / 1.237 s), using the current AWS configuration without saved
 notebook mutation. The reported HTTP failure was not reproduced. Local HTTP
 error handling now identifies safe failure categories/status and bounded
 provider retry times; no automatic retries or provider switch. 274 backend
-tests and quality rescan passed with no remaining new findings. This follow-up
-is not committed, pushed or deployed; publication requires separate approval.
+tests and quality rescan passed with no remaining new findings. The user then
+approved publication: signed/verified code commit `64945e4` is pushed and live on
+AWS after SQLite backup, exact row-preservation and public/protected checks.
+Providers/secrets remain unchanged; no additional AI call was made during release.
 See [the diagnostic and quality report](docs/evaluations/2026-10-07-groq-diagnostic.md).
+See [the release and recovery report](docs/evaluations/2026-10-07-groq-release.md).
 
 Approved final regression passed on October 7: one Groq request of a two-request
 ceiling, no repair, accurate citation of the saved public NVIDIA excerpt, cache,

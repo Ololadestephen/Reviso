@@ -106,3 +106,10 @@ scanner, not independent review judgments:
 | Package organization | 0.0 |
 | Test strategy | 0.0 |
 | Type safety | 0.0 |
+
+## Subsequently approved publication
+
+The user approved signed commit/push and AWS deployment. Code release `64945e4`
+is live after the integrity-checked production backup, exact row preservation
+check and public/protected HTTP checks. No further AI request was made. See
+[the release and recovery report](2026-10-07-groq-release.md).
