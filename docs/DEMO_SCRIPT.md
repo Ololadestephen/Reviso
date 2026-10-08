@@ -1,5 +1,7 @@
 # Reviso demo script
 
+Recorded demo: [Watch on YouTube](https://youtu.be/tj8HOTQ-atc).
+
 Aim for about three minutes. Speak slowly and pause when the screen changes.
 Read only the voiceover, not the recording instructions.
 
@@ -10,21 +12,21 @@ problem, solution, one product story, proof and a clear ending.
 ## Before recording
 
 - Sign in first. Hide your email, private research and notifications.
-- Use a separate demo record with two saved historical NVIDIA checks. Confirm
+- Use a separate demo record with the NVIDIA company report shown in the recording. Confirm
   a 75% GAAP gross-margin minimum and an 80% year-over-year revenue-growth
   minimum. These are example conditions, not recommended investment targets.
-- Keep **Historical NVIDIA example — 2024 reports** visible. The replay becomes
-  available on 29 August and 21 November 2024; it is not today's report or price.
-- Prepare the saved results, source and export first. Loading a new check can
-  automatically request an AI explanation: approve any new calls separately.
-  Do not assume a replay is credit-free. Do not click Refresh filing, Help me
-  draft or Send just for the recording.
-- Use an already saved chat reply for **that same historical check**. The October 7
+- The recorded report is **NVIDIA Q2 FY2027**, published **26 August 2026**.
+  It shows 75.0% GAAP gross margin and 106% year-over-year revenue growth.
+  Both recorded conditions are supported. Do not narrate the older mixed-result replay.
+- This recording is a fresh research walkthrough, not the older saved replay.
+  Use the recorded footage for the replacement voiceover; no check or AI call
+  needs to be repeated just to replace the audio. Any additional AI check by
+  the assistant needs separate approval.
+- Any chat answer shown must belong to **that same recorded check**. The October 7
   management-discussion regression is a different context; do not use its answer
-  as an explanation of this historical mixed result.
-- If the checks or matching chat reply are not ready, show the public written
-  NVIDIA example for the numbers and omit the chat shot. Say it is a written
-  example, not a newly performed app check.
+  as an explanation of a different research record.
+- Include a chat shot only if the matching answer appears in your recording.
+  Do not say an answer was newly generated if it was already saved.
 - Keep Market details and Advanced view closed. Never show API keys. Reviso
   does not place trades; the Bitget token is not a registered NVIDIA share.
 
@@ -33,16 +35,14 @@ problem, solution, one product story, proof and a clear ending.
 1. **Opening — 20 seconds:** landing page and Reviso name.
 2. **The idea — 30 seconds:** NVIDIA and the saved idea in the Idea tab.
 3. **Conditions — 30 seconds:** the 75% margin and 80% growth limits.
-4. **Evidence — 45 seconds:** first saved historical check, then the second.
-   Point at each reported number beside its limit. Open a source.
-5. **AI — 20 seconds:** show a saved explanation and, if ready, a matching
-   saved chat answer and source. Do not send a new question.
-6. **Decision — 25 seconds:** show the recorded Set aside decision and reason,
+4. **Evidence — 45 seconds:** show the recorded NVIDIA report and its two supported conditions.
+   Point at 75.0% margin beside the 75% minimum, and 106% growth beside the 80% minimum.
+   Open a source if that appears in your recording.
+5. **AI — 20 seconds:** show the recorded explanation and any matching
+   chat answer and source already captured in the footage.
+6. **Decision — 25 seconds:** show the recorded Keep decision and reason, “It meets my expectation,”
    then the download or history. Do not pretend a saved action is new.
 7. **Close — 10 seconds:** Reviso name and revisoagent.xyz.
-
-If using the public example, introduce it with:
-“Here is a written NVIDIA example using two older company reports.”
 
 ## Voiceover
 
@@ -69,29 +69,26 @@ Second, sales must grow at least eighty percent compared with a year earlier.
 These are my conditions, not targets chosen by Reviso. If I change them
 later, the earlier version stays saved.
 
-Now let us look at two older NVIDIA reports from twenty twenty-four.
+Now I check NVIDIA's company report.
 
-In the first report, both conditions hold. Gross margin is seventy-five
-point one percent, and sales grew one hundred and twenty-two percent.
+Gross margin is seventy-five percent, which meets my seventy-five percent minimum.
 
-Then comes the next report.
+Sales grew one hundred and six percent from a year earlier. That is above
+my eighty percent minimum.
 
-Sales grew ninety-four percent, so that condition still holds.
+Both conditions are supported for this quarter.
 
-But gross margin fell to seventy-four point six percent. That is below
-the seventy-five percent minimum I set.
+I can see each reported number beside my minimum and open the source to check it.
 
-The result is mixed. One condition holds, and one does not.
+The AI explains what these results mean in simple words. Both conditions
+are met in this report, but that does not tell me what will happen next.
 
-I can see the numbers beside my conditions and open the source to check them.
-If a number is missing, Reviso says so.
+I can also ask a follow-up question and check the sources used in the answer.
 
-AI helps explain the saved result in plain language. It can also answer
-questions about the report with source links. The app checks the numbers;
-AI does not choose my decision.
+Based on this report, I keep my idea and save my reason:
+“It meets my expectation.”
 
-For this example, I set the idea aside because the margin condition did not
-hold, even though sales growth stayed strong.
+The AI helps me understand the evidence. The decision is still mine.
 
 My idea, conditions, results and reason stay together. I can reopen them
 or download the record.
@@ -109,7 +106,7 @@ Try Reviso at revisoagent.xyz.
 
 Use this only when a matching saved answer is visible:
 
-“Here is a saved answer explaining which condition failed. I can follow
+“Here is a saved answer explaining this report. I can follow
 the source link and check it myself.”
 
 ## Text for the screen
@@ -121,8 +118,7 @@ the source link and check it myself.”
 
 **Decision reason:**
 
-> I am setting this idea aside because gross margin fell below 75%, even
-> though sales growth stayed above 80%.
+> It meets my expectation.
 
 ## Questions to prepare for
 

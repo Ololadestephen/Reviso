@@ -1,59 +1,67 @@
 # Local quality reports
 
-The latest [October 4 close-out report](evaluations/2026-10-04-research-closeout.md#desloppify-results) contains the initial, intermediate and final scans, every mechanical dimension and all unassessed subjective dimensions. The two new backend findings and the new test finding were corrected and scan-resolved. Existing findings remain open; no independent subjective review or security certification is claimed.
+## Latest recorded checks — 2026-10-07
+
+See the [Groq diagnostic and quality report](evaluations/2026-10-07-groq-diagnostic.md)
+for the latest separate backend/frontend scans and their remaining limitations.
+The [release report](evaluations/2026-10-07-groq-release.md) records 274 backend
+and 126 frontend passing tests plus formatting, static checks, TypeScript,
+and the production build. No fresh scan is claimed for documentation-only edits.
+
+The earlier [October 4 close-out report](evaluations/2026-10-04-research-closeout.md#desloppify-results) contains the initial, intermediate and final scans, every mechanical dimension and all unassessed subjective dimensions. The two new backend findings and the new test finding were corrected and scan-resolved. Existing findings remain open; no independent subjective review or security certification is claimed.
 
 ## Earlier local quality report — 2026-09-17
 
 The installed Desloppify workflow was used for separate coherent backend and frontend scans, with `status` and `next` after each milestone. Exclusions cover dependency/build/cache output; no application files were excluded to raise scores. No suppressions, fabricated subjective evidence or wontfix decisions were entered. No branch, commit, push or external issue was created.
 
-## Latest tool-reported scores
+## Historical tool-reported scores — 2026-09-17
 
 These are scanner outputs, not test coverage percentages or research-accuracy scores. All subjective dimensions are still unassessed; the tool records them as zero. Independent review/triage is incomplete: after this close-out scan, `next` still queued an initial subjective review, which was deferred without fabricated scores because runner-backed review remains gated. Mechanical scans and tests continue.
 
-| Project | Overall (lenient) | Objective | Strict | Verified | Open findings |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| backend | 23.1 | 92.3 | 21.9 | 92.3 | 69 |
-| apps/web | 21.0 | 84.1 | 19.8 | 84.1 | 72 |
+| Project  | Overall (lenient) | Objective | Strict | Verified | Open findings |
+| -------- | ----------------: | --------: | -----: | -------: | ------------: |
+| backend  |              23.1 |      92.3 |   21.9 |     92.3 |            69 |
+| apps/web |              21.0 |      84.1 |   19.8 |     84.1 |            72 |
 
 | Mechanical dimension | Backend health | Backend strict | Web health | Web strict |
-| --- | ---: | ---: | ---: | ---: |
-| File health | 86.0 | 83.2 | 98.7 | 98.7 |
-| Code quality | 89.2 | 86.0 | 97.5 | 95.8 |
-| Duplication | 100.0 | 100.0 | 100.0 | 100.0 |
-| Security | 98.8 | 96.4 | 100.0 | 100.0 |
-| Test health | 87.6 | 76.0 | 46.6 | 31.7 |
+| -------------------- | -------------: | -------------: | ---------: | ---------: |
+| File health          |           86.0 |           83.2 |       98.7 |       98.7 |
+| Code quality         |           89.2 |           86.0 |       97.5 |       95.8 |
+| Duplication          |          100.0 |          100.0 |      100.0 |      100.0 |
+| Security             |           98.8 |           96.4 |      100.0 |      100.0 |
+| Test health          |           87.6 |           76.0 |       46.6 |       31.7 |
 
-| Subjective dimension | Backend | Web | Assessment status |
-| --- | ---: | ---: | --- |
-| Abstraction fit | 0 | 0 | Unassessed |
-| AI-generated debt | 0 | 0 | Unassessed |
-| API coherence | 0 | 0 | Unassessed |
-| Authorization consistency | 0 | 0 | Unassessed |
-| Contract coherence | 0 | 0 | Unassessed |
-| Convention outlier | 0 | 0 | Unassessed |
-| Cross-module architecture | 0 | 0 | Unassessed |
-| Dependency health | 0 | 0 | Unassessed |
-| Design coherence | 0 | 0 | Unassessed |
-| Error consistency | 0 | 0 | Unassessed |
-| High-level elegance | 0 | 0 | Unassessed |
-| Incomplete migration | 0 | 0 | Unassessed |
-| Initialization coupling | 0 | 0 | Unassessed |
-| Logic clarity | 0 | 0 | Unassessed |
-| Low-level elegance | 0 | 0 | Unassessed |
-| Mid-level elegance | 0 | 0 | Unassessed |
-| Naming quality | 0 | 0 | Unassessed |
-| Package organization | 0 | 0 | Unassessed |
-| Test strategy | 0 | 0 | Unassessed |
-| Type safety | 0 | 0 | Unassessed |
+| Subjective dimension      | Backend | Web | Assessment status |
+| ------------------------- | ------: | --: | ----------------- |
+| Abstraction fit           |       0 |   0 | Unassessed        |
+| AI-generated debt         |       0 |   0 | Unassessed        |
+| API coherence             |       0 |   0 | Unassessed        |
+| Authorization consistency |       0 |   0 | Unassessed        |
+| Contract coherence        |       0 |   0 | Unassessed        |
+| Convention outlier        |       0 |   0 | Unassessed        |
+| Cross-module architecture |       0 |   0 | Unassessed        |
+| Dependency health         |       0 |   0 | Unassessed        |
+| Design coherence          |       0 |   0 | Unassessed        |
+| Error consistency         |       0 |   0 | Unassessed        |
+| High-level elegance       |       0 |   0 | Unassessed        |
+| Incomplete migration      |       0 |   0 | Unassessed        |
+| Initialization coupling   |       0 |   0 | Unassessed        |
+| Logic clarity             |       0 |   0 | Unassessed        |
+| Low-level elegance        |       0 |   0 | Unassessed        |
+| Mid-level elegance        |       0 |   0 | Unassessed        |
+| Naming quality            |       0 |   0 | Unassessed        |
+| Package organization      |       0 |   0 | Unassessed        |
+| Test strategy             |       0 |   0 | Unassessed        |
+| Type safety               |       0 |   0 | Unassessed        |
 
 Scores are transcribed rather than recalculated. The scanner reports strict/lenient gaps even though its wontfix count is zero; this report does not infer a cause or silently replace those values. Its test-health numbers use import/detector heuristics, not measured runtime coverage. The backend scan also reported zero LOC despite scanning 15 production modules, while the web scan reported 2,883 LOC across 26 files. These tool-reporting limitations should be investigated independently before interpreting numerical score changes as engineering progress. Immediately before the owner-isolation scan, the tool had reported backend 22.8/91.3/21.0/91.3 with 56 findings and web 20.5/82.2/19.4/82.2 with 57 findings. After the public-page rewrite, `next` still asked for an initial subjective review; that review was not fabricated.
 
 ## Earlier milestone in this continuation
 
-| Project | Overall | Objective | Strict | Verified |
-| --- | ---: | ---: | ---: | ---: |
-| backend before additional provider/storage tests | 20.6 | 82.4 | 18.3 | 82.4 |
-| web before component tests | 12.9 | 51.4 | 12.7 | 51.4 |
+| Project                                          | Overall | Objective | Strict | Verified |
+| ------------------------------------------------ | ------: | --------: | -----: | -------: |
+| backend before additional provider/storage tests |    20.6 |      82.4 |   18.3 |     82.4 |
+| web before component tests                       |    12.9 |      51.4 |   12.7 |     51.4 |
 
 Earlier backend mechanical health/strict: file 100/93.6, code 87/84.3, duplication 100/100, security 97.3/93.2, test 63.9/44.2. Earlier web: file 100/93.6, code 93.6/93.6, duplication 100/100, security 100/100, test 0.4/0.4. All twenty subjective dimensions were also zero/unassessed then. A small decrease in web code score accompanies explicit mode/rewind branches; they are behaviorally tested, not suppressed.
 

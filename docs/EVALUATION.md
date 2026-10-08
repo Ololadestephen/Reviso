@@ -1,6 +1,25 @@
 # Evaluation
 
-## Latest local verification — 2026-10-04
+## Latest verification — 2026-10-07
+
+The [latest release report](evaluations/2026-10-07-groq-release.md) records
+274 backend and 126 frontend passing tests, static/format checks, TypeScript,
+and the production build. The signed release was pushed and deployed to AWS
+after an integrity-checked SQLite backup; stored rows, accounts, secrets, and
+persistent volumes were preserved. No AI request was made during deployment.
+
+The [Groq diagnostic](evaluations/2026-10-07-groq-diagnostic.md) used two
+authorized public NVIDIA chat requests. Both passed; the reported intermittent
+HTTP failure was not reproduced. Safer failure messages are implemented, but
+the upstream cause is not established.
+
+The [final chat citation regression](evaluations/final-chat-2026-10-07/REPORT.md)
+passed with one request and no repair, including citation, cache, restart,
+export, and immutable-assessment checks. These are bounded checks on constructed
+public research, not an independent accuracy benchmark. The user-owned study
+and broader independent pilot remain incomplete.
+
+## Earlier local verification — 2026-10-04
 
 The [SEC live follow-up](evaluations/2026-10-04-sec-live.md) verifies the user's
 corrected `.env`, CIK-bound NVIDIA/Microsoft metadata name variants and real
@@ -66,12 +85,12 @@ Independent numerical examples in the tests:
 
 The two-document calibration expectations are explicit:
 
-| Available gate (UTC) | Confirmed rule | Reported observation | Expected state |
-| --- | --- | --- | --- |
-| 2024-08-29 | GAAP margin ≥75% | 75.1% | Supported |
-| 2024-08-29 | Revenue growth ≥80% YoY | 122% | Supported |
-| 2024-11-21 | GAAP margin ≥75% | 74.6% | Invalidated |
-| 2024-11-21 | Revenue growth ≥80% YoY | 94% | Supported |
+| Available gate (UTC) | Confirmed rule          | Reported observation | Expected state |
+| -------------------- | ----------------------- | -------------------- | -------------- |
+| 2024-08-29           | GAAP margin ≥75%        | 75.1%                | Supported      |
+| 2024-08-29           | Revenue growth ≥80% YoY | 122%                 | Supported      |
+| 2024-11-21           | GAAP margin ≥75%        | 74.6%                | Invalidated    |
+| 2024-11-21           | Revenue growth ≥80% YoY | 94%                  | Supported      |
 
 These four comparisons and the growth-only essential negative control are asserted by deterministic tests. This is a calibration sanity check, not a generalization result. It cannot establish narrative contradiction precision/recall. Source passages and limitations are bundled in `backend/replay.py`; broader contradiction, misleading-headline and ambiguous-document cases remain to be evaluated.
 
@@ -86,6 +105,7 @@ Browser-inspected flow: draft → confirmation → first disclosure → second d
 Two authorized live Bitget Qwen extraction attempts preceded the frozen batch. The first hit Reviso's original 25-second read timeout; the second returned a valid unsaved proposal in 49.58 seconds after the Bitget-only window was raised to 90 seconds. The subsequent frozen calibration completed all 21 cases with 25 requests and 43,145 reported tokens. Only the clear extraction passed the application contract. Post-run inspection found that all 22 raw assumption judgments in the 11 Reviso-prompt narrative cases matched the accepted constructed labels and stayed within the citation boundary, but the model returned incompatible JSON shapes that Reviso correctly rejected. The plain-prompt baseline also failed the contract. Full details and limitations are in [batch 01](evaluations/2026-09-11-batch-01/REPORT.md).
 
 The newly frozen v2 validation used 5 of its 10 authorized requests and 10,196 reported tokens. All five provider responses completed on the first attempt, and all five cases passed the complete application contract: structured extraction and risk preservation, mixed evidence, embedded prompt injection with a phantom-citation request, abstention on missing financial observations, and persisted/cached review integration across SQLite restart. The injection case took 84.494 seconds against the 90-second read timeout, leaving a narrow operational margin. See the [v2 report](evaluations/2026-09-11-v2-validation-01/REPORT.md). The set was constructed after the v1 failures and is not an untouched independent benchmark. No user-study metric, trading return, win rate or general research-accuracy percentage has been measured. The clean locked install and local deployment rehearsal are complete; host selection and publication remain pending.
+
 # Approved supplemental-source AI check — 4 October 2026
 
 The user approved a new frozen three-action check against review v5 / question v4.
